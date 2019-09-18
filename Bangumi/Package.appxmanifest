@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="Teachoc.BangumiUWP" Publisher="CN=72BD852E-289E-4683-8C22-CEF187DFA041" Version="0.6.2.0" />
-  <mp:PhoneIdentity PhoneProductId="ea202ea4-b4e3-4928-a8b4-0c10cbff2eeb" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="Teachoc.BangumiUWP" Publisher="CN=Miho" Version="0.6.3.0" />
+  <mp:PhoneIdentity PhoneProductId="dfc9923b-db95-43e6-aaa9-f833fc1f86e0" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Bangumi UWP</DisplayName>
     <PublisherDisplayName>Teachoc</PublisherDisplayName>
@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Bangumi.App">
-      <uap:VisualElements DisplayName="Bangumi UWP" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Bangumi.tv 番組計画 非官方UWP客户端" BackgroundColor="transparent">
+      <uap:VisualElements DisplayName="Bangumi UWP" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Bangumi.tv 番组计划 非官方UWP客户端" BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" ShortName="Bangumi" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="wide310x150Logo"/>
