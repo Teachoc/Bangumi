@@ -3,6 +3,7 @@ using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.Views;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
@@ -25,12 +26,54 @@ namespace Bangumi
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         SystemNavigationManager systemNavigationManager;
+
+        private bool _isOffline;
+        public bool IsOffline
+        {
+            get => _isOffline;
+            set
+            {
+                Set(ref _isOffline, value);
+            }
+        }
         public static MainPage RootPage;
         public static Frame RootFrame;
         public bool HasDialog = false;
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        /// 属性变更通知
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        private void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        /// <summary>
+        /// 检查属性值是否相同。
+        /// 仅在不同时设置属性值。
+        /// </summary>
+        /// <typeparam name="T">属性类型。</typeparam>
+        /// <param name="storage">可读写的属性。</param>
+        /// <param name="value">属性值。</param>
+        /// <param name="propertyName">属性名。可被支持 CallerMemberName 的编译器自动提供。</param>
+        /// <returns>值改变则返回 true，未改变返回 false。</returns>
+        private bool Set<T>(ref T storage, T value,
+            [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+            {
+                return false;
+            }
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+        #endregion
 
         public MainPage()
         {
@@ -46,6 +89,7 @@ namespace Bangumi
 
             CostomTitleBar();
 
+
             // 初始化 Api 对象
             BangumiApi.Init(ApplicationData.Current.LocalFolder.Path,
                             ApplicationData.Current.LocalCacheFolder.Path,
@@ -57,7 +101,8 @@ namespace Bangumi
                             "BangumiGithubVersion", // RedirectUrl
                             "ms-appx:///Assets/resource/err_404.png",
                             new FileHelper.EncryptionDelegate(EncryptionHelper.EncryptionAsync),
-                            new FileHelper.DecryptionDelegate(EncryptionHelper.DecryptionAsync));
+                            new FileHelper.DecryptionDelegate(EncryptionHelper.DecryptionAsync),
+                            new BangumiApi.CheckNetworkDelegate(CheckNetworkStatus));
 
             if (SettingHelper.UseBangumiData)
             {
@@ -65,6 +110,16 @@ namespace Bangumi
                 _ = BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
                                      SettingHelper.UseBiliApp);
             }
+        }
+
+        /// <summary>
+        /// 检查网络状态
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckNetworkStatus()
+        {
+            IsOffline = Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile() == null;
+            return IsOffline;
         }
 
         /// <summary>
@@ -231,6 +286,16 @@ namespace Bangumi
                     await UpdataUserStatusAsync();
                 }
             }
+        }
+
+        /// <summary>
+        /// 检查网络状态
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OfflineAppBarButton_Click(object sender, RoutedEventArgs e)
+        {
+            BangumiApi.RecheckNetworkStatus();
         }
     }
 }

@@ -20,6 +20,15 @@
                     VerticalAlignment="Bottom"
                     RequestedTheme="Dark"
                     Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}">
+            <AppBarButton Name="OfflineAppBarButton"
+                          x:FieldModifier="public"
+                          Label="离线模式"
+                          ToolTipService.ToolTip="点击检测网络"
+                          Click="OfflineAppBarButton_Click"
+                          Visibility="{x:Bind IsOffline, Mode=OneWay}">
+                <FontIcon FontFamily="Segoe MDL2 Assets" 
+                          Glyph="&#xE7BA;" />
+            </AppBarButton>
             <AppBarButton Name="CollectionAppBarButton"
                           x:FieldModifier="public"
                           IsEnabled="{Binding ElementName=RefreshAppBarButton,Path=IsEnabled}"

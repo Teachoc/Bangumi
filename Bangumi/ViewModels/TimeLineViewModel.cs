@@ -90,7 +90,7 @@ namespace Bangumi.ViewModels
         {
             try
             {
-                List<BangumiTimeLine> cache = BangumiApi.BangumiCache.TimeLine.ToList();
+                List<BangumiTimeLine> cache = BangumiApi.BangumiCache.TimeLine;
                 int day = GetDayOfWeek();
                 if (!cache.SequenceEqualExT(bangumiTimeLine.OrderBy(b => b.Weekday.Id).ToList()))
                 {

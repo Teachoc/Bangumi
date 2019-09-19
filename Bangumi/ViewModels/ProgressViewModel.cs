@@ -177,7 +177,7 @@ namespace Bangumi.ViewModels
         {
             try
             {
-                List<Watching> watchingsCache = BangumiApi.BangumiCache.Watchings.ToList();
+                List<Watching> watchingsCache = BangumiApi.BangumiCache.Watchings;
                 // 加载缓存
                 var cachedList = await ProcessWatchings(watchingsCache);
                 DiffListToObservableCollection(watchingCollection, cachedList);
@@ -255,7 +255,7 @@ namespace Bangumi.ViewModels
                                 if (item.LastTouch != cachedWatchings?.Find(c => c.SubjectId == item.SubjectId)?.LastTouch ||
                                     !SettingHelper.IsUpdatedToday)
                                 {
-                                    var subject = await BangumiApi.GetSubjectAsync(item.SubjectId.ToString());
+                                    var subject = await BangumiApi.GetSubjectEpsAsync(item.SubjectId.ToString());
                                     // 更新数据
                                     await ProcessSubject(item, subject, fromCache);
                                 }

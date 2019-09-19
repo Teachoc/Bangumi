@@ -56,6 +56,10 @@ namespace Bangumi.Api
         public static string ClientId => wrapper.ClientId;
         public static string RedirectUrl => wrapper.RedirectUrl;
 
+        public delegate bool CheckNetworkDelegate();
+        private static CheckNetworkDelegate CheckNetworkAction;
+        private static bool IsOffline;
+
         /// <summary>
         /// 用户认证存在且可用
         /// </summary>
@@ -97,11 +101,14 @@ namespace Bangumi.Api
             string redirectUrl,
             string noImageUri,
             FileHelper.EncryptionDelegate encryptionDelegate,
-            FileHelper.DecryptionDelegate decryptionDelegate)
+            FileHelper.DecryptionDelegate decryptionDelegate,
+            CheckNetworkDelegate checkNetworkActivityDelegate)
         {
 
             FileHelper.EncryptionAsync = encryptionDelegate ?? throw new ArgumentNullException("encryptionDelegate");
             FileHelper.DecryptionAsync = decryptionDelegate ?? throw new ArgumentNullException("decryptionDelegate");
+            CheckNetworkAction = checkNetworkActivityDelegate ?? throw new ArgumentNullException("checkNetworkActivityDelegate");
+            IsOffline = CheckNetworkAction();
             if (wrapper == null && BangumiCache == null && timer == null)
             {
                 localFolderPath = localFolder ?? throw new ArgumentNullException("localFolder");
@@ -199,6 +206,11 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    BangumiCache.Collections.TryGetValue(subjectType.GetValue(), out Collection2 cache);
+                    return cache;
+                }
                 var result = await wrapper.GetSubjectCollectionAsync(MyToken.UserId, subjectType);
                 UpdateCache(BangumiCache.Collections, subjectType.GetValue(), result);
                 return result;
@@ -206,6 +218,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("GetSubjectCollectionAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -220,6 +233,11 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    BangumiCache.SubjectStatus.TryGetValue(subjectId, out SubjectStatus2 subjectStatusCache);
+                    return subjectStatusCache;
+                }
                 var result = await wrapper.GetCollectionStatusAsync(MyToken.Token, subjectId);
                 UpdateCache(BangumiCache.SubjectStatus, subjectId, result);
                 return result;
@@ -227,6 +245,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("GetCollectionStatusAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -242,6 +261,11 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    BangumiCache.Progresses.TryGetValue(subjectId, out Progress progressCache);
+                    return progressCache;
+                }
                 var result = await wrapper.GetProgressesAsync(MyToken.UserId, MyToken.Token, subjectId);
                 UpdateCache(BangumiCache.Progresses, subjectId, result);
                 return result;
@@ -249,6 +273,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("GetProgressesAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -262,6 +287,10 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    return BangumiCache.Watchings;
+                }
                 var result = await wrapper.GetWatchingListAsync(MyToken.UserId);
                 UpdateCache(BangumiCache.Watchings, result);
                 return result;
@@ -269,6 +298,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("GetWatchingListAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -291,6 +321,10 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    throw new Exception("当前处于离线模式");
+                }
                 var result = await wrapper.UpdateCollectionStatusAsync(MyToken.Token, subjectId,
                                     collectionStatusEnum, comment, rating, privace);
                 if (result)
@@ -302,6 +336,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("UpdateCollectionStatusAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -316,6 +351,10 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    throw new Exception("当前处于离线模式");
+                }
                 var result = await wrapper.UpdateProgressAsync(MyToken.Token, epId, status);
                 if (result)
                 {
@@ -326,6 +365,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("UpdateProgressAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -343,12 +383,17 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    throw new Exception("当前处于离线模式");
+                }
                 var result = await wrapper.UpdateProgressBatchAsync(MyToken.Token, ep, status, epsId);
                 return result;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("UpdateProgressBatchAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -362,6 +407,11 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    BangumiCache.Subjects.TryGetValue(subjectId, out Subject subjectCache);
+                    return subjectCache;
+                }
                 Subject result;
                 // 若缓存中已有该条目，则只获取 Ep 信息，
                 // 否则获取完整信息
@@ -379,6 +429,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("GetSubjectEpsAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -392,6 +443,11 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    BangumiCache.Subjects.TryGetValue(subjectId, out Subject subjectCache);
+                    return subjectCache;
+                }
                 var result = await wrapper.GetSubjectAsync(subjectId);
                 UpdateCache(BangumiCache.Subjects, subjectId, result);
                 return result;
@@ -399,6 +455,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("GetSubjectAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -411,6 +468,10 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    return BangumiCache.TimeLine;
+                }
                 var result = await wrapper.GetBangumiCalendarAsync();
                 UpdateCache(BangumiCache.TimeLine, result);
                 return result;
@@ -418,6 +479,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("GetBangumiCalendarAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -433,12 +495,17 @@ namespace Bangumi.Api
         {
             try
             {
+                if (IsOffline)
+                {
+                    throw new Exception("当前处于离线模式");
+                }
                 var result = await wrapper.GetSearchResultAsync(keyWord, type, start, n);
                 return result;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("GetSearchResultAsync Error.");
+                RecheckNetworkStatus();
                 throw e;
             }
         }
@@ -601,7 +668,7 @@ namespace Bangumi.Api
             {
                 source.Clear();
                 source.AddRange(dest);
-                // 重新计时 5 秒
+                // 重新计时
                 timer.Interval = interval;
                 isCacheUpdated = true;
             }
@@ -610,7 +677,6 @@ namespace Bangumi.Api
         #endregion
 
         #endregion
-
 
         #region OAuth 相关方法
 
@@ -704,6 +770,7 @@ namespace Bangumi.Api
                     isLogin = false;
                 }
                 Debug.WriteLine(e.Message);
+                RecheckNetworkStatus();
             }
         }
 
@@ -724,6 +791,14 @@ namespace Bangumi.Api
         #endregion
 
         #endregion
+
+        /// <summary>
+        /// 重新检查网络状态
+        /// </summary>
+        public static void RecheckNetworkStatus()
+        {
+            IsOffline = CheckNetworkAction();
+        }
 
         #region AppFile
         /// <summary>
