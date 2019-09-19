@@ -4,9 +4,9 @@ using Windows.Storage;
 
 namespace Bangumi.Helper
 {
-    static class SettingHelper
+    internal static class SettingHelper
     {
-        private static ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        private static readonly ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private static bool? _epsBatch;
         private static bool? _subjectComplete;
         private static bool? _useBangumiData;

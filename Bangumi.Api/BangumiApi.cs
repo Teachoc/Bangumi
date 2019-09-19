@@ -804,7 +804,7 @@ namespace Bangumi.Api
         /// <summary>
         /// 使用的文件
         /// </summary>
-        internal enum AppFile
+        private enum AppFile
         {
             Token_Data,
             BangumiCache,

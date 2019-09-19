@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace Bangumi.Api.Services
 {
-    public class BangumiHttpWrapper
+    internal class BangumiHttpWrapper
     {
-        public string BaseUrl { get; set; }
-        public string OAuthBaseUrl { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string RedirectUrl { get; set; }
-        public string NoImageUri { get; set; }
+        internal string BaseUrl { get; set; }
+        internal string OAuthBaseUrl { get; set; }
+        internal string ClientId { get; set; }
+        internal string ClientSecret { get; set; }
+        internal string RedirectUrl { get; set; }
+        internal string NoImageUri { get; set; }
 
         /// <summary>
         /// 获取指定类别收藏信息。
@@ -25,7 +25,7 @@ namespace Bangumi.Api.Services
         /// <param name="userIdString"></param>
         /// <param name="subjectType"></param>
         /// <returns></returns>
-        public async Task<Collection2> GetSubjectCollectionAsync(string userIdString, SubjectTypeEnum subjectType)
+        internal async Task<Collection2> GetSubjectCollectionAsync(string userIdString, SubjectTypeEnum subjectType)
         {
             string url = string.Format("{0}/user/{1}/collections/{2}?app_id={3}&max_results=25", BaseUrl, userIdString, subjectType.GetValue(), ClientId);
             try
@@ -74,7 +74,7 @@ namespace Bangumi.Api.Services
         /// <param name="accessTokenString"></param>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public async Task<SubjectStatus2> GetCollectionStatusAsync(string accessTokenString, string subjectId)
+        internal async Task<SubjectStatus2> GetCollectionStatusAsync(string accessTokenString, string subjectId)
         {
             string url = string.Format("{0}/collection/{1}?access_token={2}", BaseUrl, subjectId, accessTokenString);
 
@@ -97,7 +97,7 @@ namespace Bangumi.Api.Services
         /// <param name="accessTokenString"></param>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public async Task<Progress> GetProgressesAsync(string userIdString, string accessTokenString, string subjectId)
+        internal async Task<Progress> GetProgressesAsync(string userIdString, string accessTokenString, string subjectId)
         {
             string url = string.Format("{0}/user/{1}/progress?subject_id={2}&access_token={3}", BaseUrl, userIdString, subjectId, accessTokenString);
             try
@@ -117,7 +117,7 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="userIdString"></param>
         /// <returns></returns>
-        public async Task<List<Watching>> GetWatchingListAsync(string userIdString)
+        internal async Task<List<Watching>> GetWatchingListAsync(string userIdString)
         {
             string url = string.Format("{0}/user/{1}/collection?cat=watching&responseGroup=medium", BaseUrl, userIdString);
             try
@@ -168,7 +168,7 @@ namespace Bangumi.Api.Services
         /// <param name="rating"></param>
         /// <param name="privace"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateCollectionStatusAsync(string accessTokenString,
+        internal async Task<bool> UpdateCollectionStatusAsync(string accessTokenString,
                                                                    string subjectId,
                                                                    CollectionStatusEnum collectionStatusEnum,
                                                                    string comment = "",
@@ -204,7 +204,7 @@ namespace Bangumi.Api.Services
         /// <param name="ep"></param>
         /// <param name="status"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateProgressAsync(string accessTokenString, string ep, EpStatusEnum status)
+        internal async Task<bool> UpdateProgressAsync(string accessTokenString, string ep, EpStatusEnum status)
         {
             string url = string.Format("{0}/ep/{1}/status/{2}?access_token={3}", BaseUrl, ep, status, accessTokenString);
             try
@@ -232,7 +232,7 @@ namespace Bangumi.Api.Services
         /// <param name="status"></param>
         /// <param name="epsId"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateProgressBatchAsync(string accessTokenString, int ep, EpStatusEnum status, string epsId)
+        internal async Task<bool> UpdateProgressBatchAsync(string accessTokenString, int ep, EpStatusEnum status, string epsId)
         {
             string url = string.Format("{0}/ep/{1}/status/{2}?access_token={3}", BaseUrl, ep, status, accessTokenString);
             string postData = "ep_id=" + epsId;
@@ -258,7 +258,7 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public async Task<Subject> GetSubjectEpsAsync(string subjectId)
+        internal async Task<Subject> GetSubjectEpsAsync(string subjectId)
         {
             string url = string.Format("{0}/subject/{1}/ep", BaseUrl, subjectId);
             try
@@ -291,7 +291,7 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public async Task<Subject> GetSubjectAsync(string subjectId)
+        internal async Task<Subject> GetSubjectAsync(string subjectId)
         {
             string url = string.Format("{0}/subject/{1}?responseGroup=large", BaseUrl, subjectId);
             try
@@ -353,7 +353,7 @@ namespace Bangumi.Api.Services
         /// 获取时间表。
         /// </summary>
         /// <returns></returns>
-        public async Task<List<BangumiTimeLine>> GetBangumiCalendarAsync()
+        internal async Task<List<BangumiTimeLine>> GetBangumiCalendarAsync()
         {
             string url = string.Format("{0}/calendar", BaseUrl);
             try
@@ -399,7 +399,7 @@ namespace Bangumi.Api.Services
         /// <param name="start"></param>
         /// <param name="n"></param>
         /// <returns></returns>
-        public async Task<SearchResult> GetSearchResultAsync(string keyWord, string type, int start, int n)
+        internal async Task<SearchResult> GetSearchResultAsync(string keyWord, string type, int start, int n)
         {
             string url = string.Format("{0}/search/subject/{1}?type={2}&responseGroup=small&start={3}&max_results={4}", BaseUrl, keyWord, type, start, n);
             try
@@ -447,7 +447,7 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="code"></param>
         /// <returns>获取失败返回 null。</returns>
-        public async Task<AccessToken> GetTokenAsync(string code)
+        internal async Task<AccessToken> GetTokenAsync(string code)
         {
             string url = $"{OAuthBaseUrl}/access_token";
             string postData = "grant_type=authorization_code";
@@ -473,7 +473,7 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="token"></param>
         /// <returns>获取失败返回 null。</returns>
-        public async Task<AccessToken> RefreshTokenAsync(AccessToken token)
+        internal async Task<AccessToken> RefreshTokenAsync(AccessToken token)
         {
             string url = $"{OAuthBaseUrl}/access_token";
             string postData = "grant_type=refresh_token";
@@ -499,7 +499,7 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="token"></param>
         /// <returns>获取失败返回 null，可能会抛出异常。</returns>
-        public async Task<AccessToken> CheckTokenAsync(AccessToken token)
+        internal async Task<AccessToken> CheckTokenAsync(AccessToken token)
         {
             string url = string.Format("{0}/token_status?access_token={1}", OAuthBaseUrl, token.Token);
 

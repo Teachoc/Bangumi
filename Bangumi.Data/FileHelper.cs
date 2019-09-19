@@ -10,7 +10,7 @@ namespace Bangumi.Data
         /// </summary>
         /// <param name="filePath">文件路径全名</param>
         /// <returns></returns>
-        public static async Task<string> ReadTextAsync(string filePath)
+        internal static async Task<string> ReadTextAsync(string filePath)
         {
             using (var reader = File.OpenText(filePath))
             {
@@ -24,7 +24,7 @@ namespace Bangumi.Data
         /// <param name="filePath">文件路径全名</param>
         /// <param name="data">待写入文本</param>
         /// <returns></returns>
-        public static async Task WriteTextAsync(string filePath, string data)
+        internal static async Task WriteTextAsync(string filePath, string data)
         {
             using (var writer = File.CreateText(filePath))
             {

@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Bangumi.Api.Services
 {
-    public static class HttpHelper
+    internal static class HttpHelper
     {
         /// <summary>
         /// 使用 Get 方法获取数据。
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static async Task<string> GetAsync(string url)
+        internal static async Task<string> GetAsync(string url)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace Bangumi.Api.Services
         /// <param name="url"></param>
         /// <param name="post"></param>
         /// <returns></returns>
-        public static async Task<string> PostAsync(string url, string post = "")
+        internal static async Task<string> PostAsync(string url, string post = "")
         {
             try
             {

@@ -169,7 +169,7 @@ namespace Bangumi.Data
         /// <summary>
         /// 使用的文件
         /// </summary>
-        internal enum AppFile
+        private enum AppFile
         {
             Data_json,
             Version,

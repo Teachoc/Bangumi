@@ -13,11 +13,11 @@ namespace Bangumi.Api
         /// <summary>
         /// 加密委托
         /// </summary>
-        public static EncryptionDelegate EncryptionAsync { get; set; }
+        internal static EncryptionDelegate EncryptionAsync { get; set; }
         /// <summary>
         /// 解密委托
         /// </summary>
-        public static DecryptionDelegate DecryptionAsync { get; set; }
+        internal static DecryptionDelegate DecryptionAsync { get; set; }
 
         #region 异步读写文件
 
@@ -26,7 +26,7 @@ namespace Bangumi.Api
         /// </summary>
         /// <param name="filePath">文件路径全名</param>
         /// <returns></returns>
-        public static async Task<string> ReadTextAsync(string filePath)
+        internal static async Task<string> ReadTextAsync(string filePath)
         {
             using (var reader = File.OpenText(filePath))
             {
@@ -40,7 +40,7 @@ namespace Bangumi.Api
         /// <param name="filePath">文件路径全名</param>
         /// <param name="data">待写入文本</param>
         /// <returns></returns>
-        public static async Task WriteTextAsync(string filePath, string data)
+        internal static async Task WriteTextAsync(string filePath, string data)
         {
             using (var writer = File.CreateText(filePath))
             {
@@ -57,7 +57,7 @@ namespace Bangumi.Api
         /// <param name="filePath"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static async Task EncryptAndWriteFileAsync(string filePath, string data)
+        internal static async Task EncryptAndWriteFileAsync(string filePath, string data)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace Bangumi.Api
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static async Task<string> ReadAndDecryptFileAsync(string filePath)
+        internal static async Task<string> ReadAndDecryptFileAsync(string filePath)
         {
             try
             {
@@ -108,7 +108,7 @@ namespace Bangumi.Api
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static long GetFileLength(string filePath)
+        internal static long GetFileLength(string filePath)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace Bangumi.Api
         /// 删除存在的文件
         /// </summary>
         /// <param name="filePath">文件完整路径</param>
-        public static void DeleteFile(string filePath)
+        internal static void DeleteFile(string filePath)
         {
             if (File.Exists(filePath))
                 File.Delete(filePath);
