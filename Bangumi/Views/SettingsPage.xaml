@@ -111,7 +111,7 @@
                                        TextWrapping="Wrap" />
                         </ToggleSwitch.Header>
                     </ToggleSwitch>
-                    <StackPanel Visibility="{x:Bind UseBangumiDataToggleSwitch.IsOn,Mode=OneWay}">
+                    <StackPanel Visibility="{x:Bind UseBangumiDataToggleSwitch.IsOn, Mode=OneWay}">
                         <TextBlock Name="BangumiDataTextBlock" 
                                    Text="数据版本："
                                    Margin="0,10,0,0"/>
@@ -139,6 +139,19 @@
                             <ToggleSwitch.Header>
                                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                            Text="B站放送链接使用应用打开"
+                                           Margin="0,4,0,0"
+                                           FontWeight="Normal"
+                                           TextWrapping="Wrap" />
+                            </ToggleSwitch.Header>
+                        </ToggleSwitch>
+                        <ToggleSwitch Name="UseBangumiDataAirWeekdayToggleSwitch"
+                                      OnContent="开启" 
+                                      OffContent="关闭"
+                                      FontSize="16"
+                                      Toggled="UseBangumiDataAirWeekdayToggleSwitch_Toggled">
+                            <ToggleSwitch.Header>
+                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                           Text="进度页使用 bangumi-data 推测放送时间"
                                            Margin="0,4,0,0"
                                            FontWeight="Normal"
                                            TextWrapping="Wrap" />

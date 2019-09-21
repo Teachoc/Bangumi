@@ -91,6 +91,7 @@ namespace Bangumi.Api
         /// <param name="noImageUri">无图片时显示的图片路径</param>
         /// <param name="encryptionDelegate">加密方法</param>
         /// <param name="decryptionDelegate">解密方法</param>
+        /// <param name="checkNetworkActivityDelegate">检查网络是否可用的方法</param>
         public static async void Init(
             string localFolder,
             string cacheFolder,
@@ -105,22 +106,22 @@ namespace Bangumi.Api
             CheckNetworkDelegate checkNetworkActivityDelegate)
         {
 
-            FileHelper.EncryptionAsync = encryptionDelegate ?? throw new ArgumentNullException("encryptionDelegate");
-            FileHelper.DecryptionAsync = decryptionDelegate ?? throw new ArgumentNullException("decryptionDelegate");
-            CheckNetworkAction = checkNetworkActivityDelegate ?? throw new ArgumentNullException("checkNetworkActivityDelegate");
+            FileHelper.EncryptionAsync = encryptionDelegate ?? throw new ArgumentNullException(nameof(encryptionDelegate));
+            FileHelper.DecryptionAsync = decryptionDelegate ?? throw new ArgumentNullException(nameof(decryptionDelegate));
+            CheckNetworkAction = checkNetworkActivityDelegate ?? throw new ArgumentNullException(nameof(checkNetworkActivityDelegate));
             IsOffline = CheckNetworkAction();
             if (wrapper == null && BangumiCache == null && timer == null)
             {
-                localFolderPath = localFolder ?? throw new ArgumentNullException("localFolder");
-                cacheFolderPath = cacheFolder ?? throw new ArgumentNullException("cacheFolder");
+                localFolderPath = localFolder ?? throw new ArgumentNullException(nameof(localFolder));
+                cacheFolderPath = cacheFolder ?? throw new ArgumentNullException(nameof(cacheFolder));
                 wrapper = new BangumiHttpWrapper
                 {
-                    BaseUrl = baseUrl ?? throw new ArgumentNullException("baseUrl"),
-                    OAuthBaseUrl = oAuthBaseUrl ?? throw new ArgumentNullException("oAuthBaseUrl"),
-                    ClientId = clientId ?? throw new ArgumentNullException("clientId"),
-                    ClientSecret = clientSecret ?? throw new ArgumentNullException("clientSecret"),
-                    RedirectUrl = redirectUrl ?? throw new ArgumentNullException("redirectUrl"),
-                    NoImageUri = noImageUri ?? throw new ArgumentNullException("noImageUri")
+                    BaseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl)),
+                    OAuthBaseUrl = oAuthBaseUrl ?? throw new ArgumentNullException(nameof(oAuthBaseUrl)),
+                    ClientId = clientId ?? throw new ArgumentNullException(nameof(clientId)),
+                    ClientSecret = clientSecret ?? throw new ArgumentNullException(nameof(clientSecret)),
+                    RedirectUrl = redirectUrl ?? throw new ArgumentNullException(nameof(redirectUrl)),
+                    NoImageUri = noImageUri ?? throw new ArgumentNullException(nameof(noImageUri))
                 };
 
                 // 加载缓存

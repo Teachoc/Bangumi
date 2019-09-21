@@ -432,13 +432,11 @@
                                            Foreground="#666666" 
                                            Margin="0,2,0,0" />
                                 <TextBlock Name="air_weekdayTextBlock" 
-                                           Text="更新时间：" 
+                                           Text="{x:Bind sys:String.Format('更新时间：{0}',ViewModel.AirTime), Mode=OneWay}" 
                                            RelativePanel.RightOf="BangumiImage"
                                            RelativePanel.Below="air_dateTextBlock"
                                            Foreground="#666666" 
-                                           Margin="0,2,0,0" >
-                                    <Run Text="{x:Bind common:Converters.GetWeekday(ViewModel.AirWeekday), Mode=OneWay}"/>
-                                </TextBlock>
+                                           Margin="0,2,0,0" />
                                 <TextBlock Name="ratingTextBlock" 
                                            Text="{x:Bind common:Converters.DoubleToString(ViewModel.Score,1), Mode=OneWay}" 
                                            RelativePanel.LeftOf="RateItemsControl"

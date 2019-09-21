@@ -11,14 +11,16 @@ namespace Bangumi.Helper
         private static bool? _subjectComplete;
         private static bool? _useBangumiData;
         private static bool? _useBiliApp;
+        private static bool? _useBangumiDataAirWeekday;
         private static long? _updateDay;
 
         static SettingHelper()
         {
-            _epsBatch = localSettings.Values["EpsBatch"] as bool?;
-            _subjectComplete = localSettings.Values["SubjectComplete"] as bool?;
-            _useBangumiData = localSettings.Values["UseBangumiData"] as bool?;
-            _useBiliApp = localSettings.Values["UseBiliApp"] as bool?;
+            _epsBatch = localSettings.Values[nameof(EpsBatch)] as bool?;
+            _subjectComplete = localSettings.Values[nameof(SubjectComplete)] as bool?;
+            _useBangumiData = localSettings.Values[nameof(UseBangumiData)] as bool?;
+            _useBiliApp = localSettings.Values[nameof(UseBiliApp)] as bool?;
+            _useBangumiDataAirWeekday = localSettings.Values[nameof(UseBangumiDataAirWeekday)] as bool?;
             _updateDay = localSettings.Values["UpdateDay"] as long?;
         }
 
@@ -27,7 +29,7 @@ namespace Bangumi.Helper
             set
             {
                 _epsBatch = value;
-                localSettings.Values["EpsBatch"] = _epsBatch;
+                localSettings.Values[nameof(EpsBatch)] = _epsBatch;
             }
             get
             {
@@ -40,7 +42,7 @@ namespace Bangumi.Helper
             set
             {
                 _subjectComplete = value;
-                localSettings.Values["SubjectComplete"] = _subjectComplete;
+                localSettings.Values[nameof(SubjectComplete)] = _subjectComplete;
             }
             get
             {
@@ -53,7 +55,7 @@ namespace Bangumi.Helper
             set
             {
                 _useBangumiData = value;
-                localSettings.Values["UseBangumiData"] = _useBangumiData;
+                localSettings.Values[nameof(UseBangumiData)] = _useBangumiData;
             }
             get
             {
@@ -66,11 +68,24 @@ namespace Bangumi.Helper
             set
             {
                 _useBiliApp = value;
-                localSettings.Values["UseBiliApp"] = _useBiliApp;
+                localSettings.Values[nameof(UseBiliApp)] = _useBiliApp;
             }
             get
             {
                 return _useBiliApp == true;
+            }
+        }
+
+        public static bool UseBangumiDataAirWeekday
+        {
+            set
+            {
+                _useBangumiDataAirWeekday = value;
+                localSettings.Values[nameof(UseBangumiDataAirWeekday)] = _useBangumiDataAirWeekday;
+            }
+            get
+            {
+                return _useBangumiDataAirWeekday == true;
             }
         }
 

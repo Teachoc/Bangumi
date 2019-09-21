@@ -24,12 +24,14 @@ namespace Bangumi.Data
         public static bool UseBiliApp { get; set; }
 
         /// <summary>
+        /// 初始化 bangumi-data 数据，
         /// 读取文件，将数据加载到内存
         /// </summary>
         /// <param name="datafolderpath">文件夹路径</param>
+        /// <param name="useBiliApp">是否将链接转换为使用 哔哩哔哩动画 启动协议</param>
         public static async Task Init(string datafolderpath, bool useBiliApp = false)
         {
-            folderPath = datafolderpath;
+            folderPath = datafolderpath ?? throw new ArgumentNullException(nameof(datafolderpath));
             UseBiliApp = useBiliApp;
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
@@ -53,6 +55,7 @@ namespace Bangumi.Data
             }
         }
 
+        #region 版本更新
         /// <summary>
         /// 解析网页获取最新版本号，并暂存
         /// </summary>
@@ -75,7 +78,7 @@ namespace Bangumi.Data
         }
 
         /// <summary>
-        /// 下载最新的数据，并更新原有数据，不比较版本号
+        /// 获取最新版本并下载数据
         /// </summary>
         /// <returns></returns>
         public static async Task<bool> DownloadLatestBangumiData()
@@ -104,6 +107,34 @@ namespace Bangumi.Data
                 return false;
             }
         }
+        #endregion
+
+        /// <summary>
+        /// 根据网站放送开始时间推测更新时间
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static string GetAirTimeByBangumiId(string id)
+        {
+            var siteList = dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
+                                        .Where(s => dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
+            string[] airSites = new string[] { "bilibili", "acfun", "iqiyi" , "qq" };
+            if (siteList != null)
+            {
+                foreach (var siteName in airSites)
+                {
+                    if (siteList.FirstOrDefault(s => s.SiteName == siteName) is Site site)
+                    {
+                        if (site.Begin is DateTime d)
+                        {
+                            d = d.ToLocalTime();
+                            return $"{System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetDayName(d.DayOfWeek)} {d.TimeOfDay.ToString(@"hh\:mm")}";
+                        }
+                    }
+                }
+            }
+            return null;
+        }
 
         /// <summary>
         /// 根据Bangumi的ID返回所有放送网站
@@ -112,14 +143,8 @@ namespace Bangumi.Data
         /// <returns></returns>
         public static async Task<List<Site>> GetAirSitesByBangumiIdAsync(string id)
         {
-            if (dataSet == null)
-            {
-                return new List<Site>();
-            }
-
-            var siteList = dataSet.Items.Where(e => e.Sites.Where(s => s.SiteName == "bangumi" && s.Id == id).Count() != 0)
-                                          .FirstOrDefault()?.Sites
-                                          .Where(s => dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
+            var siteList = dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
+                                         .Where(s => dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
             if (siteList != null)
             {
                 foreach (var site in siteList)
@@ -131,7 +156,7 @@ namespace Bangumi.Data
                 // 启用设置，将mediaid转换为seasonid
                 if (UseBiliApp)
                 {
-                    var biliSite = siteList.Where(s => s.SiteName == "bilibili").FirstOrDefault();
+                    var biliSite = siteList.FirstOrDefault(s => s.SiteName == "bilibili");
                     if (biliSite != null)
                     {
                         string seasonId;

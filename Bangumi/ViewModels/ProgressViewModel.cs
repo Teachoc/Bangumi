@@ -3,6 +3,7 @@ using Bangumi.Api.Models;
 using Bangumi.Api.Utils;
 using Bangumi.Common;
 using Bangumi.ContentDialogs;
+using Bangumi.Data;
 using Bangumi.Facades;
 using Bangumi.Helper;
 using Bangumi.Views;
@@ -237,8 +238,9 @@ namespace Bangumi.ViewModels
                                 LastTouch = watching.LastTouch, // 该条目上次修改时间
                                 WatchedEps = watching.EpStatus,
                                 UpdatedEps = watching.Subject.EpsCount,
-                                AirDate = watching.Subject.AirDate,
-                                AirWeekday = watching.Subject.AirWeekday,
+                                AirTime = SettingHelper.UseBangumiDataAirWeekday
+                                          ? BangumiData.GetAirTimeByBangumiId(watching.SubjectId.ToString()) ?? Converters.GetWeekday(watching.Subject.AirWeekday)
+                                          : Converters.GetWeekday(watching.Subject.AirWeekday),
                                 Type = watching.Subject.Type,
                                 IsUpdating = false,
                             };
@@ -427,6 +429,14 @@ namespace Bangumi.ViewModels
                         origin.Move(index, i);
                     }
                 }
+                if (!origin.SequenceEqualExT(dest))
+                {
+                    origin.Clear();
+                    foreach (var item in dest)
+                    {
+                        origin.Add(item);
+                    }
+                }
             }
         }
 
@@ -456,9 +466,8 @@ namespace Bangumi.ViewModels
         public long LastTouch { get; set; }
         public string Url { get; set; }
         public string Image { get; set; }
-        public string AirDate { get; set; }
         public int Type { get; set; }
-        public int AirWeekday { get; set; }
+        public string AirTime { get; set; }
         public List<SimpleEp> Eps { get; set; }
 
         private bool _isUpdating;
@@ -508,7 +517,7 @@ namespace Bangumi.ViewModels
             return SubjectId == w.SubjectId &&
                    LastTouch == w.LastTouch &&
                    Type == w.Type &&
-                   AirWeekday == w.AirWeekday &&
+                   AirTime == w.AirTime &&
                    IsUpdating == w.IsUpdating &&
                    WatchedEps == w.WatchedEps &&
                    UpdatedEps == w.UpdatedEps &&
@@ -518,7 +527,6 @@ namespace Bangumi.ViewModels
                    NameCn.EqualsExT(w.NameCn) &&
                    Url.EqualsExT(w.Url) &&
                    Image.EqualsExT(w.Image) &&
-                   AirDate.EqualsExT(w.AirDate) &&
                    Eps.SequenceEqualExT(w.Eps);
         }
 

@@ -3,6 +3,7 @@ using Bangumi.Api.Models;
 using Bangumi.Api.Utils;
 using Bangumi.Common;
 using Bangumi.ContentDialogs;
+using Bangumi.Data;
 using Bangumi.Facades;
 using Bangumi.Helper;
 using System;
@@ -63,7 +64,7 @@ namespace Bangumi.ViewModels
 
         private SubjectTypeEnum SubjectType { get; set; }
 
-        private string _imageSource = "ms-appx:///Assets/resource/err_404.png";
+        private string _imageSource;
         public string ImageSource
         {
             get => _imageSource;
@@ -84,11 +85,11 @@ namespace Bangumi.ViewModels
             set => Set(ref _air_date, value);
         }
 
-        private int _air_weekday;
-        public int AirWeekday
+        private string _air_time;
+        public string AirTime
         {
-            get => _air_weekday;
-            set => Set(ref _air_weekday, value);
+            get => _air_time;
+            set => Set(ref _air_time, value);
         }
 
         private string _summary;
@@ -169,10 +170,10 @@ namespace Bangumi.ViewModels
         public void InitViewModel()
         {
             IsLoading = false;
-            ImageSource = "ms-appx:///Assets/resource/err_404.png";
+            ImageSource = "";
             NameCn = "";
             AirDate = "";
-            AirWeekday = 0;
+            AirTime = "";
             Summary = "";
             OthersRates.Clear();
             OthersCollection = "";
@@ -380,6 +381,14 @@ namespace Bangumi.ViewModels
                     }
                 }
 
+                // 检查用户登录状态
+                Task<Progress> progress = null;
+                Task<SubjectStatus2> subjectStatus = null;
+                if (BangumiApi.IsLogin)
+                {
+                    progress = BangumiApi.GetProgressesAsync(SubjectId);
+                    subjectStatus = BangumiApi.GetCollectionStatusAsync(SubjectId);
+                }
                 // 获取最新数据
                 Subject subject = await BangumiApi.GetSubjectAsync(SubjectId);
 
@@ -395,8 +404,6 @@ namespace Bangumi.ViewModels
                     // 检查用户登录状态
                     if (BangumiApi.IsLogin)
                     {
-                        Task<Progress> progress = BangumiApi.GetProgressesAsync(SubjectId);
-                        Task<SubjectStatus2> subjectStatus = BangumiApi.GetCollectionStatusAsync(SubjectId);
                         if (subjectChanged || !progressCache.EqualsExT(await progress))
                         {
                             ProcessProgress(subject, await progress);
@@ -434,10 +441,10 @@ namespace Bangumi.ViewModels
                 // 条目标题
                 NameCn = string.IsNullOrEmpty(subject.NameCn) ? subject.Name : subject.NameCn;
                 // 条目图片
-                ImageSource = subject.Images?.Common;
+                ImageSource = subject.Images.Common;
                 // 放送日期
                 AirDate = subject.AirDate;
-                AirWeekday = subject.AirWeekday;
+                AirTime = Converters.GetWeekday(subject.AirWeekday);
                 // 条目简介
                 if (!string.IsNullOrEmpty(subject.Summary))
                 {

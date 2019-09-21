@@ -76,6 +76,7 @@ namespace Bangumi.Views
             SubjectCompleteToggleSwitch.IsOn = SettingHelper.SubjectComplete;
             UseBangumiDataToggleSwitch.IsOn = SettingHelper.UseBangumiData;
             UseBilibiliUWPToggleSwitch.IsOn = SettingHelper.UseBiliApp;
+            UseBangumiDataAirWeekdayToggleSwitch.IsOn = SettingHelper.UseBangumiDataAirWeekday;
 
             // 获取缓存文件大小
             JsonCacheSizeTextBlock.Text = ((double)BangumiApi.GetCacheFileLength() / 1024).ToString("F3");
@@ -172,6 +173,21 @@ namespace Bangumi.Views
                     SettingHelper.UseBiliApp = false;
                 }
                 BangumiData.UseBiliApp = SettingHelper.UseBiliApp;
+            }
+        }
+
+        private void UseBangumiDataAirWeekdayToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (sender is ToggleSwitch toggleSwitch)
+            {
+                if (toggleSwitch.IsOn == true)
+                {
+                    SettingHelper.UseBangumiDataAirWeekday = true;
+                }
+                else
+                {
+                    SettingHelper.UseBangumiDataAirWeekday = false;
+                }
             }
         }
 

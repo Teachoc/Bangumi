@@ -50,7 +50,7 @@
                                Foreground="{StaticResource BangumiPinkColor}"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock Name="AirWeekdayTextBlock"
-                               Text="{x:Bind common:Converters.GetWeekday(AirWeekday)}" 
+                               Text="{x:Bind AirTime}" 
                                x:Phase="1"
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="TitleTextBlock"
@@ -114,6 +114,7 @@
                                  Width="{Binding ElementName=BangumiImage, Path=Width}"
                                  RelativePanel.Below="BangumiImage"
                                  RelativePanel.AlignLeftWithPanel="True"
+                                 ToolTipService.ToolTip="{x:Bind common:Converters.GetProgress(WatchedEps, Eps.Count), Mode=OneWay}"
                                  Margin="0,1,0,0"
                                  Background="{ThemeResource SystemChromeHighColor}"
                                  Foreground="{StaticResource BangumiPinkColor}" />
@@ -171,7 +172,7 @@
                              FontSize="16"/>
                     </TextBlock>
                     <TextBlock Name="AirWeekdayTextBlock"
-                               Text="{x:Bind common:Converters.GetWeekday(AirWeekday)}" 
+                               Text="{x:Bind AirTime}" 
                                x:Phase="1"
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="TitleTextBlock"
@@ -235,6 +236,7 @@
                                  Width="{Binding ElementName=BangumiImage, Path=Width}"
                                  RelativePanel.Below="BangumiImage"
                                  RelativePanel.AlignLeftWithPanel="True"
+                                 ToolTipService.ToolTip="{x:Bind common:Converters.GetProgress(WatchedEps, Eps.Count), Mode=OneWay}"
                                  Margin="0,1,0,0"
                                  Background="{ThemeResource SystemChromeHighColor}"
                                  Foreground="{StaticResource BangumiPinkColor}" />

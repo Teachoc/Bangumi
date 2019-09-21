@@ -227,6 +227,17 @@ namespace Bangumi.Common
         }
 
         /// <summary>
+        /// 返回 a / b 的形式字符串
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static string GetProgress(int a, int b)
+        {
+            return $"{a} / {b}";
+        }
+
+        /// <summary>
         /// 保留小数位数
         /// </summary>
         /// <param name="d"></param>
