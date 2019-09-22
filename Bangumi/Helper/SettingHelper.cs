@@ -11,7 +11,8 @@ namespace Bangumi.Helper
         private static bool? _subjectComplete;
         private static bool? _useBangumiData;
         private static bool? _useBiliApp;
-        private static bool? _useBangumiDataAirWeekday;
+        private static bool? _useBangumiDataAirSites;
+        private static bool? _useBangumiDataAirTime;
         private static long? _updateDay;
 
         static SettingHelper()
@@ -20,7 +21,8 @@ namespace Bangumi.Helper
             _subjectComplete = localSettings.Values[nameof(SubjectComplete)] as bool?;
             _useBangumiData = localSettings.Values[nameof(UseBangumiData)] as bool?;
             _useBiliApp = localSettings.Values[nameof(UseBiliApp)] as bool?;
-            _useBangumiDataAirWeekday = localSettings.Values[nameof(UseBangumiDataAirWeekday)] as bool?;
+            _useBangumiDataAirSites = localSettings.Values[nameof(UseBangumiDataAirSites)] as bool?;
+            _useBangumiDataAirTime = localSettings.Values[nameof(UseBangumiDataAirTime)] as bool?;
             _updateDay = localSettings.Values["UpdateDay"] as long?;
         }
 
@@ -63,6 +65,19 @@ namespace Bangumi.Helper
             }
         }
 
+        public static bool UseBangumiDataAirSites
+        {
+            set
+            {
+                _useBangumiDataAirSites = value;
+                localSettings.Values[nameof(UseBangumiDataAirSites)] = _useBangumiDataAirSites;
+            }
+            get
+            {
+                return _useBangumiDataAirSites == true && UseBangumiData;
+            }
+        }
+
         public static bool UseBiliApp
         {
             set
@@ -76,16 +91,16 @@ namespace Bangumi.Helper
             }
         }
 
-        public static bool UseBangumiDataAirWeekday
+        public static bool UseBangumiDataAirTime
         {
             set
             {
-                _useBangumiDataAirWeekday = value;
-                localSettings.Values[nameof(UseBangumiDataAirWeekday)] = _useBangumiDataAirWeekday;
+                _useBangumiDataAirTime = value;
+                localSettings.Values[nameof(UseBangumiDataAirTime)] = _useBangumiDataAirTime;
             }
             get
             {
-                return _useBangumiDataAirWeekday == true;
+                return _useBangumiDataAirTime == true && UseBangumiData;
             }
         }
 

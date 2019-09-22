@@ -238,7 +238,7 @@ namespace Bangumi.ViewModels
                                 LastTouch = watching.LastTouch, // 该条目上次修改时间
                                 WatchedEps = watching.EpStatus,
                                 UpdatedEps = watching.Subject.EpsCount,
-                                AirTime = SettingHelper.UseBangumiDataAirWeekday
+                                AirTime = SettingHelper.UseBangumiDataAirTime
                                           ? BangumiData.GetAirTimeByBangumiId(watching.SubjectId.ToString()) ?? Converters.GetWeekday(watching.Subject.AirWeekday)
                                           : Converters.GetWeekday(watching.Subject.AirWeekday),
                                 Type = watching.Subject.Type,
@@ -429,6 +429,7 @@ namespace Bangumi.ViewModels
                         origin.Move(index, i);
                     }
                 }
+                // 若通过以上步骤任无法排好序，则重置列表
                 if (!origin.SequenceEqualExT(dest))
                 {
                     origin.Clear();

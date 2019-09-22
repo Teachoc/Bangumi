@@ -36,8 +36,9 @@
                     <ToggleSwitch Name="EpsBatchToggleSwitch"
                                   OnContent="开启" 
                                   OffContent="关闭"
+                                  Tag="EpsBatch"
                                   FontSize="16"
-                                  Toggled="EpsBatchToggleSwitch_Toggled">
+                                  Toggled="SettingToggleSwitch_Toggled">
                         <ToggleSwitch.Header>
                             <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                        Text="收藏状态修改为看过时，将所有章节状态修改为看过（仅在详情页有效）"
@@ -51,8 +52,9 @@
                     <ToggleSwitch Name="SubjectCompleteToggleSwitch"
                                   OnContent="开启" 
                                   OffContent="关闭"
+                                  Tag="SubjectComplete"
                                   FontSize="16"
-                                  Toggled="SubjectCompleteToggleSwitch_Toggled">
+                                  Toggled="SettingToggleSwitch_Toggled">
                         <ToggleSwitch.Header>
                             <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                        Text="看完所有剧集后弹窗提示评价"
@@ -101,11 +103,12 @@
                     <ToggleSwitch Name="UseBangumiDataToggleSwitch"
                                   OnContent="开启" 
                                   OffContent="关闭"
+                                  Tag="UseBangumiData"
                                   FontSize="16"
-                                  Toggled="UseBangumiDataToggleSwitch_Toggled">
+                                  Toggled="SettingToggleSwitch_Toggled">
                         <ToggleSwitch.Header>
                             <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                                       Text="使用 bangumi-data 数据显示番剧放送网站"
+                                       Text="使用 bangumi-data "
                                        Margin="0,4,0,0"
                                        FontWeight="Normal"
                                        TextWrapping="Wrap" />
@@ -131,24 +134,41 @@
                                           IsActive="True"
                                           Margin="10,0,0,0"/>
                         </Grid>
-                        <ToggleSwitch Name="UseBilibiliUWPToggleSwitch"
+                        <ToggleSwitch Name="UseBangumiDataAirSitesToggleSwitch"
                                       OnContent="开启" 
                                       OffContent="关闭"
+                                      Tag="UseBangumiDataAirSites"
                                       FontSize="16"
-                                      Toggled="UseBilibiliUWPToggleSwitch_Toggled">
+                                      Toggled="SettingToggleSwitch_Toggled">
                             <ToggleSwitch.Header>
                                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                                           Text="B站放送链接使用应用打开"
+                                       Text="使用 bangumi-data 数据显示番剧放送网站"
+                                       Margin="0,4,0,0"
+                                       FontWeight="Normal"
+                                       TextWrapping="Wrap" />
+                            </ToggleSwitch.Header>
+                        </ToggleSwitch>
+                        <ToggleSwitch Name="UseBilibiliUWPToggleSwitch"
+                                      Visibility="{x:Bind UseBangumiDataAirSitesToggleSwitch.IsOn, Mode=OneWay}"
+                                      OnContent="使用哔哩哔哩动画应用打开" 
+                                      OffContent="使用默认浏览器打开"
+                                      Tag="UseBilibiliUWP"
+                                      FontSize="16"
+                                      Toggled="SettingToggleSwitch_Toggled">
+                            <ToggleSwitch.Header>
+                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                           Text="B站放送链接打开方式"
                                            Margin="0,4,0,0"
                                            FontWeight="Normal"
                                            TextWrapping="Wrap" />
                             </ToggleSwitch.Header>
                         </ToggleSwitch>
-                        <ToggleSwitch Name="UseBangumiDataAirWeekdayToggleSwitch"
+                        <ToggleSwitch Name="UseBangumiDataAirTimeToggleSwitch"
                                       OnContent="开启" 
                                       OffContent="关闭"
+                                      Tag="UseBangumiDataAirTime"
                                       FontSize="16"
-                                      Toggled="UseBangumiDataAirWeekdayToggleSwitch_Toggled">
+                                      Toggled="SettingToggleSwitch_Toggled">
                             <ToggleSwitch.Header>
                                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                            Text="进度页使用 bangumi-data 推测放送时间"
@@ -166,9 +186,11 @@
                 <StackPanel Padding="0,10,0,0">
                     <TextBlock Text="Bangumi UWP (非官方)" 
                                Style="{StaticResource TitleTextBlockStyle}" />
-                    <TextBlock>
+                    <TextBlock TextWrapping="Wrap">
                         <LineBreak/>
-                        © 2019 Bangumi
+                        © 2008-2019 Bangumi (a.k.a.Chobits), some rights reserved
+                        <LineBreak/>
+                        © 2019 Teachoc
                         <LineBreak/>
                         版本：
                         <Run Text="{x:Bind Version}"/>

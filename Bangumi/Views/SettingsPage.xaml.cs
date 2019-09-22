@@ -75,8 +75,9 @@ namespace Bangumi.Views
             EpsBatchToggleSwitch.IsOn = SettingHelper.EpsBatch;
             SubjectCompleteToggleSwitch.IsOn = SettingHelper.SubjectComplete;
             UseBangumiDataToggleSwitch.IsOn = SettingHelper.UseBangumiData;
+            UseBangumiDataAirSitesToggleSwitch.IsOn = SettingHelper.UseBangumiDataAirSites;
             UseBilibiliUWPToggleSwitch.IsOn = SettingHelper.UseBiliApp;
-            UseBangumiDataAirWeekdayToggleSwitch.IsOn = SettingHelper.UseBangumiDataAirWeekday;
+            UseBangumiDataAirTimeToggleSwitch.IsOn = SettingHelper.UseBangumiDataAirTime;
 
             // 获取缓存文件大小
             JsonCacheSizeTextBlock.Text = ((double)BangumiApi.GetCacheFileLength() / 1024).ToString("F3");
@@ -104,89 +105,49 @@ namespace Bangumi.Views
             }
         }
 
-        private void EpsBatchToggleSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
-            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
-            if (toggleSwitch != null)
-            {
-                if (toggleSwitch.IsOn == true)
-                {
-                    SettingHelper.EpsBatch = true;
-                }
-                else
-                {
-                    SettingHelper.EpsBatch = false;
-                }
-            }
-        }
-
-        private void SubjectCompleteToggleSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
-            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
-            if (toggleSwitch != null)
-            {
-                if (toggleSwitch.IsOn == true)
-                {
-                    SettingHelper.SubjectComplete = true;
-                }
-                else
-                {
-                    SettingHelper.SubjectComplete = false;
-                }
-            }
-        }
-
-        private async void UseBangumiDataToggleSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
-            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
-            if (toggleSwitch != null)
-            {
-                if (toggleSwitch.IsOn == true)
-                {
-                    SettingHelper.UseBangumiData = true;
-                    // 获取数据版本
-                    await BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
-                                           SettingHelper.UseBiliApp);
-                    BangumiDataTextBlock.Text = "数据版本：" +
-                        (string.IsNullOrEmpty(BangumiData.Version) ?
-                        "无数据" :
-                        BangumiData.Version);
-                }
-                else
-                {
-                    SettingHelper.UseBangumiData = false;
-                }
-            }
-        }
-
-        private void UseBilibiliUWPToggleSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
-            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
-            if (toggleSwitch != null)
-            {
-                if (toggleSwitch.IsOn == true)
-                {
-                    SettingHelper.UseBiliApp = true;
-                }
-                else
-                {
-                    SettingHelper.UseBiliApp = false;
-                }
-                BangumiData.UseBiliApp = SettingHelper.UseBiliApp;
-            }
-        }
-
-        private void UseBangumiDataAirWeekdayToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// 设置开关
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void SettingToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
             if (sender is ToggleSwitch toggleSwitch)
             {
-                if (toggleSwitch.IsOn == true)
+                switch (toggleSwitch.Tag.ToString())
                 {
-                    SettingHelper.UseBangumiDataAirWeekday = true;
-                }
-                else
-                {
-                    SettingHelper.UseBangumiDataAirWeekday = false;
+                    case "EpsBatch":
+                        SettingHelper.EpsBatch = toggleSwitch.IsOn;
+                        break;
+                    case "SubjectComplete":
+                        SettingHelper.SubjectComplete = toggleSwitch.IsOn;
+                        break;
+                    case "UseBangumiData":
+                        SettingHelper.UseBangumiData = toggleSwitch.IsOn;
+                        if(SettingHelper.UseBangumiData)
+                        {
+                            // 获取数据版本
+                            await BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
+                                                   SettingHelper.UseBiliApp);
+                            BangumiDataTextBlock.Text = "数据版本：" +
+                                (string.IsNullOrEmpty(BangumiData.Version) ?
+                                "无数据" :
+                                BangumiData.Version);
+                        }
+                        break;
+                    case "UseBangumiDataAirSites":
+                        SettingHelper.UseBangumiDataAirSites = toggleSwitch.IsOn;
+                        break;
+                    case "UseBilibiliUWP":
+                        SettingHelper.UseBiliApp = toggleSwitch.IsOn;
+                        BangumiData.UseBiliApp = SettingHelper.UseBiliApp;
+                        break;
+                    case "UseBangumiDataAirTime":
+                        SettingHelper.UseBangumiDataAirTime = toggleSwitch.IsOn;
+                        break;
+
+                    default:
+                        break;
                 }
             }
         }

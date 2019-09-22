@@ -133,7 +133,7 @@ namespace Bangumi.Views
                 MainPage.RootPage.CollectionAppBarButton.Visibility = Visibility.Visible;
             }
 
-            if (SettingHelper.UseBangumiData == true)
+            if (SettingHelper.UseBangumiDataAirSites)
             {
                 InitAirSites();
             }

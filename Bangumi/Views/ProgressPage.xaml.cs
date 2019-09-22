@@ -138,7 +138,7 @@ namespace Bangumi.Views
         /// <param name="e"></param>
         private void RelativePanel_RightTapped(object sender, Windows.UI.Xaml.Input.RightTappedRoutedEventArgs e)
         {
-            if (SettingHelper.UseBangumiData == true)
+            if (SettingHelper.UseBangumiDataAirSites)
             {
                 if (e.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
                 {
@@ -155,7 +155,7 @@ namespace Bangumi.Views
         /// <param name="e"></param>
         private void RelativePanel_Holding(object sender, Windows.UI.Xaml.Input.HoldingRoutedEventArgs e)
         {
-            if (SettingHelper.UseBangumiData == true)
+            if (SettingHelper.UseBangumiDataAirSites)
             {
                 if (e.HoldingState == Windows.UI.Input.HoldingState.Started)
                 {
