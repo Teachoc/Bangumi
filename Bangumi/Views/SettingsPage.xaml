@@ -29,228 +29,237 @@
                        TextTrimming="CharacterEllipsis"/>
         </Grid>
         <Pivot Grid.Row="1">
-            <PivotItem Header="设置">
-                <StackPanel Padding="0,10,0,0">
+            <PivotItem Header="设置"
+                       Margin="0">
+                <ScrollViewer>
+                    <StackPanel Padding="12,10">
                     
-                    <!-- 看过逻辑 -->
-                    <ToggleSwitch Name="EpsBatchToggleSwitch"
-                                  OnContent="开启" 
-                                  OffContent="关闭"
-                                  Tag="EpsBatch"
-                                  FontSize="16"
-                                  Toggled="SettingToggleSwitch_Toggled">
-                        <ToggleSwitch.Header>
-                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                                       Text="收藏状态修改为看过时，将所有章节状态修改为看过（仅在详情页有效）"
-                                       Margin="0,4,0,0"
-                                       FontWeight="Normal"
-                                       TextWrapping="Wrap" />
-                        </ToggleSwitch.Header>
-                    </ToggleSwitch>
+                        <!-- 看过逻辑 -->
+                        <ToggleSwitch Name="EpsBatchToggleSwitch"
+                                      OnContent="开启" 
+                                      OffContent="关闭"
+                                      Tag="EpsBatch"
+                                      FontSize="16"
+                                      Toggled="SettingToggleSwitch_Toggled">
+                            <ToggleSwitch.Header>
+                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                           Text="收藏状态修改为看过时，将所有章节状态修改为看过（仅在详情页有效）"
+                                           Margin="0,4,0,0"
+                                           FontWeight="Normal"
+                                           TextWrapping="Wrap" />
+                            </ToggleSwitch.Header>
+                        </ToggleSwitch>
 
-                    <!-- 看完逻辑 -->
-                    <ToggleSwitch Name="SubjectCompleteToggleSwitch"
-                                  OnContent="开启" 
-                                  OffContent="关闭"
-                                  Tag="SubjectComplete"
-                                  FontSize="16"
-                                  Toggled="SettingToggleSwitch_Toggled">
-                        <ToggleSwitch.Header>
-                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                                       Text="看完所有剧集后弹窗提示评价"
-                                       Margin="0,4,0,0"
-                                       FontWeight="Normal"
-                                       TextWrapping="Wrap" />
-                        </ToggleSwitch.Header>
-                    </ToggleSwitch>
+                        <!-- 看完逻辑 -->
+                        <ToggleSwitch Name="SubjectCompleteToggleSwitch"
+                                      OnContent="开启" 
+                                      OffContent="关闭"
+                                      Tag="SubjectComplete"
+                                      FontSize="16"
+                                      Toggled="SettingToggleSwitch_Toggled">
+                            <ToggleSwitch.Header>
+                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                           Text="看完所有剧集后弹窗提示评价"
+                                           Margin="0,4,0,0"
+                                           FontWeight="Normal"
+                                           TextWrapping="Wrap" />
+                            </ToggleSwitch.Header>
+                        </ToggleSwitch>
 
-                    <!-- 用户数据缓存 -->
-                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                               Text="用户数据缓存"
-                               Margin="0,10,0,0"
-                               FontWeight="Normal"/>
-                    <TextBlock Margin="0,10,0,0">
-                        <Run Text="缓存大小："/>
-                        <Run x:Name="JsonCacheSizeTextBlock" Text="0" />
-                        <Run Text="KB"/>
-                    </TextBlock>
-                    <Button Name="DeleteUserCacheFileButton"
-                            Content="清空缓存" 
-                            Margin="0,4,0,0"
-                            Click="DeleteJsonCacheFileButton_Click"/>
+                        <!-- 用户数据缓存 -->
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                   Text="用户数据缓存"
+                                   Margin="0,10,0,0"
+                                   FontWeight="Normal"/>
+                        <TextBlock Margin="0,10,0,0">
+                            <Run Text="缓存大小："/>
+                            <Run x:Name="JsonCacheSizeTextBlock" Text="0" />
+                            <Run Text="KB"/>
+                        </TextBlock>
+                        <Button Name="DeleteUserCacheFileButton"
+                                Content="清空缓存" 
+                                Margin="0,4,0,0"
+                                Click="DeleteJsonCacheFileButton_Click"/>
 
-                    <!-- 图片缓存 -->
-                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                               Text="图片缓存"
-                               Margin="0,10,0,0"
-                               FontWeight="Normal"/>
-                    <TextBlock Margin="0,10,0,0">
-                        <Run Text="缓存大小："/>
-                        <Run x:Name="ImageCacheSizeTextBlock" Text="0" />
-                        <Run Text="KB"/>
-                    </TextBlock>
-                    <Button Name="DeleteImageTempFileButton"
-                            Content="清空缓存" 
-                            Margin="0,4,0,0"
-                            Click="DeleteImageTempFileButton_Click"/>
+                        <!-- 图片缓存 -->
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                   Text="图片缓存"
+                                   Margin="0,10,0,0"
+                                   FontWeight="Normal"/>
+                        <TextBlock Margin="0,10,0,0">
+                            <Run Text="缓存大小："/>
+                            <Run x:Name="ImageCacheSizeTextBlock" Text="0" />
+                            <Run Text="KB"/>
+                        </TextBlock>
+                        <Button Name="DeleteImageTempFileButton"
+                                Content="清空缓存" 
+                                Margin="0,4,0,0"
+                                Click="DeleteImageTempFileButton_Click"/>
 
-                </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </PivotItem>
 
-            <PivotItem Header="实验性功能">
-                <StackPanel Padding="0,10,0,0">
-                    <!-- 使用BangumiData -->
-                    <ToggleSwitch Name="UseBangumiDataToggleSwitch"
-                                  OnContent="开启" 
-                                  OffContent="关闭"
-                                  Tag="UseBangumiData"
-                                  FontSize="16"
-                                  Toggled="SettingToggleSwitch_Toggled">
-                        <ToggleSwitch.Header>
-                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                                       Text="使用 bangumi-data "
-                                       Margin="0,4,0,0"
-                                       FontWeight="Normal"
-                                       TextWrapping="Wrap" />
-                        </ToggleSwitch.Header>
-                    </ToggleSwitch>
-                    <StackPanel Visibility="{x:Bind UseBangumiDataToggleSwitch.IsOn, Mode=OneWay}">
-                        <TextBlock Name="BangumiDataTextBlock" 
-                                   Text="数据版本："
-                                   Margin="0,10,0,0"/>
-                        <Grid Margin="0,4,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Button Name="BangumiDataButton"
-                                    Content="检查更新"
-                                    Click="BangumiDataButton_Click"
-                                    Tag="Update"/>
-                            <ProgressRing Name="BangumiDataProgressRing"
-                                          Grid.Column="1"
-                                          Visibility="Collapsed"
-                                          HorizontalAlignment="Left"
-                                          IsActive="True"
-                                          Margin="10,0,0,0"/>
-                        </Grid>
-                        <ToggleSwitch Name="UseBangumiDataAirSitesToggleSwitch"
+            <PivotItem Header="实验性功能"
+                       Margin="0">
+                <ScrollViewer>
+                    <StackPanel Padding="12,10">
+                        <!-- 使用BangumiData -->
+                        <ToggleSwitch Name="UseBangumiDataToggleSwitch"
                                       OnContent="开启" 
                                       OffContent="关闭"
-                                      Tag="UseBangumiDataAirSites"
+                                      Tag="UseBangumiData"
                                       FontSize="16"
                                       Toggled="SettingToggleSwitch_Toggled">
                             <ToggleSwitch.Header>
                                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                                       Text="使用 bangumi-data 数据显示番剧放送网站"
-                                       Margin="0,4,0,0"
-                                       FontWeight="Normal"
-                                       TextWrapping="Wrap" />
-                            </ToggleSwitch.Header>
-                        </ToggleSwitch>
-                        <ToggleSwitch Name="UseBilibiliUWPToggleSwitch"
-                                      Visibility="{x:Bind UseBangumiDataAirSitesToggleSwitch.IsOn, Mode=OneWay}"
-                                      OnContent="使用哔哩哔哩动画应用打开" 
-                                      OffContent="使用默认浏览器打开"
-                                      Tag="UseBilibiliUWP"
-                                      FontSize="16"
-                                      Toggled="SettingToggleSwitch_Toggled">
-                            <ToggleSwitch.Header>
-                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                                           Text="B站放送链接打开方式"
+                                           Text="使用 bangumi-data "
                                            Margin="0,4,0,0"
                                            FontWeight="Normal"
                                            TextWrapping="Wrap" />
                             </ToggleSwitch.Header>
                         </ToggleSwitch>
-                        <ToggleSwitch Name="UseBangumiDataAirTimeToggleSwitch"
-                                      OnContent="开启" 
-                                      OffContent="关闭"
-                                      Tag="UseBangumiDataAirTime"
-                                      FontSize="16"
-                                      Toggled="SettingToggleSwitch_Toggled">
-                            <ToggleSwitch.Header>
-                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                                           Text="进度页使用 bangumi-data 推测放送时间"
+                        <StackPanel Visibility="{x:Bind UseBangumiDataToggleSwitch.IsOn, Mode=OneWay}">
+                            <TextBlock Name="BangumiDataTextBlock" 
+                                       Text="数据版本："
+                                       Margin="0,10,0,0"/>
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Name="BangumiDataButton"
+                                        Content="检查更新"
+                                        Click="BangumiDataButton_Click"
+                                        Tag="Update"/>
+                                <ProgressRing Name="BangumiDataProgressRing"
+                                              Grid.Column="1"
+                                              Visibility="Collapsed"
+                                              HorizontalAlignment="Left"
+                                              IsActive="True"
+                                              Margin="10,0,0,0"/>
+                            </Grid>
+                            <ToggleSwitch Name="UseBangumiDataAirSitesToggleSwitch"
+                                          OnContent="开启" 
+                                          OffContent="关闭"
+                                          Tag="UseBangumiDataAirSites"
+                                          FontSize="16"
+                                          Toggled="SettingToggleSwitch_Toggled">
+                                <ToggleSwitch.Header>
+                                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                           Text="使用 bangumi-data 数据显示番剧放送网站"
                                            Margin="0,4,0,0"
                                            FontWeight="Normal"
                                            TextWrapping="Wrap" />
-                            </ToggleSwitch.Header>
-                        </ToggleSwitch>
-                    </StackPanel>
+                                </ToggleSwitch.Header>
+                            </ToggleSwitch>
+                            <ToggleSwitch Name="UseBilibiliUWPToggleSwitch"
+                                          Visibility="{x:Bind UseBangumiDataAirSitesToggleSwitch.IsOn, Mode=OneWay}"
+                                          OnContent="使用哔哩哔哩动画应用打开" 
+                                          OffContent="使用默认浏览器打开"
+                                          Tag="UseBilibiliUWP"
+                                          FontSize="16"
+                                          Toggled="SettingToggleSwitch_Toggled">
+                                <ToggleSwitch.Header>
+                                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                               Text="B站放送链接打开方式"
+                                               Margin="0,4,0,0"
+                                               FontWeight="Normal"
+                                               TextWrapping="Wrap" />
+                                </ToggleSwitch.Header>
+                            </ToggleSwitch>
+                            <ToggleSwitch Name="UseBangumiDataAirTimeToggleSwitch"
+                                          OnContent="开启" 
+                                          OffContent="关闭"
+                                          Tag="UseBangumiDataAirTime"
+                                          FontSize="16"
+                                          Toggled="SettingToggleSwitch_Toggled">
+                                <ToggleSwitch.Header>
+                                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                               Text="进度页使用 bangumi-data 推测放送时间"
+                                               Margin="0,4,0,0"
+                                               FontWeight="Normal"
+                                               TextWrapping="Wrap" />
+                                </ToggleSwitch.Header>
+                            </ToggleSwitch>
+                        </StackPanel>
 
-                </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </PivotItem>
             
-            <PivotItem Header="关于">
-                <StackPanel Padding="0,10,0,0">
-                    <TextBlock Text="Bangumi UWP (非官方)" 
-                               Style="{StaticResource TitleTextBlockStyle}" />
-                    <TextBlock TextWrapping="Wrap">
-                        <LineBreak/>
-                        © 2008-2019 Bangumi (a.k.a.Chobits), some rights reserved
-                        <LineBreak/>
-                        © 2019 Teachoc
-                        <LineBreak/>
-                        版本：
-                        <Run Text="{x:Bind Version}"/>
-                        <LineBreak/>
-                    </TextBlock>
-                    <TextBlock TextWrapping="Wrap">
-                        <Run Text="项目开源地址："/>
-                        <Hyperlink NavigateUri="https://github.com/Teachoc/Bangumi">
-                            https://github.com/Teachoc/Bangumi
-                        </Hyperlink>
-                    </TextBlock>
-                    <TextBlock TextWrapping="Wrap">
-                        <Run Text="应用图标及应用内素材由"/>
-                        <Hyperlink NavigateUri="https://bgm.tv/user/419012">
-                            ekibun
-                        </Hyperlink>
-                        <Run Text="授权使用"/>
-                        <LineBreak/>
-                    </TextBlock>
-                    <TextBlock Text="引用及参考" 
-                               Margin="0,0,0,5"
-                               Style="{StaticResource SubtitleTextBlockStyle}" />
-                    <TextBlock TextWrapping="Wrap"
-                               Margin="0,0,0,5">
-                        <Hyperlink NavigateUri="https://github.com/bangumi/api">
-                            Bangumi API(https://github.com/bangumi/api)
-                        </Hyperlink>
-                    </TextBlock>
-                    <TextBlock TextWrapping="Wrap"
-                               Margin="0,0,0,5">
-                        <Hyperlink NavigateUri="https://www.newtonsoft.com/json">
-                            Newtonsoft.Json(https://www.newtonsoft.com/json)
-                        </Hyperlink>
-                    </TextBlock>
-                    <TextBlock TextWrapping="Wrap"
-                               Margin="0,0,0,5">
-                        <Hyperlink NavigateUri="https://github.com/Microsoft/microsoft-ui-xaml">
-                            Microsoft.UI.Xaml(https://github.com/Microsoft/microsoft-ui-xaml)
-                        </Hyperlink>
-                    </TextBlock>
-                    <TextBlock TextWrapping="Wrap"
-                               Margin="0,0,0,5">
-                        <Hyperlink NavigateUri="https://github.com/windows-toolkit/WindowsCommunityToolkit">
-                            WindowsCommunityToolkit(https://github.com/windows-toolkit/WindowsCommunityToolkit)
-                        </Hyperlink>
-                    </TextBlock>
-                    <TextBlock TextWrapping="Wrap"
-                               Margin="0,0,0,5">
-                        <Hyperlink NavigateUri="https://github.com/bangumi-data/bangumi-data">
-                            bangumi-data(https://github.com/bangumi-data/bangumi-data)
-                        </Hyperlink>
-                    </TextBlock>
-                    <TextBlock TextWrapping="Wrap"
-                               Margin="0,0,0,5">
-                        <Hyperlink NavigateUri="https://flurl.dev/">
-                            Flurl(https://flurl.dev/)
-                        </Hyperlink>
-                    </TextBlock>
+            <PivotItem Header="关于"
+                       Margin="0">
+                <ScrollViewer>
+                    <StackPanel Padding="12,10">
+                        <TextBlock Text="Bangumi UWP (非官方)" 
+                                   Style="{StaticResource TitleTextBlockStyle}" />
+                        <TextBlock TextWrapping="Wrap">
+                            <LineBreak/>
+                            © 2008-2019 Bangumi (a.k.a.Chobits), some rights reserved
+                            <LineBreak/>
+                            © 2019 Teachoc
+                            <LineBreak/>
+                            版本：
+                            <Run Text="{x:Bind Version}"/>
+                            <LineBreak/>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap">
+                            <Run Text="项目开源地址："/>
+                            <Hyperlink NavigateUri="https://github.com/Teachoc/Bangumi">
+                                https://github.com/Teachoc/Bangumi
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap">
+                            <Run Text="应用图标及应用内素材由"/>
+                            <Hyperlink NavigateUri="https://bgm.tv/user/419012">
+                                ekibun
+                            </Hyperlink>
+                            <Run Text="授权使用"/>
+                            <LineBreak/>
+                        </TextBlock>
+                        <TextBlock Text="引用及参考" 
+                                   Margin="0,0,0,5"
+                                   Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,0,0,5">
+                            <Hyperlink NavigateUri="https://github.com/bangumi/api">
+                                Bangumi API(https://github.com/bangumi/api)
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,0,0,5">
+                            <Hyperlink NavigateUri="https://www.newtonsoft.com/json">
+                                Newtonsoft.Json(https://www.newtonsoft.com/json)
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,0,0,5">
+                            <Hyperlink NavigateUri="https://github.com/Microsoft/microsoft-ui-xaml">
+                                Microsoft.UI.Xaml(https://github.com/Microsoft/microsoft-ui-xaml)
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,0,0,5">
+                            <Hyperlink NavigateUri="https://github.com/windows-toolkit/WindowsCommunityToolkit">
+                                WindowsCommunityToolkit(https://github.com/windows-toolkit/WindowsCommunityToolkit)
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,0,0,5">
+                            <Hyperlink NavigateUri="https://github.com/bangumi-data/bangumi-data">
+                                bangumi-data(https://github.com/bangumi-data/bangumi-data)
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,0,0,5">
+                            <Hyperlink NavigateUri="https://flurl.dev/">
+                                Flurl(https://flurl.dev/)
+                            </Hyperlink>
+                        </TextBlock>
 
-                </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </PivotItem>
         </Pivot>
     </Grid>

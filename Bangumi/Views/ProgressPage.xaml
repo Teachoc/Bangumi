@@ -40,7 +40,7 @@
                                       RelativePanel.AlignTopWithPanel="True"
                                       Height="75" 
                                       Width="75" 
-                                      Margin="0,0,5,0"
+                                      Margin="0,0,6,0"
                                       Stretch="UniformToFill" />
                     <TextBlock Name="TitleTextBlock"
                                Text="{x:Bind NameCn}" 
@@ -286,7 +286,7 @@
         </VisualStateManager.VisualStateGroups>
         
         <controls:AdaptiveGridView Name="MyGridView" 
-                                   Padding="12,6,12,46"
+                                   Padding="12,0,12,48"
                                    ItemsSource="{x:Bind ViewModel.WatchingCollection}" 
                                    ShowsScrollingPlaceholders="False"
                                    IsItemClickEnabled="True" 

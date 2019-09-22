@@ -96,9 +96,9 @@
                                       RelativePanel.AlignLeftWithPanel="True"
                                       RelativePanel.AlignTopWithPanel="True"
                                       x:Phase="2"
-                                      Height="136" 
-                                      Width="100" 
-                                      Margin="0,0,12,0"
+                                      Height="120" 
+                                      Width="85" 
+                                      Margin="0,0,10,0"
                                       Stretch="UniformToFill" />
                     <TextBlock Name="TitleTextBlock" Text="{x:Bind Subject.NameCn}" 
                                RelativePanel.RightOf="BangumiImage"
@@ -156,7 +156,7 @@
                     <VisualState.Setters>
                         <Setter Target="MyGridView.ItemTemplate" 
                                 Value="{StaticResource WideZoomedInTemplate}"/>
-                        <Setter Target="MyGridView.DesiredWidth" Value="370"/>
+                        <Setter Target="MyGridView.DesiredWidth" Value="360"/>
                         <Setter Target="EmptyImage.Width" Value="300"/>
                         <Setter Target="EmptyImage.Height" Value="490"/>
                     </VisualState.Setters>
@@ -169,7 +169,7 @@
             <SemanticZoom.ZoomedInView>
                 <controls:AdaptiveGridView Name="MyGridView" 
                                            ItemsSource="{x:Bind cvsGroups.View}" 
-                                           Padding="12,0,12,40"
+                                           Padding="12,0,12,48"
                                            ScrollViewer.IsHorizontalScrollChainingEnabled="False"
                                            ShowsScrollingPlaceholders="False"
                                            SelectionMode="None"
@@ -189,7 +189,7 @@
 
             <SemanticZoom.ZoomedOutView>
                 <ListView ItemsSource="{x:Bind cvsGroups.View.CollectionGroups}"
-                          Padding="12,0,12,40"
+                          Padding="12,0,12,52"
                           SelectionMode="None"
                           IsItemClickEnabled="True" 
                           ScrollViewer.IsHorizontalScrollChainingEnabled="False"
