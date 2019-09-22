@@ -48,11 +48,12 @@ namespace Bangumi.ViewModels
         /// <param name="currentStatus"></param>
         public async void EditCollectionStatus(WatchingStatus status, CollectionStatusEnum currentStatus = CollectionStatusEnum.Do)
         {
+            BangumiApi.BangumiCache.SubjectStatus.TryGetValue(status.SubjectId.ToString(), out SubjectStatus2 subjectStatus);
             CollectionEditContentDialog collectionEditContentDialog = new CollectionEditContentDialog()
             {
-                Rate = 0,
-                Comment = "",
-                Privacy = false,
+                Rate = subjectStatus?.Rating ?? 0,
+                Comment = subjectStatus?.Comment,
+                Privacy = subjectStatus?.Private?.Equals("1") ?? false,
                 CollectionStatus = currentStatus,
                 SubjectType = (SubjectTypeEnum)status.Type
             };

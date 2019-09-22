@@ -177,7 +177,7 @@ namespace Bangumi.Api.Services
         {
             string url = string.Format("{0}/collection/{1}/update?access_token={2}", BaseUrl, subjectId, accessTokenString);
             string postData = "status=" + collectionStatusEnum.GetValue();
-            postData += "&comment=" + comment;
+            postData += "&comment=" + System.Net.WebUtility.UrlEncode(comment);
             postData += "&rating=" + rating;
             postData += "&privacy=" + privace;
 
