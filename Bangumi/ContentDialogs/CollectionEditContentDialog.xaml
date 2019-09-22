@@ -14,6 +14,11 @@
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     Background="{ThemeResource SystemChromeLowColor}">
 
+    <ContentDialog.TitleTemplate>
+        <DataTemplate>
+            <TextBlock Text="{Binding}" TextWrapping="Wrap" MaxWidth="300"/>
+        </DataTemplate>
+    </ContentDialog.TitleTemplate>
     <ContentDialog.Resources>
 
         <ResourceDictionary>
@@ -41,32 +46,8 @@
                                 <VisualStateManager.VisualStateGroups>
                                     <VisualStateGroup x:Name="CommonStates">
                                         <VisualState x:Name="Normal"/>
-                                        <VisualState x:Name="PointerOver">
-                                            <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RadioButtonForegroundPointerOver}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Background">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{TemplateBinding Background}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="BorderBrush">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RadioButtonBorderBrushPointerOver}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Pressed">
-                                            <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RadioButtonForegroundPressed}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Background">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{TemplateBinding Background}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="BorderBrush">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RadioButtonBorderBrushPressed}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
+                                        <VisualState x:Name="PointerOver"/>
+                                        <VisualState x:Name="Pressed"/>
                                         <VisualState x:Name="Disabled">
                                             <Storyboard>
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
@@ -84,7 +65,7 @@
                                     <VisualStateGroup x:Name="CheckStates">
                                         <VisualState x:Name="Checked">
                                             <Storyboard>
-                                                <DoubleAnimation Duration="0" Storyboard.TargetName="RectangleChecked" Storyboard.TargetProperty="Opacity" To="1"/>
+                                                <DoubleAnimation Duration="00:00:00.10" Storyboard.TargetName="RectangleChecked" Storyboard.TargetProperty="Opacity" To="1"/>
                                             </Storyboard>
                                         </VisualState>
                                         <VisualState x:Name="Unchecked"/>
@@ -126,7 +107,7 @@
                 AutomationProperties.Name="Slider with ticks"
                 TickFrequency="1" 
                 TickPlacement="Outside"
-                Height="30"
+                Height="31"
                 Minimum="0"
                 Maximum="10"
                 Value="{x:Bind Rate}"/>

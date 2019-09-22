@@ -88,6 +88,8 @@ namespace Bangumi.Views
             // 设置访问网页按钮隐藏以及解除事件绑定
             MainPage.RootPage.WebPageAppBarButton.Visibility = Visibility.Collapsed;
             MainPage.RootPage.WebPageAppBarButton.Click -= LaunchWebPage_Click;
+            MainPage.RootPage.MyCommandBar.IsDynamicOverflowEnabled = false;
+            MainPage.RootPage.MyCommandBar.IsDynamicOverflowEnabled = true;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)

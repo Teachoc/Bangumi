@@ -29,6 +29,7 @@
                 <FontIcon FontFamily="Segoe MDL2 Assets" 
                           Glyph="&#xE7BA;" />
             </AppBarButton>
+            <AppBarSeparator Visibility="{Binding ElementName=OfflineAppBarButton,Path=Visibility}" />
             <AppBarButton Name="CollectionAppBarButton"
                           x:FieldModifier="public"
                           IsEnabled="{Binding ElementName=RefreshAppBarButton,Path=IsEnabled}"
@@ -75,11 +76,6 @@
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
-        
-        <ProgressRing Name="MyProgressRing" 
-                      Height="50" 
-                      Width="50"/>
-
         <controls:InAppNotification x:Name="ToastInAppNotification"
                                     x:FieldModifier="public"
                                     ShowDismissButton="False"
@@ -114,13 +110,18 @@
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <!--<AdaptiveTrigger
-                        MinWindowWidth="{x:Bind NavView.CompactModeThresholdWidth}"/>-->
+                        <AdaptiveTrigger MinWindowWidth="0"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <!-- Leave the next line for left-only navigation. -->
-                        <!--<Setter Target="ContentFrame.Padding" 
-                                Value="12,0,12,12"/>-->
+                        <Setter Target="MyCommandBar.DefaultLabelPosition" Value="Bottom"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="600"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="MyCommandBar.DefaultLabelPosition" Value="Right"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
