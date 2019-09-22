@@ -209,7 +209,8 @@ namespace Bangumi.ViewModels
                 Comment = myComment,
                 Privacy = myPrivacy,
                 CollectionStatus = _collectionStatus,
-                SubjectType = this.SubjectType
+                SubjectType = this.SubjectType,
+                Title = this.NameCn,
             };
             MainPage.RootPage.HasDialog = true;
             if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync())

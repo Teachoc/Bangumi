@@ -55,7 +55,8 @@ namespace Bangumi.ViewModels
                 Comment = subjectStatus?.Comment,
                 Privacy = subjectStatus?.Private?.Equals("1") ?? false,
                 CollectionStatus = currentStatus,
-                SubjectType = (SubjectTypeEnum)status.Type
+                SubjectType = (SubjectTypeEnum)status.Type,
+                Title = status.NameCn,
             };
             MainPage.RootPage.HasDialog = true;
             if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync())

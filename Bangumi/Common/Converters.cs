@@ -262,6 +262,17 @@ namespace Bangumi.Common
         }
 
         /// <summary>
+        /// 根据评分返回对应的描述
+        /// </summary>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static string GetRateDesc(double rate)
+        {
+            string[] descs = new string[] { "撤销", "不忍直视", "很差", "差", "较差", "不过不失", "还行", "推荐", "力荐", "神作", "超神作 (请谨慎评价)" };
+            return descs[(int)rate];
+        }
+
+        /// <summary>
         /// 将演员列表转为string
         /// </summary>
         /// <param name="actors"></param>
