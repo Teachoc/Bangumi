@@ -4,6 +4,7 @@ using Bangumi.Api.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Text.RegularExpressions;
 
 namespace Bangumi.Common
 {
@@ -207,7 +208,7 @@ namespace Bangumi.Common
             {
                 return "EP.";
             }
-            var ep = eps?.Where(p => p.Sort == next_ep).FirstOrDefault();
+            var ep = eps?.Where(p => p.Sort == next_ep && Regex.Match(p.Status, "Air|Today|NA").Success).FirstOrDefault();
             if (ep == null)
             {
                 return "EP.";
