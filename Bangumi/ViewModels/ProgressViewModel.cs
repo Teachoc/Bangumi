@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
@@ -123,25 +124,24 @@ namespace Bangumi.ViewModels
         /// <param name="item"></param>
         public async void UpdateNextEpStatus(WatchingStatus item)
         {
-            if (item != null && item.Eps != null && item.Eps.Count != 0)
+            if (item?.Eps != null && item.Eps.Count != 0 && item.NextEp != -1)
             {
                 item.IsUpdating = true;
-                if (item.NextEp != -1 && await BangumiFacade.UpdateProgressAsync(
-                    item.Eps.Where(ep => (ep.Status == "Air" || ep.Status == "Today" || ep.Status == "NA") && ep.Sort == item.NextEp)
-                            .FirstOrDefault().Id.ToString(), EpStatusEnum.watched))
+                if (await BangumiFacade.UpdateProgressAsync(item.Eps.FirstOrDefault(ep => Regex.IsMatch(ep.Status, "(Air|Today|NA)") &&
+                                                                                          ep.Sort == item.NextEp).Id.ToString(),
+                                                            EpStatusEnum.watched))
                 {
-                    item.Eps.Where(ep => (ep.Status == "Air" || ep.Status == "Today" || ep.Status == "NA") && ep.Sort == item.NextEp)
-                            .FirstOrDefault().Status = "看过";
-                    if (item.Eps.Count == item.Eps.Where(e => e.Status == "看过").Count())
-                        item.NextEp = -1;
-                    else
-                        item.NextEp = item.Eps.Where(ep => ep.Status == "Air" || ep.Status == "Today").Count() != 0 ?
-                                       item.Eps.Where(ep => ep.Status == "Air" || ep.Status == "Today").OrderBy(ep => ep.Sort).FirstOrDefault().Sort :
-                                       item.Eps.Where(ep => ep.Status == "NA").FirstOrDefault().Sort;
+                    item.Eps.FirstOrDefault(ep => Regex.IsMatch(ep.Status, "(Air|Today|NA)") && ep.Sort == item.NextEp).Status = "看过";
                     item.WatchedEps++;
+                    item.NextEp = item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(Air|Today)")).OrderBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
+                                  item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(NA)")).OrderBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
+                                  -1;
+
                     // 若未看到最新一集，则使用粉色，否则使用灰色
-                    if (item.Eps.Where(e => e.Status == "看过").Count() < (item.Eps.Count - item.Eps.Where(e => e.Status == "NA").Count()))
+                    if (item.Eps.FirstOrDefault(ep => Regex.IsMatch(ep.Status, "(Air|Today)")) != null)
+                    {
                         item.EpColor = "#d26585";
+                    }
                     else
                     {
                         // 将已看到最新剧集的条目排到最后，且设为灰色
@@ -153,13 +153,12 @@ namespace Bangumi.ViewModels
                         item.EpColor = "Gray";
 
                         // 若设置启用且看完则弹窗提示修改收藏状态及评价
-                        if (SettingHelper.SubjectComplete && item.Eps.Where(e => e.Status == "看过").Count() == item.Eps.Count)
+                        if (SettingHelper.SubjectComplete && item.Eps.FirstOrDefault(ep => Regex.IsMatch(ep.Status, "(Air|Today|NA)")) == null)
                         {
                             EditCollectionStatus(item, CollectionStatusEnum.Collect);
                         }
                     }
                     item.LastTouch = DateTime.Now.ConvertDateTimeToJsTick();
-
                 }
                 item.IsUpdating = false;
             }
@@ -317,7 +316,7 @@ namespace Bangumi.ViewModels
                     };
                     item.Eps.Add(simpleEp);
                 }
-                item.UpdatedEps = item.Eps.Count - item.Eps.Where(e => e.Status == "NA").Count();
+                item.UpdatedEps = item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(Air|Today)")).Count();
 
                 if (fromCache && BangumiApi.BangumiCache.Progresses.TryGetValue(item.SubjectId.ToString(), out Progress progressCache))
                 {
@@ -336,14 +335,13 @@ namespace Bangumi.ViewModels
             {
                 item.WatchedEps = -1;
                 item.UpdatedEps = -1;
-                item.EpColor = "Gray";
             }
 
             if (item.NextEp != -1 && item.Eps.Count != 0)
             {
-                item.NextEp = item.Eps.Where(ep => ep.Status == "Air" || ep.Status == "Today").Count() != 0 ?
-                              item.Eps.Where(ep => ep.Status == "Air" || ep.Status == "Today").OrderBy(ep => ep.Sort).FirstOrDefault().Sort :
-                              item.Eps.Where(ep => ep.Status == "NA").FirstOrDefault().Sort;
+                item.NextEp = item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(Air|Today)")).OrderBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
+                              item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(NA)")).OrderBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
+                              -1;
             }
         }
 
@@ -361,15 +359,8 @@ namespace Bangumi.ViewModels
                 {
                     item.NextEp = -1;
                 }
-                if (progress.Eps.Count < (item.Eps.Count - item.Eps.Where(e => e.Status == "NA").Count()))
-                {
-                    item.EpColor = "#d26585";
-                }
-                else
-                {
-                    item.EpColor = "Gray";
-                }
-                foreach (var ep in item.Eps) // 填充用户观看状态
+                // 填充用户观看状态
+                foreach (var ep in item.Eps)
                 {
                     var temp = progress.Eps.ToList();
                     foreach (var p in temp)
@@ -381,6 +372,14 @@ namespace Bangumi.ViewModels
                             break;
                         }
                     }
+                }
+                if (item.Eps.FirstOrDefault(ep => Regex.IsMatch(ep.Status, "(Air|Today)")) != null)
+                {
+                    item.EpColor = "#d26585";
+                }
+                else
+                {
+                    item.EpColor = "Gray";
                 }
             }
             else

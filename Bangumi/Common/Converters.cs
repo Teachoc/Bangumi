@@ -208,7 +208,7 @@ namespace Bangumi.Common
             {
                 return "EP.";
             }
-            var ep = eps?.Where(p => p.Sort == next_ep && Regex.Match(p.Status, "Air|Today|NA").Success).FirstOrDefault();
+            var ep = eps?.Where(p => p.Sort == next_ep && Regex.IsMatch(p.Status, "(Air|Today|NA)")).FirstOrDefault();
             if (ep == null)
             {
                 return "EP.";
