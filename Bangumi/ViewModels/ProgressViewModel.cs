@@ -179,7 +179,7 @@ namespace Bangumi.ViewModels
         {
             try
             {
-                List<Watching> watchingsCache = BangumiApi.BangumiCache.Watchings;
+                List<Watching> watchingsCache = BangumiApi.BangumiCache.Watchings.ToList();
                 // 加载缓存
                 var cachedList = await ProcessWatchings(watchingsCache);
                 DiffListToObservableCollection(watchingCollection, cachedList);
