@@ -293,7 +293,7 @@ namespace Bangumi.Api
                     return BangumiCache.Watchings;
                 }
                 var result = await wrapper.GetWatchingListAsync(MyToken.UserId);
-                UpdateCache(BangumiCache.Watchings, result);
+                UpdateCache(ref BangumiCache._watchings, result);
                 return result;
             }
             catch (Exception e)
@@ -419,7 +419,7 @@ namespace Bangumi.Api
                 if (BangumiCache.Subjects.ContainsKey(subjectId))
                 {
                     result = await wrapper.GetSubjectEpsAsync(subjectId);
-                    UpdateCache(BangumiCache.Subjects[subjectId].Eps, result.Eps);
+                    UpdateCache(ref BangumiCache.Subjects[subjectId]._eps, result._eps);
                 }
                 else
                 {
@@ -474,7 +474,7 @@ namespace Bangumi.Api
                     return BangumiCache.TimeLine;
                 }
                 var result = await wrapper.GetBangumiCalendarAsync();
-                UpdateCache(BangumiCache.TimeLine, result);
+                UpdateCache(ref BangumiCache._timeLine, result);
                 return result;
             }
             catch (Exception e)
@@ -555,7 +555,7 @@ namespace Bangumi.Api
         private static void UpdateProgressCache(int epId, EpStatusEnum status)
         {
             // 找到该章节所属的条目
-            var sub = BangumiCache.Subjects.Values.Where(s => s.Eps?.Where(p => p.Id == epId).FirstOrDefault() != null).FirstOrDefault();
+            var sub = BangumiCache.Subjects.Values.Where(s => s.Eps.Where(p => p.Id == epId).FirstOrDefault() != null).FirstOrDefault();
             if (sub != null)
             {
                 // 找到已有进度，否则新建
@@ -637,23 +637,23 @@ namespace Bangumi.Api
         /// <param name="value"></param>
         private static void UpdateCache<T>(Dictionary<string, T> dic, string key, T value)
         {
-            if (value != null)
+            if (dic == null) throw new ArgumentNullException(nameof(dic));
+            if (key == null) throw new ArgumentNullException(nameof(key));
+
+            if (dic.ContainsKey(key))
             {
-                if (dic.ContainsKey(key))
+                if (!dic[key].EqualsExT(value))
                 {
-                    if (!value.Equals(dic[key]))
-                    {
-                        dic[key] = value;
-                        timer.Interval = interval;
-                        isCacheUpdated = true;
-                    }
-                }
-                else
-                {
-                    dic.Add(key, value);
                     timer.Interval = interval;
+                    dic[key] = value;
                     isCacheUpdated = true;
                 }
+            }
+            else
+            {
+                timer.Interval = interval;
+                dic.Add(key, value);
+                isCacheUpdated = true;
             }
         }
 
@@ -663,14 +663,13 @@ namespace Bangumi.Api
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <param name="dest"></param>
-        private static void UpdateCache<T>(List<T> source, List<T> dest)
+        private static void UpdateCache<T>(ref List<T> source, List<T> dest)
         {
-            if (!source.SequenceEqual(dest))
+            if (!source.SequenceEqualExT(dest))
             {
-                source.Clear();
-                source.AddRange(dest);
                 // 重新计时
                 timer.Interval = interval;
+                source = dest;
                 isCacheUpdated = true;
             }
         }
@@ -760,7 +759,7 @@ namespace Bangumi.Api
                 if (token != null)
                 {
                     // 将信息写入本地文件
-                    if (!token.Equals(MyToken))
+                    if (!token.EqualsExT(MyToken))
                         await WriteTokenAsync(token);
                 }
             }

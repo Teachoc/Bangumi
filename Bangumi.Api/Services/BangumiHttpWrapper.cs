@@ -267,15 +267,12 @@ namespace Bangumi.Api.Services
                 var result = JsonConvert.DeserializeObject<Subject>(response);
                 result.Name = System.Net.WebUtility.HtmlDecode(result.Name);
                 result.NameCn = string.IsNullOrEmpty(result.NameCn) ? result.Name : System.Net.WebUtility.HtmlDecode(result.NameCn);
-                if (result.Eps != null)
+                // 将章节按类别排序
+                result._eps = result.Eps.OrderBy(c => c.Type).ToList();
+                foreach (var ep in result.Eps)
                 {
-                    // 将章节按类别排序
-                    result.Eps = result.Eps.OrderBy(c => c.Type).ToList();
-                    foreach (var ep in result.Eps)
-                    {
-                        ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
-                        ep.NameCn = string.IsNullOrEmpty(ep.NameCn) ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
-                    }
+                    ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
+                    ep.NameCn = string.IsNullOrEmpty(ep.NameCn) ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
                 }
                 return result;
             }
@@ -315,15 +312,12 @@ namespace Bangumi.Api.Services
                 {
                     result.Images.ConvertImageHttpToHttps();
                 }
-                if (result.Eps != null)
+                // 将章节按类别排序
+                result._eps = result.Eps.OrderBy(c => c.Type).ToList();
+                foreach (var ep in result.Eps)
                 {
-                    // 将章节按类别排序
-                    result.Eps = result.Eps.OrderBy(c => c.Type).ToList();
-                    foreach (var ep in result.Eps)
-                    {
-                        ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
-                        ep.NameCn = string.IsNullOrEmpty(ep.NameCn) ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
-                    }
+                    ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
+                    ep.NameCn = string.IsNullOrEmpty(ep.NameCn) ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
                 }
                 if (result.Blogs != null)
                 {

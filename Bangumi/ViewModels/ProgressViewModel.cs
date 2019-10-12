@@ -275,6 +275,10 @@ namespace Bangumi.ViewModels
                         }
                         catch (Exception e)
                         {
+                            if (Debugger.IsAttached)
+                            {
+                                Debugger.Break();
+                            }
                             throw e;
                         }
                         finally
@@ -302,7 +306,7 @@ namespace Bangumi.ViewModels
             //item.IsUpdating = true;
 
             item.Eps = new List<SimpleEp>();
-            if (subject?.Eps != null)
+            if (subject?.Eps.Count > 0)
             {
                 foreach (var ep in subject.Eps)
                 {

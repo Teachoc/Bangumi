@@ -48,8 +48,19 @@ namespace Bangumi.Api.Models
         [JsonProperty("collection")]
         public CollectionStatus Collection { get; set; }
 
+        internal List<Ep> _eps;
         [JsonProperty("eps")]
-        public List<Ep> Eps { get; set; }
+        public List<Ep> Eps
+        {
+            get
+            {
+                if (_eps == null)
+                {
+                    _eps = new List<Ep>();
+                }
+                return _eps;
+            }
+        }
 
         [JsonProperty("crt")]
         public List<Crt> Characters { get; set; }

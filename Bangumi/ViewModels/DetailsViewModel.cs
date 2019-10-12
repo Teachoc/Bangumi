@@ -409,7 +409,7 @@ namespace Bangumi.ViewModels
                         {
                             ProcessProgress(subject, await progress);
                         }
-                        if (subjectChanged || !subjectStatusCache.EqualsExT(await subjectStatus))
+                        if (!subjectStatusCache.EqualsExT(await subjectStatus))
                         {
                             ProcessCollectionStatus(await subjectStatus);
                         }
@@ -494,7 +494,7 @@ namespace Bangumi.ViewModels
                 MoreInfo = "作品分类：" + SubjectType.GetDescCn();
                 MoreInfo += subject.AirDate == "0000-00-00" ? "" : "\n放送开始：" + subject.AirDate;
                 MoreInfo += subject.AirWeekday == 0 ? "" : "\n放送星期：" + Converters.GetWeekday(subject.AirWeekday);
-                MoreInfo += subject.Eps == null ? "" : "\n话数：" + subject.Eps.Count;
+                MoreInfo += subject.Eps.Count == 0 ? "" : "\n话数：" + subject.Eps.Count;
                 // 角色
                 Characters.Clear();
                 if (subject.Characters != null)
@@ -532,7 +532,7 @@ namespace Bangumi.ViewModels
                     }
                 }
                 // 显示章节
-                if (subject.Eps != null)
+                if (subject.Eps.Count > 0)
                 {
                     // 在无章节信息时添加
                     if (Eps.Count == 0)
@@ -596,7 +596,7 @@ namespace Bangumi.ViewModels
                 {
                     foreach (var ep in Eps) //用户观看状态
                     {
-                        var prog = progress?.Eps?.Where(p => p.Id == ep.Id).FirstOrDefault();
+                        var prog = progress.Eps?.Where(p => p.Id == ep.Id).FirstOrDefault();
                         if (prog != null)
                         {
                             ep.Status = prog.Status.CnName;
@@ -630,6 +630,13 @@ namespace Bangumi.ViewModels
                     myRate = subjectStatus.Rating;
                     myComment = subjectStatus.Comment;
                     myPrivacy = subjectStatus.Private == "1" ? true : false;
+                }
+                else
+                {
+                    CollectionStatusText = "收藏";
+                    myRate = 0;
+                    myComment = string.Empty;
+                    myPrivacy = false;
                 }
                 SetCollectionIcon();
                 IsStatusLoaded = true;
