@@ -187,14 +187,14 @@ namespace Bangumi.ViewModels
                 {
                     var watchings = await BangumiApi.GetWatchingListAsync();
                     // 当天首次更新或内容有变更
-                    if (!SettingHelper.IsUpdatedToday || !watchingsCache.SequenceEqualExT(watchings))
+                    if (!BangumiApi.IsCacheUpdatedToday || !watchingsCache.SequenceEqualExT(watchings))
                     {
                         var newList = await ProcessWatchings(watchings, watchingCollection.ToList(), false);
                         DiffListToObservableCollection(watchingCollection, newList);
                         // 当天成功更新
-                        if (!SettingHelper.IsUpdatedToday)
+                        if (!BangumiApi.IsCacheUpdatedToday)
                         {
-                            SettingHelper.IsUpdatedToday = true;
+                            BangumiApi.IsCacheUpdatedToday = true;
                         }
                     }
                 }
@@ -256,7 +256,7 @@ namespace Bangumi.ViewModels
                             {
                                 // 将条目修改时间进行比较，仅更新有修改的条目，以及每天首次更新
                                 if (item.LastTouch != cachedWatchings?.Find(c => c.SubjectId == item.SubjectId)?.LastTouch ||
-                                    !SettingHelper.IsUpdatedToday)
+                                    !BangumiApi.IsCacheUpdatedToday)
                                 {
                                     var subject = await BangumiApi.GetSubjectEpsAsync(item.SubjectId.ToString());
                                     // 更新数据

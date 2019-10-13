@@ -104,26 +104,5 @@ namespace Bangumi.Helper
             }
         }
 
-        public static bool IsUpdatedToday
-        {
-            set
-            {
-                if (value)
-                {
-                    _updateDay = DateTime.Today.ConvertDateTimeToJsTick();
-                    localSettings.Values["UpdateDay"] = _updateDay;
-                }
-                else
-                {
-                    _updateDay = DateTime.Today.AddDays(-1).ConvertDateTimeToJsTick();
-                    localSettings.Values["UpdateDay"] = _updateDay;
-                }
-            }
-            get
-            {
-                return _updateDay == DateTime.Today.ConvertDateTimeToJsTick();
-            }
-        }
-
     }
 }

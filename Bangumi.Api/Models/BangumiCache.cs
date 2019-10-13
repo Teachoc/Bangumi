@@ -101,5 +101,10 @@ namespace Bangumi.Api.Models
                 return _timeLine;
             }
         }
+
+        /// <summary>
+        /// 缓存更新时间
+        /// </summary>
+        public long UpdateDate { get; set; }
     }
 }

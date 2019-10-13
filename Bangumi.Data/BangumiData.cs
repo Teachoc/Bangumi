@@ -15,10 +15,10 @@ namespace Bangumi.Data
     {
         private const string BangumiDataUrl = "https://api.github.com/repos/bangumi-data/bangumi-data/tags";
         private const string BangumiDataCDNUrl = "https://cdn.jsdelivr.net/npm/bangumi-data@0.3/dist/data.json";
-        private static BangumiDataSet dataSet;
-        private static Dictionary<string, string> seasonIdMap;
-        private static string latestVersion;
-        private static string folderPath;
+        private static BangumiDataSet _dataSet;
+        private static Dictionary<string, string> _seasonIdMap;
+        private static string _latestVersion;
+        private static string _folderPath;
 
         public static string Version { get; private set; }
         public static bool UseBiliApp { get; set; }
@@ -31,84 +31,32 @@ namespace Bangumi.Data
         /// <param name="useBiliApp">是否将链接转换为使用 哔哩哔哩动画 启动协议</param>
         public static async Task Init(string datafolderpath, bool useBiliApp = false)
         {
-            folderPath = datafolderpath ?? throw new ArgumentNullException(nameof(datafolderpath));
+            _folderPath = datafolderpath ?? throw new ArgumentNullException(nameof(datafolderpath));
             UseBiliApp = useBiliApp;
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-            if (dataSet == null &&
-                File.Exists(AppFile.Data_json.GetFilePath(folderPath)) &&
-                File.Exists(AppFile.Version.GetFilePath(folderPath)))
+            if (!Directory.Exists(_folderPath))
+                Directory.CreateDirectory(_folderPath);
+            if (_dataSet == null &&
+                File.Exists(AppFile.Data_json.GetFilePath(_folderPath)) &&
+                File.Exists(AppFile.Version.GetFilePath(_folderPath)))
             {
-                dataSet = JsonConvert.DeserializeObject<BangumiDataSet>(await FileHelper.ReadTextAsync(AppFile.Data_json.GetFilePath(folderPath)));
-                Version = await FileHelper.ReadTextAsync(AppFile.Version.GetFilePath(folderPath));
+                _dataSet = JsonConvert.DeserializeObject<BangumiDataSet>(await FileHelper.ReadTextAsync(AppFile.Data_json.GetFilePath(_folderPath)));
+                Version = await FileHelper.ReadTextAsync(AppFile.Version.GetFilePath(_folderPath));
             }
-            if (seasonIdMap == null)
+            if (_seasonIdMap == null)
             {
-                if (File.Exists(AppFile.Map_json.GetFilePath(folderPath)))
+                if (File.Exists(AppFile.Map_json.GetFilePath(_folderPath)))
                 {
-                    seasonIdMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(await FileHelper.ReadTextAsync(AppFile.Map_json.GetFilePath(folderPath)));
+                    _seasonIdMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(await FileHelper.ReadTextAsync(AppFile.Map_json.GetFilePath(_folderPath)));
                 }
                 else
                 {
-                    seasonIdMap = new Dictionary<string, string>();
+                    _seasonIdMap = new Dictionary<string, string>();
                 }
             }
         }
 
-        #region 版本更新
-        /// <summary>
-        /// 解析网页获取最新版本号，并暂存
-        /// </summary>
-        /// <returns>返回最新版本号</returns>
-        public static async Task<string> GetLatestVersion()
-        {
-            try
-            {
-                var result = await BangumiDataUrl.WithHeader("User-Agent", "Bangumi UWP").GetStringAsync();
-                JArray jArray = JArray.Parse(result);
-                // 返回第一个 tag 版本号
-                latestVersion = jArray[0].SelectToken("name").ToString();
-                return latestVersion;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                return "";
-            }
-        }
 
-        /// <summary>
-        /// 获取最新版本并下载数据
-        /// </summary>
-        /// <returns></returns>
-        public static async Task<bool> DownloadLatestBangumiData()
-        {
-            if (string.IsNullOrEmpty(latestVersion))
-                await GetLatestVersion();
-            if (!string.IsNullOrEmpty(latestVersion))
-            {
-                try
-                {
-                    var data = await BangumiDataCDNUrl.GetStringAsync();
-                    dataSet = JsonConvert.DeserializeObject<BangumiDataSet>(data);
-                    await FileHelper.WriteTextAsync(AppFile.Data_json.GetFilePath(folderPath), data);
-                    Version = latestVersion;
-                    await FileHelper.WriteTextAsync(AppFile.Version.GetFilePath(folderPath), Version);
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e.Message);
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        #endregion
-
+        #region 公共方法
         /// <summary>
         /// 根据网站放送开始时间推测更新时间
         /// </summary>
@@ -116,8 +64,8 @@ namespace Bangumi.Data
         /// <returns></returns>
         public static string GetAirTimeByBangumiId(string id)
         {
-            var siteList = dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
-                                        .Where(s => dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
+            var siteList = _dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
+                                          .Where(s => _dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
             string[] airSites = new string[] { "bilibili", "acfun", "iqiyi" , "qq" };
             if (siteList != null)
             {
@@ -143,15 +91,15 @@ namespace Bangumi.Data
         /// <returns></returns>
         public static async Task<List<Site>> GetAirSitesByBangumiIdAsync(string id)
         {
-            var siteList = dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
-                                         .Where(s => dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
+            var siteList = _dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
+                                         .Where(s => _dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
             if (siteList != null)
             {
                 foreach (var site in siteList)
                 {
                     site.Url = string.IsNullOrEmpty(site.Id) ?
                                site.Url :
-                               dataSet.SiteMeta[site.SiteName].UrlTemplate.Replace("{{id}}", site.Id);
+                               _dataSet.SiteMeta[site.SiteName].UrlTemplate.Replace("{{id}}", site.Id);
                 }
                 // 启用设置，将mediaid转换为seasonid
                 if (UseBiliApp)
@@ -160,7 +108,7 @@ namespace Bangumi.Data
                     if (biliSite != null)
                     {
                         string seasonId;
-                        if (!seasonIdMap.TryGetValue(biliSite.Id, out seasonId))
+                        if (!_seasonIdMap.TryGetValue(biliSite.Id, out seasonId))
                         {
                             var url = string.Format("https://bangumi.bilibili.com/view/web_api/media?media_id={0}", biliSite.Id);
                             try
@@ -168,8 +116,8 @@ namespace Bangumi.Data
                                 var result = await url.GetStringAsync();
                                 JObject jObject = JObject.Parse(result);
                                 seasonId = jObject.SelectToken("result.param.season_id").ToString();
-                                seasonIdMap.Add(biliSite.Id, seasonId);
-                                _ = FileHelper.WriteTextAsync(AppFile.Map_json.GetFilePath(folderPath), JsonConvert.SerializeObject(seasonIdMap));
+                                _seasonIdMap.Add(biliSite.Id, seasonId);
+                                _ = FileHelper.WriteTextAsync(AppFile.Map_json.GetFilePath(_folderPath), JsonConvert.SerializeObject(_seasonIdMap));
                             }
                             catch (Exception e)
                             {
@@ -188,6 +136,62 @@ namespace Bangumi.Data
                 return new List<Site>();
             }
         }
+        #endregion
+
+
+        #region 版本更新
+        /// <summary>
+        /// 解析网页获取最新版本号，并暂存
+        /// </summary>
+        /// <returns>返回最新版本号</returns>
+        public static async Task<string> GetLatestVersion()
+        {
+            try
+            {
+                var result = await BangumiDataUrl.WithHeader("User-Agent", "Bangumi UWP").GetStringAsync();
+                JArray jArray = JArray.Parse(result);
+                // 返回第一个 tag 版本号
+                _latestVersion = jArray[0].SelectToken("name").ToString();
+                return _latestVersion;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// 获取最新版本并下载数据
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<bool> DownloadLatestBangumiData()
+        {
+            if (string.IsNullOrEmpty(_latestVersion))
+                await GetLatestVersion();
+            if (!string.IsNullOrEmpty(_latestVersion))
+            {
+                try
+                {
+                    var data = await BangumiDataCDNUrl.GetStringAsync();
+                    _dataSet = JsonConvert.DeserializeObject<BangumiDataSet>(data);
+                    await FileHelper.WriteTextAsync(AppFile.Data_json.GetFilePath(_folderPath), data);
+                    Version = _latestVersion;
+                    await FileHelper.WriteTextAsync(AppFile.Version.GetFilePath(_folderPath), Version);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        #endregion
 
 
         #region AppFile
