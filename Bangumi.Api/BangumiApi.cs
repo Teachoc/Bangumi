@@ -548,11 +548,11 @@ namespace Bangumi.Api
         private static void UpdateSubjectStatusCache(string subjectId, CollectionStatusEnum collectionStatus,
                                                      string comment, string rating, string privace)
         {
-            BangumiCache.SubjectStatus.TryGetValue(subjectId, out var status);
-            if (status != null)
+            _isCacheUpdated = false;
+            if (collectionStatus != CollectionStatusEnum.No)
             {
-                _isCacheUpdated = false;
-                if (collectionStatus != CollectionStatusEnum.No)
+                BangumiCache.SubjectStatus.TryGetValue(subjectId, out var status);
+                if (status != null)
                 {
                     status.Status = new SubjectStatus()
                     {
@@ -565,10 +565,31 @@ namespace Bangumi.Api
                 }
                 else
                 {
-                    BangumiCache.SubjectStatus.Remove(subjectId);
+                    BangumiCache.SubjectStatus.Add(subjectId,
+                        new SubjectStatus2()
+                        {
+                            Status = new SubjectStatus()
+                            {
+                                Id = (int)collectionStatus,
+                                Type = collectionStatus.GetValue(),
+                            },
+                            Comment = comment,
+                            Rating = string.IsNullOrEmpty(rating) ? 0 : int.Parse(rating),
+                            Private = privace,
+                        });
                 }
-                _isCacheUpdated = true;
+                // 若状态不是在做，则从进度中删除
+                if (collectionStatus != CollectionStatusEnum.Do)
+                {
+                    BangumiCache.Watchings.RemoveAll(w => w.SubjectId.ToString() == subjectId);
+                }
             }
+            else
+            {
+                BangumiCache.SubjectStatus.Remove(subjectId);
+                BangumiCache.Watchings.RemoveAll(w => w.SubjectId.ToString() == subjectId);
+            }
+            _isCacheUpdated = true;
         }
 
         /// <summary>

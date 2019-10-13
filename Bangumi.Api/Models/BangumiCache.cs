@@ -6,10 +6,10 @@ namespace Bangumi.Api.Models
 {
     public class BangumiCache
     {
+        internal Dictionary<string, Collection2> _collections;
         /// <summary>
         /// 收藏，含动画、书籍、音乐、游戏、三次元
         /// </summary>
-        internal Dictionary<string, Collection2> _collections;
         public Dictionary<string, Collection2> Collections
         {
             get
@@ -22,10 +22,10 @@ namespace Bangumi.Api.Models
             }
         }
 
+        internal Dictionary<string, Subject> _subjects;
         /// <summary>
         /// 条目详情
         /// </summary>
-        internal Dictionary<string, Subject> _subjects;
         public Dictionary<string, Subject> Subjects
         {
             get
@@ -38,10 +38,10 @@ namespace Bangumi.Api.Models
             }
         }
 
+        internal Dictionary<string, SubjectStatus2> _subjectStatus;
         /// <summary>
         /// 条目收藏信息
         /// </summary>
-        internal Dictionary<string, SubjectStatus2> _subjectStatus;
         public Dictionary<string, SubjectStatus2> SubjectStatus
         {
             get
@@ -54,10 +54,10 @@ namespace Bangumi.Api.Models
             }
         }
 
+        internal Dictionary<string, Progress> _progresses;
         /// <summary>
         /// 条目收视进度
         /// </summary>
-        internal Dictionary<string, Progress> _progresses;
         public Dictionary<string, Progress> Progresses
         {
             get
@@ -70,10 +70,10 @@ namespace Bangumi.Api.Models
             }
         }
 
+        internal List<Watching> _watchings;
         /// <summary>
         /// 用户收视列表
         /// </summary>
-        internal List<Watching> _watchings;
         public List<Watching> Watchings
         {
             get
@@ -86,10 +86,10 @@ namespace Bangumi.Api.Models
             }
         }
 
+        internal List<BangumiTimeLine> _timeLine;
         /// <summary>
         /// 时间表
         /// </summary>
-        internal List<BangumiTimeLine> _timeLine;
         public List<BangumiTimeLine> TimeLine
         {
             get
