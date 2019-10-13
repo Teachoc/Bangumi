@@ -249,17 +249,7 @@ namespace Bangumi.Common
             if (d == 0)
                 return "-";
             else
-                switch (n)
-                {
-                    case 0:
-                        return d.ToString("0");
-                    case 1:
-                        return d.ToString("0.0");
-                    case 2:
-                        return d.ToString("0.00");
-                    default:
-                        return d.ToString();
-                }
+                return Math.Round(d, n, MidpointRounding.AwayFromZero).ToString();
         }
 
         /// <summary>
@@ -269,8 +259,8 @@ namespace Bangumi.Common
         /// <returns></returns>
         public static string GetRateDesc(double rate)
         {
-            string[] descs = new string[] { "撤销", "不忍直视", "很差", "差", "较差", "不过不失", "还行", "推荐", "力荐", "神作", "超神作 (请谨慎评价)" };
-            return descs[(int)rate];
+            string[] descs = new string[] { "", "不忍直视", "很差", "差", "较差", "不过不失", "还行", "推荐", "力荐", "神作", "超神作 (请谨慎评价)" };
+            return descs[(int)Math.Round(rate, 0, MidpointRounding.AwayFromZero)];
         }
 
         /// <summary>

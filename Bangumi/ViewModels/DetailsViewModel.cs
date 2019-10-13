@@ -469,11 +469,11 @@ namespace Bangumi.ViewModels
                     simpleRates.Add(new SimpleRate { Count = subject.Rating.Count._3, Score = 3 });
                     simpleRates.Add(new SimpleRate { Count = subject.Rating.Count._2, Score = 2 });
                     simpleRates.Add(new SimpleRate { Count = subject.Rating.Count._1, Score = 1 });
-                    double maxCount = simpleRates.Max().Count;
+                    double sumCount = simpleRates.Sum(s => s.Count);
                     OthersRates.Clear();
                     foreach (var item in simpleRates)
                     {
-                        item.Ratio = (double)item.Count * 100 / maxCount;
+                        item.Ratio = (double)item.Count * 100 / sumCount;
                         OthersRates.Add(item);
                     }
                 }
