@@ -20,53 +20,59 @@ namespace Bangumi.Api
         /// <summary>
         /// Http 请求封装
         /// </summary>
-        private static BangumiHttpWrapper wrapper;
+        private static BangumiHttpWrapper _wrapper;
 
         /// <summary>
         /// 本地文件夹路径，永久保存
         /// </summary>
-        private static string localFolderPath;
+        private static string _localFolderPath;
 
         /// <summary>
         /// 缓存文件夹路径
         /// </summary>
-        private static string cacheFolderPath;
+        private static string _cacheFolderPath;
 
         /// <summary>
         /// 用来表示 Token 过期或不可用
         /// </summary>
-        private static bool isLogin = true;
+        private static bool _isLogin = true;
 
         /// <summary>
         /// 记录缓存是否更新过
         /// </summary>
-        private static bool isCacheUpdated = false;
+        private static bool _isCacheUpdated = false;
 
         /// <summary>
         /// 定时器
         /// </summary>
-        private static Timer timer;
+        private static Timer _timer;
 
         /// <summary>
         /// 定时器触发间隔
         /// </summary>
-        private const int interval = 30000;
+        private const int _interval = 30000;
 
-        public static string OAuthBaseUrl => wrapper.OAuthBaseUrl;
-        public static string ClientId => wrapper.ClientId;
-        public static string RedirectUrl => wrapper.RedirectUrl;
+        /// <summary>
+        /// 检查网络状态委托
+        /// </summary>
+        private static CheckNetworkDelegate _checkNetworkAction;
+
+        /// <summary>
+        /// 表示是否处于离线模式
+        /// </summary>
+        private static bool _isOffline;
+
 
         public delegate bool CheckNetworkDelegate();
-        private static CheckNetworkDelegate CheckNetworkAction;
-        private static bool IsOffline;
+
+        public static string OAuthBaseUrl => _wrapper.OAuthBaseUrl;
+        public static string ClientId => _wrapper.ClientId;
+        public static string RedirectUrl => _wrapper.RedirectUrl;
 
         /// <summary>
         /// 用户认证存在且可用
         /// </summary>
-        public static bool IsLogin
-        {
-            get => MyToken != null && isLogin;
-        }
+        public static bool IsLogin { get => MyToken != null && _isLogin; }
 
         /// <summary>
         /// 存储 Token
@@ -108,13 +114,13 @@ namespace Bangumi.Api
 
             FileHelper.EncryptionAsync = encryptionDelegate ?? throw new ArgumentNullException(nameof(encryptionDelegate));
             FileHelper.DecryptionAsync = decryptionDelegate ?? throw new ArgumentNullException(nameof(decryptionDelegate));
-            CheckNetworkAction = checkNetworkActivityDelegate ?? throw new ArgumentNullException(nameof(checkNetworkActivityDelegate));
-            IsOffline = CheckNetworkAction();
-            if (wrapper == null && BangumiCache == null && timer == null)
+            _checkNetworkAction = checkNetworkActivityDelegate ?? throw new ArgumentNullException(nameof(checkNetworkActivityDelegate));
+            _isOffline = _checkNetworkAction();
+            if (_wrapper == null && BangumiCache == null && _timer == null)
             {
-                localFolderPath = localFolder ?? throw new ArgumentNullException(nameof(localFolder));
-                cacheFolderPath = cacheFolder ?? throw new ArgumentNullException(nameof(cacheFolder));
-                wrapper = new BangumiHttpWrapper
+                _localFolderPath = localFolder ?? throw new ArgumentNullException(nameof(localFolder));
+                _cacheFolderPath = cacheFolder ?? throw new ArgumentNullException(nameof(cacheFolder));
+                _wrapper = new BangumiHttpWrapper
                 {
                     BaseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl)),
                     OAuthBaseUrl = oAuthBaseUrl ?? throw new ArgumentNullException(nameof(oAuthBaseUrl)),
@@ -126,51 +132,50 @@ namespace Bangumi.Api
 
                 // 加载缓存
                 BangumiCache = new BangumiCache();
-                if (File.Exists(AppFile.BangumiCache.GetFilePath(cacheFolderPath)))
+                if (File.Exists(AppFile.BangumiCache.GetFilePath(_cacheFolderPath)))
                 {
                     try
                     {
-                        BangumiCache = JsonConvert.DeserializeObject<BangumiCache>(await FileHelper.ReadTextAsync(AppFile.BangumiCache.GetFilePath(cacheFolderPath)));
+                        BangumiCache = JsonConvert.DeserializeObject<BangumiCache>(await FileHelper.ReadTextAsync(AppFile.BangumiCache.GetFilePath(_cacheFolderPath)));
                     }
                     catch (Exception)
                     {
-                        FileHelper.DeleteFile(AppFile.BangumiCache.GetFilePath(cacheFolderPath));
+                        FileHelper.DeleteFile(AppFile.BangumiCache.GetFilePath(_cacheFolderPath));
                     }
                 }
 
                 // 启动定时器，定时将缓存写入文件，30 秒
-                timer = new Timer(interval);
-                timer.Elapsed += WriteCacheToFileTimer_Elapsed;
-                timer.AutoReset = true;
-                timer.Start();
+                _timer = new Timer(_interval);
+                _timer.Elapsed += WriteCacheToFileTimer_Elapsed;
+                _timer.AutoReset = true;
+                _timer.Start();
             }
             else
             {
-                throw new InvalidOperationException("Cant init twice!");
+                throw new InvalidOperationException("BangumiApi can't init twice!");
             }
         }
 
         /// <summary>
-        /// 定时器事件
+        /// 重新检查网络状态
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static async void WriteCacheToFileTimer_Elapsed(object sender, ElapsedEventArgs e)
+        public static void RecheckNetworkStatus()
         {
-            await WriteCacheToFileRightNow();
+            _isOffline = _checkNetworkAction();
         }
 
-        #region 缓存操作方法
+        #region 缓存操作公开方法
+
         /// <summary>
         /// 将缓存写入文件
         /// </summary>
         /// <returns></returns>
         public static async Task WriteCacheToFileRightNow()
         {
-            if (isCacheUpdated)
+            if (_isCacheUpdated)
             {
-                isCacheUpdated = false;
-                await FileHelper.WriteTextAsync(AppFile.BangumiCache.GetFilePath(cacheFolderPath),
+                _isCacheUpdated = false;
+                await FileHelper.WriteTextAsync(AppFile.BangumiCache.GetFilePath(_cacheFolderPath),
                                                 JsonConvert.SerializeObject(BangumiCache));
             }
         }
@@ -180,9 +185,10 @@ namespace Bangumi.Api
         /// </summary>
         public static void DeleteCache()
         {
+            _isCacheUpdated = false;
             BangumiCache = null;
             BangumiCache = new BangumiCache();
-            FileHelper.DeleteFile(AppFile.BangumiCache.GetFilePath(cacheFolderPath));
+            FileHelper.DeleteFile(AppFile.BangumiCache.GetFilePath(_cacheFolderPath));
         }
 
         /// <summary>
@@ -191,34 +197,35 @@ namespace Bangumi.Api
         /// <returns></returns>
         public static long GetCacheFileLength()
         {
-            return FileHelper.GetFileLength(AppFile.BangumiCache.GetFilePath(cacheFolderPath));
+            return FileHelper.GetFileLength(AppFile.BangumiCache.GetFilePath(_cacheFolderPath));
         }
 
         #endregion
+
 
         #region Api 请求
         /// <summary>
         /// 获取指定类别收藏信息。
         /// </summary>
-        /// <param name="userIdString"></param>
         /// <param name="subjectType"></param>
         /// <returns></returns>
         public static async Task<Collection2> GetSubjectCollectionAsync(SubjectTypeEnum subjectType)
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     BangumiCache.Collections.TryGetValue(subjectType.GetValue(), out Collection2 cache);
                     return cache;
                 }
-                var result = await wrapper.GetSubjectCollectionAsync(MyToken.UserId, subjectType);
+                var result = await _wrapper.GetSubjectCollectionAsync(MyToken.UserId, subjectType);
                 UpdateCache(BangumiCache.Collections, subjectType.GetValue(), result);
                 return result;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("GetSubjectCollectionAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
@@ -227,25 +234,25 @@ namespace Bangumi.Api
         /// <summary>
         /// 获取指定条目收藏信息。
         /// </summary>
-        /// <param name="accessTokenString"></param>
         /// <param name="subjectId"></param>
         /// <returns></returns>
         public static async Task<SubjectStatus2> GetCollectionStatusAsync(string subjectId)
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     BangumiCache.SubjectStatus.TryGetValue(subjectId, out SubjectStatus2 subjectStatusCache);
                     return subjectStatusCache;
                 }
-                var result = await wrapper.GetCollectionStatusAsync(MyToken.Token, subjectId);
+                var result = await _wrapper.GetCollectionStatusAsync(MyToken.Token, subjectId);
                 UpdateCache(BangumiCache.SubjectStatus, subjectId, result);
                 return result;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("GetCollectionStatusAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
@@ -254,26 +261,25 @@ namespace Bangumi.Api
         /// <summary>
         /// 获取用户指定条目收视进度。
         /// </summary>
-        /// <param name="userIdString"></param>
-        /// <param name="accessTokenString"></param>
         /// <param name="subjectId"></param>
         /// <returns></returns>
         public static async Task<Progress> GetProgressesAsync(string subjectId)
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     BangumiCache.Progresses.TryGetValue(subjectId, out Progress progressCache);
                     return progressCache;
                 }
-                var result = await wrapper.GetProgressesAsync(MyToken.UserId, MyToken.Token, subjectId);
+                var result = await _wrapper.GetProgressesAsync(MyToken.UserId, MyToken.Token, subjectId);
                 UpdateCache(BangumiCache.Progresses, subjectId, result);
                 return result;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("GetProgressesAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
@@ -282,23 +288,23 @@ namespace Bangumi.Api
         /// <summary>
         /// 获取用户收视列表。
         /// </summary>
-        /// <param name="userIdString"></param>
         /// <returns></returns>
         public static async Task<List<Watching>> GetWatchingListAsync()
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     return BangumiCache.Watchings;
                 }
-                var result = await wrapper.GetWatchingListAsync(MyToken.UserId);
+                var result = await _wrapper.GetWatchingListAsync(MyToken.UserId);
                 UpdateCache(ref BangumiCache._watchings, result);
                 return result;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("GetWatchingListAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
@@ -307,7 +313,6 @@ namespace Bangumi.Api
         /// <summary>
         /// 更新指定条目收藏状态。
         /// </summary>
-        /// <param name="accessTokenString"></param>
         /// <param name="subjectId"></param>
         /// <param name="collectionStatusEnum"></param>
         /// <param name="comment"></param>
@@ -322,11 +327,11 @@ namespace Bangumi.Api
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     throw new Exception("当前处于离线模式");
                 }
-                var result = await wrapper.UpdateCollectionStatusAsync(MyToken.Token, subjectId,
+                var result = await _wrapper.UpdateCollectionStatusAsync(MyToken.Token, subjectId,
                                     collectionStatusEnum, comment, rating, privace);
                 if (result)
                 {
@@ -337,6 +342,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("UpdateCollectionStatusAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
@@ -352,11 +358,11 @@ namespace Bangumi.Api
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     throw new Exception("当前处于离线模式");
                 }
-                var result = await wrapper.UpdateProgressAsync(MyToken.Token, epId, status);
+                var result = await _wrapper.UpdateProgressAsync(MyToken.Token, epId, status);
                 if (result)
                 {
                     UpdateProgressCache(int.Parse(epId), status);
@@ -366,6 +372,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("UpdateProgressAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
@@ -375,7 +382,6 @@ namespace Bangumi.Api
         /// 批量更新收视进度。
         /// 使用 HttpWebRequest 提交表单进行更新，更新收藏状态使用相同方法。
         /// </summary>
-        /// <param name="accessTokenString"></param>
         /// <param name="ep"></param>
         /// <param name="status"></param>
         /// <param name="epsId"></param>
@@ -384,16 +390,17 @@ namespace Bangumi.Api
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     throw new Exception("当前处于离线模式");
                 }
-                var result = await wrapper.UpdateProgressBatchAsync(MyToken.Token, ep, status, epsId);
+                var result = await _wrapper.UpdateProgressBatchAsync(MyToken.Token, ep, status, epsId);
                 return result;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("UpdateProgressBatchAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
@@ -408,7 +415,7 @@ namespace Bangumi.Api
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     BangumiCache.Subjects.TryGetValue(subjectId, out Subject subjectCache);
                     return subjectCache;
@@ -418,7 +425,7 @@ namespace Bangumi.Api
                 // 否则获取完整信息
                 if (BangumiCache.Subjects.ContainsKey(subjectId))
                 {
-                    result = await wrapper.GetSubjectEpsAsync(subjectId);
+                    result = await _wrapper.GetSubjectEpsAsync(subjectId);
                     UpdateCache(ref BangumiCache.Subjects[subjectId]._eps, result._eps);
                 }
                 else
@@ -430,6 +437,7 @@ namespace Bangumi.Api
             catch (Exception e)
             {
                 Debug.WriteLine("GetSubjectEpsAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
@@ -444,18 +452,19 @@ namespace Bangumi.Api
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     BangumiCache.Subjects.TryGetValue(subjectId, out Subject subjectCache);
                     return subjectCache;
                 }
-                var result = await wrapper.GetSubjectAsync(subjectId);
+                var result = await _wrapper.GetSubjectAsync(subjectId);
                 UpdateCache(BangumiCache.Subjects, subjectId, result);
                 return result;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("GetSubjectAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
@@ -469,17 +478,18 @@ namespace Bangumi.Api
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     return BangumiCache.TimeLine;
                 }
-                var result = await wrapper.GetBangumiCalendarAsync();
+                var result = await _wrapper.GetBangumiCalendarAsync();
                 UpdateCache(ref BangumiCache._timeLine, result);
                 return result;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("GetBangumiCalendarAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
@@ -496,22 +506,36 @@ namespace Bangumi.Api
         {
             try
             {
-                if (IsOffline)
+                if (_isOffline)
                 {
                     throw new Exception("当前处于离线模式");
                 }
-                var result = await wrapper.GetSearchResultAsync(keyWord, type, start, n);
+                var result = await _wrapper.GetSearchResultAsync(keyWord, type, start, n);
                 return result;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("GetSearchResultAsync Error.");
+                Debug.WriteLine(e);
                 RecheckNetworkStatus();
                 throw e;
             }
         }
 
-        #region 更新缓存方法
+        #endregion
+
+
+        #region 内部更新缓存方法
+
+        /// <summary>
+        /// 定时器事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static async void WriteCacheToFileTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            await WriteCacheToFileRightNow();
+        }
 
         /// <summary>
         /// 更新缓存记录的条目状态
@@ -527,6 +551,7 @@ namespace Bangumi.Api
             BangumiCache.SubjectStatus.TryGetValue(subjectId, out var status);
             if (status != null)
             {
+                _isCacheUpdated = false;
                 if (collectionStatus != CollectionStatusEnum.No)
                 {
                     status.Status = new SubjectStatus()
@@ -542,8 +567,7 @@ namespace Bangumi.Api
                 {
                     BangumiCache.SubjectStatus.Remove(subjectId);
                 }
-                timer.Interval = interval;
-                isCacheUpdated = true;
+                _isCacheUpdated = true;
             }
         }
 
@@ -558,6 +582,7 @@ namespace Bangumi.Api
             var sub = BangumiCache.Subjects.Values.Where(s => s.Eps.Where(p => p.Id == epId).FirstOrDefault() != null).FirstOrDefault();
             if (sub != null)
             {
+                _isCacheUpdated = false;
                 // 找到已有进度，否则新建
                 var pro = BangumiCache.Progresses.Values.Where(p => p.SubjectId == sub.Id).FirstOrDefault();
                 if (pro != null)
@@ -623,8 +648,7 @@ namespace Bangumi.Api
                 {
                     watch.LastTouch = DateTime.Now.ConvertDateTimeToJsTick();
                 }
-                timer.Interval = interval;
-                isCacheUpdated = true;
+                _isCacheUpdated = true;
             }
         }
 
@@ -644,16 +668,16 @@ namespace Bangumi.Api
             {
                 if (!dic[key].EqualsExT(value))
                 {
-                    timer.Interval = interval;
+                    _isCacheUpdated = false;
                     dic[key] = value;
-                    isCacheUpdated = true;
+                    _isCacheUpdated = true;
                 }
             }
             else
             {
-                timer.Interval = interval;
+                _isCacheUpdated = false;
                 dic.Add(key, value);
-                isCacheUpdated = true;
+                _isCacheUpdated = true;
             }
         }
 
@@ -667,20 +691,18 @@ namespace Bangumi.Api
         {
             if (!source.SequenceEqualExT(dest))
             {
-                // 重新计时
-                timer.Interval = interval;
+                _isCacheUpdated = false;
                 source = dest;
-                isCacheUpdated = true;
+                _isCacheUpdated = true;
             }
         }
 
         #endregion
 
-        #endregion
 
         #region OAuth 相关方法
-
         #region public
+
         /// <summary>
         /// 使用 code 换取 Access Token。
         /// </summary>
@@ -693,7 +715,7 @@ namespace Bangumi.Api
             for (int i = 0; i < 3; i++)
             {
                 Debug.WriteLine($"第{i + 1}次尝试获取Token。");
-                token = await wrapper.GetTokenAsync(code);
+                token = await _wrapper.GetTokenAsync(code);
                 if (token != null)
                 {
                     await WriteTokenAsync(token);
@@ -714,7 +736,7 @@ namespace Bangumi.Api
         {
             if (MyToken == null)
             {
-                MyToken = JsonConvert.DeserializeObject<AccessToken>(await FileHelper.ReadAndDecryptFileAsync(AppFile.Token_Data.GetFilePath(localFolderPath)));
+                MyToken = JsonConvert.DeserializeObject<AccessToken>(await FileHelper.ReadAndDecryptFileAsync(AppFile.Token_Data.GetFilePath(_localFolderPath)));
                 if (MyToken == null)
                 {
                     //DeleteTokens();
@@ -722,7 +744,7 @@ namespace Bangumi.Api
                 }
             }
             // 检查是否在有效期内，接近过期或过期则刷新token
-            isLogin = true;
+            _isLogin = true;
             _ = CheckToken();
             return true;
         }
@@ -735,17 +757,15 @@ namespace Bangumi.Api
         {
             // 删除用户认证文件
             MyToken = null;
-            FileHelper.DeleteFile(AppFile.Token_Data.GetFilePath(localFolderPath));
+            FileHelper.DeleteFile(AppFile.Token_Data.GetFilePath(_localFolderPath));
             // 清空用户缓存
-            BangumiCache.Watchings.Clear();
-            BangumiCache.Progresses.Clear();
-            BangumiCache.Collections.Clear();
-            BangumiCache.SubjectStatus.Clear();
-            isCacheUpdated = true;
+            DeleteCache();
         }
         #endregion
 
+
         #region private
+
         /// <summary>
         /// 查询授权信息，并在满足条件时刷新Token。
         /// </summary>
@@ -755,7 +775,7 @@ namespace Bangumi.Api
             {
                 AccessToken token;
                 Debug.WriteLine("尝试刷新Token。");
-                token = await wrapper.CheckTokenAsync(MyToken);
+                token = await _wrapper.CheckTokenAsync(MyToken);
                 if (token != null)
                 {
                     // 将信息写入本地文件
@@ -767,7 +787,7 @@ namespace Bangumi.Api
             {
                 if (e.Message.Contains("401"))
                 {
-                    isLogin = false;
+                    _isLogin = false;
                 }
                 Debug.WriteLine(e.Message);
                 RecheckNetworkStatus();
@@ -783,24 +803,17 @@ namespace Bangumi.Api
         {
             // 存入内存
             MyToken = token;
-            isLogin = true;
+            _isLogin = true;
             // 将信息写入本地文件
-            await FileHelper.EncryptAndWriteFileAsync(AppFile.Token_Data.GetFilePath(localFolderPath),
+            await FileHelper.EncryptAndWriteFileAsync(AppFile.Token_Data.GetFilePath(_localFolderPath),
                                                       JsonConvert.SerializeObject(token));
         }
         #endregion
-
         #endregion
 
-        /// <summary>
-        /// 重新检查网络状态
-        /// </summary>
-        public static void RecheckNetworkStatus()
-        {
-            IsOffline = CheckNetworkAction();
-        }
 
         #region AppFile
+
         /// <summary>
         /// 使用的文件
         /// </summary>
