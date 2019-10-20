@@ -33,7 +33,7 @@ namespace Bangumi.Views
     public sealed partial class HomePage : Page, INotifyPropertyChanged
     {
         public bool _isLoading = false;
-        public bool isLoading
+        public bool IsLoading
         {
             get { return _isLoading; }
             set
@@ -55,50 +55,13 @@ namespace Bangumi.Views
         {
             this.InitializeComponent();
             homePage = this;
-            CostomTitleBar();
 #if DEBUG
-            TitleTextBlock.Text += " (Debug)";
+            TitleBarEx.Text += " (Debug)";
 #endif
-        }
-
-        /// <summary>
-        /// 自定义标题栏
-        /// </summary>
-        private void CostomTitleBar()
-        {
-            if (AnalyticsInfo.VersionInfo.DeviceFamily != "Windows.Mobile")
-            {
-                var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-
-                CoreTitleBar_LayoutMetricsChanged(coreTitleBar, "");
-                coreTitleBar.LayoutMetricsChanged += CoreTitleBar_LayoutMetricsChanged;
-            }
-            else
-            {
-                GridTitleBar.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        /// <summary>
-        /// 在标题栏布局变化时调用，修改左侧与右侧空白区域
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            GridTitleBar.Padding = new Thickness(
-                0,
-                0,
-                sender.SystemOverlayRightInset,
-                0);
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            Window.Current.SetTitleBar(GridTitleBar);
-            // 禁用标题栏的后退按钮
-            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-
             MainPage.RootPage.MyCommandBar.Visibility = Visibility.Visible;
             MainPage.RootPage.RefreshAppBarButton.IsEnabled = true;
 

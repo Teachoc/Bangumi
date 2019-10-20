@@ -7,6 +7,7 @@ using Windows.System.Profile;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
@@ -22,26 +23,11 @@ namespace Bangumi.Views
         public LoginPage()
         {
             this.InitializeComponent();
-            CostomTitleBar();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            Window.Current.SetTitleBar(GridTitleBar);
-            // 禁用标题栏的后退按钮
-            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
             MainPage.RootPage.MyCommandBar.Visibility = Visibility.Collapsed;
-        }
-
-        /// <summary>
-        /// 自定义标题栏
-        /// </summary>
-        private void CostomTitleBar()
-        {
-            if (AnalyticsInfo.VersionInfo.DeviceFamily == "Windows.Mobile")
-            {
-                GridTitleBar.Visibility = Visibility.Collapsed;
-            }
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -61,7 +47,7 @@ namespace Bangumi.Views
             Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 10);
             if (BangumiApi.IsLogin)
             {
-                MainPage.RootFrame.Navigate(typeof(HomePage));
+                MainPage.RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
             }
             else
             {
@@ -71,7 +57,7 @@ namespace Bangumi.Views
 
         private void EnterButton_Click(object sender, RoutedEventArgs e)
         {
-            MainPage.RootFrame.Navigate(typeof(HomePage));
+            MainPage.RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
         }
 
     }

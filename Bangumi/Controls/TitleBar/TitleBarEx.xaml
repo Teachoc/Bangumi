@@ -1,0 +1,81 @@
+﻿<UserControl
+    x:Class="Bangumi.Controls.TitleBar.TitleBarEx"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Bangumi"
+    xmlns:common="using:Bangumi.Common"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    Loaded="UserControl_Loaded">
+
+    <UserControl.Resources>
+        <ResourceDictionary Source="TitleBarDictionary.xaml"/>
+    </UserControl.Resources>
+
+    <Grid Height="32">
+        <Grid x:Name="AppTitleBar" Background="{ThemeResource PinkAcrylicWindowBrush}">
+            <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
+            <!-- Using padding columns instead of Margin ensures that the background
+                 paints the area under the caption control buttons (for transparent buttons). -->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition x:Name="RightPaddingColumn" Width="188"/>
+            </Grid.ColumnDefinitions>
+            <!-- 标题图片及文字 -->
+            <Grid Grid.Column="1"
+                  Visibility="{x:Bind common:Converters.CollapsedIf(IsLoading), Mode=OneWay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image Source="/Assets/Square44x44Logo.png" 
+                       Grid.Column="0" 
+                       Visibility="{x:Bind ImageVisibility, Mode=OneWay}"
+                       Width="32" 
+                       Height="32" 
+                       Margin="8,0,0,0"/>
+                <TextBlock x:Name="AppTitleTextBlock"
+                           Grid.Column="1" 
+                           Text="{x:Bind Text, Mode=OneWay}" 
+                           Style="{ThemeResource AppTitleBarTextBlockStyle}"
+                           Margin="8,0,0,0"/>
+            </Grid>
+            <!-- 显示加载状态 -->
+            <Grid Grid.Column="1"
+                  Visibility="{x:Bind IsLoading, Mode=OneWay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <ProgressRing x:Name="TitleBarProgressRing"
+                              Grid.Column="0"
+                              IsActive="True"
+                              Foreground="{ThemeResource AppTitleBarActiveForegroundColor}"
+                              Margin="14,0,6,0"
+                              Width="20"
+                              Height="20" >
+                </ProgressRing>
+                <TextBlock x:Name="TitleBarLoadingTextBlock"
+                           Text="{x:Bind LoadingText}"
+                           Grid.Column="1"
+                           Margin="8,0,0,0"
+                           Style="{ThemeResource AppTitleBarTextBlockStyle}">
+                </TextBlock>
+            </Grid>
+        </Grid>
+
+        <!-- This Button has a higher z-order than MyTitleBar, 
+             so it receives user input. -->
+        <!--<Button x:Name="TitleBarButton" 
+                HorizontalAlignment="Right" 
+                Style="{StaticResource AppTitleBarButtonStyle}">
+            <FontIcon FontFamily="Segoe MDL2 Assets" 
+                      Glyph="&#xE7BA;" />
+        </Button>-->
+
+    </Grid>
+</UserControl>

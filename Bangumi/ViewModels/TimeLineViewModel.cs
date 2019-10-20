@@ -30,7 +30,7 @@ namespace Bangumi.ViewModels
             set
             {
                 Set(ref _isLoading, value);
-                HomePage.homePage.isLoading = value;
+                HomePage.homePage.IsLoading = value;
                 MainPage.RootPage.RefreshAppBarButton.IsEnabled = !value;
             }
         }
@@ -48,12 +48,12 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 刷新时间表。
         /// </summary>
-        public async void LoadTimeLine(bool force = false)
+        public async void LoadTimeLine()
         {
             try
             {
                 IsLoading = true;
-                await PopulateBangumiCalendarAsync(BangumiCollection, force);
+                await PopulateBangumiCalendarAsync(BangumiCollection);
             }
             catch (Exception e)
             {
@@ -86,7 +86,7 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="bangumiTimeLine"></param>
         /// <returns></returns>
-        private async Task PopulateBangumiCalendarAsync(ObservableCollection<BangumiTimeLine> bangumiTimeLine, bool force = false)
+        private async Task PopulateBangumiCalendarAsync(ObservableCollection<BangumiTimeLine> bangumiTimeLine)
         {
             try
             {
@@ -106,12 +106,6 @@ namespace Bangumi.ViewModels
                             bangumiTimeLine.Insert(bangumiTimeLine.Count + 1 - day, item);
                         }
                     }
-                }
-
-                // 非强制加载，若缓存与当天为同一星期几则不请求新数据。
-                if (!force && bangumiTimeLine.Count > 0 && bangumiTimeLine[0].Weekday.Id == day)
-                {
-                    return;
                 }
 
                 var response = await BangumiApi.GetBangumiCalendarAsync();

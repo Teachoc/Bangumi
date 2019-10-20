@@ -125,6 +125,9 @@
     <Compile Include="ContentDialogs\CollectionEditContentDialog.xaml.cs">
       <DependentUpon>CollectionEditContentDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TitleBar\TitleBarEx.xaml.cs">
+      <DependentUpon>TitleBarEx.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Facades\BangumiFacade.cs" />
     <Compile Include="Helper\EncryptionHelper.cs" />
     <Compile Include="Helper\NotificationHelper.cs" />
@@ -233,6 +236,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\TitleBar\TitleBarDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\TitleBar\TitleBarEx.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -294,9 +305,7 @@
       <Version>4.5.0</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controls\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Bangumi.Api\Bangumi.Api.csproj">
       <Project>{f04d2305-6d91-4b17-a0a5-d7d570cc2ede}</Project>

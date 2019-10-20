@@ -49,7 +49,7 @@ namespace Bangumi.Views
             var button = sender as AppBarButton;
             var tag = button.Tag;
             if (tag.Equals("时间表"))
-                ViewModel.LoadTimeLine(true);
+                ViewModel.LoadTimeLine();
         }
 
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)

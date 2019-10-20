@@ -96,7 +96,7 @@ namespace Bangumi.Common
         /// <returns></returns>
         public static string GetSubjectTypeName(int type)
         {
-            string cn = "";
+            string cn = string.Empty;
             switch (type)
             {
                 case 1:
@@ -144,7 +144,7 @@ namespace Bangumi.Common
                 case 7:
                     return "星期日";
                 default:
-                    return "";
+                    return string.Empty;
             }
         }
 
@@ -156,7 +156,7 @@ namespace Bangumi.Common
         public static string GetWatchedEpsDesc(int watched_eps)
         {
             if (watched_eps == -1)
-                return "";
+                return string.Empty;
             if (watched_eps == 0)
                 return "尚未观看";
             return "看到" + watched_eps + "话";
@@ -217,13 +217,13 @@ namespace Bangumi.Common
             {
                 return "EP." +
                        next_ep.ToString() +
-                       (string.IsNullOrEmpty(ep.Name) ? "" : " " + ep.Name);
+                       (string.IsNullOrEmpty(ep.Name) ? string.Empty : " " + ep.Name);
             }
             else
             {
                 return "EP." +
                        ep.Type.GetEpisodeType() + " " + next_ep +
-                       (string.IsNullOrEmpty(ep.Name) ? "" : " " + ep.Name);
+                       (string.IsNullOrEmpty(ep.Name) ? string.Empty : " " + ep.Name);
             }
         }
 
@@ -259,7 +259,7 @@ namespace Bangumi.Common
         /// <returns></returns>
         public static string GetRateDesc(double rate)
         {
-            string[] descs = new string[] { "", "不忍直视", "很差", "差", "较差", "不过不失", "还行", "推荐", "力荐", "神作", "超神作 (请谨慎评价)" };
+            string[] descs = new string[] { string.Empty, "不忍直视", "很差", "差", "较差", "不过不失", "还行", "推荐", "力荐", "神作", "超神作 (请谨慎评价)" };
             return descs[(int)Math.Round(rate, 0, MidpointRounding.AwayFromZero)];
         }
 
@@ -272,15 +272,10 @@ namespace Bangumi.Common
         {
             if (actors != null && actors.Count != 0)
             {
-                string str = "CV：";
-                foreach (var item in actors)
-                {
-                    str += item.Name + '、';
-                }
-                return str.TrimEnd('、');
+                return "CV：" + string.Join('、', actors.Select(a => a.Name));
             }
             else
-                return "";
+                return string.Empty;
         }
 
         /// <summary>
@@ -292,15 +287,24 @@ namespace Bangumi.Common
         {
             if (jobs != null && jobs.Count != 0)
             {
-                string str = "";
-                foreach (var item in jobs)
-                {
-                    str += item + '、';
-                }
-                return str.TrimEnd('、');
+                return string.Join('、', jobs);
             }
             else
-                return "";
+                return string.Empty;
+        }
+
+        /// <summary>
+        /// 拼接字符串
+        /// </summary>
+        /// <param name="vs"></param>
+        /// <returns></returns>
+        public static string ConcatStrings(IEnumerable<string> vs)
+        {
+            return string.Concat(vs);
+        }
+        public static string ConcatStrings(string str0, string str1, string str2, string str3)
+        {
+            return string.Concat(str0, str1, str2, str3);
         }
 
     }

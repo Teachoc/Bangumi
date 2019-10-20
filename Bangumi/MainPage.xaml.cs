@@ -87,9 +87,6 @@ namespace Bangumi
             systemNavigationManager.BackRequested += SystemNavigationManager_BackRequested;
             Window.Current.CoreWindow.PointerPressed += CoreWindow_PointerPressed;
 
-            CostomTitleBar();
-
-
             // 初始化 Api 对象
             BangumiApi.Init(ApplicationData.Current.LocalFolder.Path,
                             ApplicationData.Current.LocalCacheFolder.Path,
@@ -134,49 +131,14 @@ namespace Bangumi
             {
                 LoginButton.Label = "注销";
                 UserIcon.Glyph = "\uE7E8";
-                RootFrame.Navigate(typeof(HomePage));
+                RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
             }
             else
             {
                 LoginButton.Label = "登录";
                 UserIcon.Glyph = "\uEE57";
-                RootFrame.Navigate(typeof(LoginPage));
+                RootFrame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
             }
-        }
-
-        /// <summary>
-        /// 自定义标题栏
-        /// </summary>
-        private void CostomTitleBar()
-        {
-            if (AnalyticsInfo.VersionInfo.DeviceFamily != "Windows.Mobile")
-            {
-                // 将内容拓展到标题栏
-                var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-                coreTitleBar.ExtendViewIntoTitleBar = true;
-                // 设置标题栏按钮部分背景颜色
-                var appTitleBar = ApplicationView.GetForCurrentView().TitleBar;
-                appTitleBar.ButtonBackgroundColor = Colors.Transparent;
-                appTitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-
-                MainPage_ActualThemeChanged(null, "");
-                ActualThemeChanged += MainPage_ActualThemeChanged;
-            }
-        }
-
-        /// <summary>
-        /// 在主题颜色改变时调用，设置标题栏按钮颜色
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private void MainPage_ActualThemeChanged(FrameworkElement sender, object args)
-        {
-            // 主题颜色改变时设置标题栏按钮颜色
-            var appTitleBar = ApplicationView.GetForCurrentView().TitleBar;
-            if (ActualTheme == ElementTheme.Light)
-                appTitleBar.ButtonForegroundColor = Colors.Black;
-            else
-                appTitleBar.ButtonForegroundColor = Colors.White;
         }
 
         private void BackInvoked(KeyboardAccelerator sender,

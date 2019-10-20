@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Bangumi.Views"
+    xmlns:local2="using:Bangumi.Controls.TitleBar"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:Bangumi.Api.Models"
@@ -335,52 +336,11 @@
             <RowDefinition Height="32"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" 
-              Height="32"
-              Name="GridTitleBar"
-              Background="Transparent">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="auto"/>
-            </Grid.ColumnDefinitions>
-            <!-- 显示标题及条目ID -->
-            <TextBlock Grid.Column="0"
-                       VerticalAlignment="Center"  
-                       Visibility="{x:Bind common:Converters.CollapsedIf(ViewModel.IsLoading),Mode=OneWay}"
-                       Margin="10,0"
-                       TextTrimming="CharacterEllipsis">
-                <Run Text="{x:Bind ViewModel.NameCn,Mode=OneWay}"/>
-                <Run Text="("/><Run Text="{x:Bind ViewModel.SubjectId,Mode=OneWay}"/><Run Text=")"/>
-            </TextBlock>
-            <!-- 显示加载中 -->
-            <Grid Grid.Column="0"
-                  Margin="10,0"
-                  Visibility="{x:Bind ViewModel.IsLoading,Mode=OneWay}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <ProgressRing Name="MyProgressRing"
-                              Grid.Column="0"
-                              VerticalAlignment="Center"
-                              IsActive="True"
-                              Width="20"
-                              Height="20" >
-                    <ProgressRing.RenderTransform>
-                        <CompositeTransform CenterX="10"
-                                            CenterY="10"
-                                            ScaleX="0.75" 
-                                            ScaleY="0.75"/>
-                    </ProgressRing.RenderTransform>
-                </ProgressRing>
-                <TextBlock Text="加载中..."
-                           Grid.Column="1"
-                           VerticalAlignment="Center"  
-                           Margin="10,0"
-                           TextTrimming="CharacterEllipsis">
-                </TextBlock>
-            </Grid>
-        </Grid>
+
+        <local2:TitleBarEx Text="{x:Bind common:Converters.ConcatStrings(ViewModel.NameCn, ' (', ViewModel.SubjectId, ')'), Mode=OneWay}"
+                           IsLoading="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                           LoadingText="加载中..."
+                           IsBackEnabled="True"/>
 
         <Pivot Name="MyPivot"
                Grid.Row="1">
