@@ -20,14 +20,12 @@ namespace Bangumi.Api
         /// <summary>
         /// 检查网络状态委托
         /// </summary>
-        private static CheckNetworkDelegate _checkNetworkAction;
+        private static Func<bool> _checkNetworkAction;
 
         /// <summary>
         /// 表示是否处于离线模式
         /// </summary>
         private static bool _isOffline;
-
-        public delegate bool CheckNetworkDelegate();
 
 
         /// <summary>

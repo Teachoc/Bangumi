@@ -3,6 +3,7 @@ using Bangumi.Api.Services;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace Bangumi.Api
@@ -35,11 +36,10 @@ namespace Bangumi.Api
             string clientSecret,
             string redirectUrl,
             string noImageUri,
-            FileHelper.EncryptionDelegate encryptionDelegate,
-            FileHelper.DecryptionDelegate decryptionDelegate,
-            CheckNetworkDelegate checkNetworkActivityDelegate)
+            Func<string, Task<byte[]>> encryptionDelegate,
+            Func<byte[], Task<string>> decryptionDelegate,
+            Func<bool> checkNetworkActivityDelegate)
         {
-
             FileHelper.EncryptionAsync = encryptionDelegate ?? throw new ArgumentNullException(nameof(encryptionDelegate));
             FileHelper.DecryptionAsync = decryptionDelegate ?? throw new ArgumentNullException(nameof(decryptionDelegate));
             _checkNetworkAction = checkNetworkActivityDelegate ?? throw new ArgumentNullException(nameof(checkNetworkActivityDelegate));

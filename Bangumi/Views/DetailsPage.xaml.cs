@@ -52,7 +52,7 @@ namespace Bangumi.Views
             MainPage.RootPage.CollectionAppBarButton.Visibility = Visibility.Collapsed;
             MainPage.RootPage.CollectionAppBarButton.Click -= CollectionAppBarButton_Click;
             // 设置刷新按钮隐藏以及解除事件绑定
-            MainPage.RootPage.RefreshAppBarButton.Click -= DetailPageRefresh_Click;
+            MainPage.RootPage.RefreshButton.Click -= DetailPageRefresh_Click;
             // 设置访问网页按钮隐藏以及解除事件绑定
             MainPage.RootPage.WebPageAppBarButton.Visibility = Visibility.Collapsed;
             MainPage.RootPage.WebPageAppBarButton.Click -= LaunchWebPage_Click;
@@ -64,7 +64,7 @@ namespace Bangumi.Views
         {
             // 设置刷新按钮可见以及事件绑定
             MainPage.RootPage.MyCommandBar.Visibility = Visibility.Visible;
-            MainPage.RootPage.RefreshAppBarButton.Click += DetailPageRefresh_Click;
+            MainPage.RootPage.RefreshButton.Click += DetailPageRefresh_Click;
 
             // 设置访问网页按钮可见以及事件绑定
             MainPage.RootPage.WebPageAppBarButton.Visibility = Visibility.Visible;

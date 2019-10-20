@@ -49,7 +49,7 @@ namespace Bangumi.Views
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public static HomePage homePage;
+        public static HomePage homePage { get; private set; }
 
         public HomePage()
         {
@@ -63,7 +63,9 @@ namespace Bangumi.Views
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             MainPage.RootPage.MyCommandBar.Visibility = Visibility.Visible;
-            MainPage.RootPage.RefreshAppBarButton.IsEnabled = true;
+            MainPage.RootPage.RefreshButton.IsEnabled = !IsLoading;
+            MainPage.RootPage.MyCommandBar.IsDynamicOverflowEnabled = false;
+            MainPage.RootPage.MyCommandBar.IsDynamicOverflowEnabled = true;
 
             if (BangumiApi.IsLogin)
             {
@@ -87,7 +89,7 @@ namespace Bangumi.Views
                     HomePagePivot.Items.Remove(ProgressItem);
                     HomePagePivot.Items.Remove(CollectionItem);
                     TimeLinePageFrame.Navigate(typeof(TimeLinePage), null, new SuppressNavigationTransitionInfo());
-                    MainPage.RootPage.RefreshAppBarButton.Tag = TimeLineItem.Header;
+                    MainPage.RootPage.RefreshButton.Tag = TimeLineItem.Header;
                 }
             }
         }
@@ -97,7 +99,7 @@ namespace Bangumi.Views
             var pivot = sender as Pivot;
             var pivotItem = pivot.SelectedItem as PivotItem;
             var frame = pivotItem.Content as Frame;
-            MainPage.RootPage.RefreshAppBarButton.Tag = pivotItem.Header;
+            MainPage.RootPage.RefreshButton.Tag = pivotItem.Header;
             if (frame.Content == null)
             {
                 switch (pivotItem.Header)

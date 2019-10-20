@@ -33,7 +33,7 @@ namespace Bangumi.Views
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.RefreshAppBarButton.Click += ProgressPageRefresh;
+            MainPage.RootPage.RefreshButton.Click += ProgressPageRefresh;
             if (!ViewModel.IsLoading)
             {
                 await ViewModel.LoadWatchingListAsync(ViewModel.WatchingCollection.Count != 0);
@@ -42,7 +42,7 @@ namespace Bangumi.Views
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.RefreshAppBarButton.Click -= ProgressPageRefresh;
+            MainPage.RootPage.RefreshButton.Click -= ProgressPageRefresh;
         }
 
         private async void ProgressPageRefresh(object sender, RoutedEventArgs e)

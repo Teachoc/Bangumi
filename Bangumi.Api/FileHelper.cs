@@ -7,17 +7,14 @@ namespace Bangumi.Api
 {
     public static class FileHelper
     {
-        public delegate Task<byte[]> EncryptionDelegate(string data);
-        public delegate Task<string> DecryptionDelegate(byte[] buff);
-
         /// <summary>
         /// 加密委托
         /// </summary>
-        internal static EncryptionDelegate EncryptionAsync { get; set; }
+        internal static Func<string, Task<byte[]>> EncryptionAsync { get; set; }
         /// <summary>
         /// 解密委托
         /// </summary>
-        internal static DecryptionDelegate DecryptionAsync { get; set; }
+        internal static Func<byte[], Task<string>> DecryptionAsync { get; set; }
 
         #region 异步读写文件
 

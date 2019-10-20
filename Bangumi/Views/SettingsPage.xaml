@@ -22,7 +22,8 @@
 
         <Pivot Grid.Row="1">
             <PivotItem Header="设置"
-                       Margin="0">
+                       Margin="0"
+                       AccessKey="I">
                 <ScrollViewer>
                     <StackPanel Padding="12,10">
                     
@@ -93,7 +94,8 @@
             </PivotItem>
 
             <PivotItem Header="实验性功能"
-                       Margin="0">
+                       Margin="0"
+                       AccessKey="O">
                 <ScrollViewer>
                     <StackPanel Padding="12,10">
                         <!-- 使用BangumiData -->
@@ -181,7 +183,8 @@
             </PivotItem>
             
             <PivotItem Header="关于"
-                       Margin="0">
+                       Margin="0"
+                       AccessKey="P">
                 <ScrollViewer>
                     <StackPanel Padding="12,10">
                         <TextBlock Text="Bangumi UWP (非官方)" 

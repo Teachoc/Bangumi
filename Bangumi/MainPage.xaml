@@ -13,62 +13,79 @@
     Background="{ThemeResource SystemChromeLowColor}">
     
     <Grid>
-        <Frame Name="MyFrame" />
+        <Frame x:Name="MyFrame" />
 
         <CommandBar x:Name="MyCommandBar"
                     x:FieldModifier="public"
                     VerticalAlignment="Bottom"
                     RequestedTheme="Dark"
-                    Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}">
-            <AppBarButton Name="OfflineAppBarButton"
-                          x:FieldModifier="public"
+                    Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}"
+                    AccessKey="M">
+            <AppBarButton x:Name="OfflineAppBarButton"
                           Label="离线模式"
                           ToolTipService.ToolTip="点击检测网络"
-                          Click="OfflineAppBarButton_Click"
-                          Visibility="{x:Bind IsOffline, Mode=OneWay}">
+                          Visibility="{x:Bind IsOffline, Mode=OneWay}"
+                          AccessKey="N">
                 <FontIcon FontFamily="Segoe MDL2 Assets" 
                           Glyph="&#xE7BA;" />
             </AppBarButton>
             <AppBarSeparator Visibility="{Binding ElementName=OfflineAppBarButton,Path=Visibility}" />
-            <AppBarButton Name="CollectionAppBarButton"
+            <AppBarButton x:Name="CollectionAppBarButton"
                           x:FieldModifier="public"
                           IsEnabled="{Binding ElementName=RefreshAppBarButton,Path=IsEnabled}"
                           Label="收藏"
                           ToolTipService.ToolTip="收藏"
-                          Visibility="Collapsed">
-                <FontIcon Name="CollectionAppBarButtonFontIcon" 
+                          Visibility="Collapsed"
+                          AccessKey="C">
+                <FontIcon x:Name="CollectionAppBarButtonFontIcon" 
                           x:FieldModifier="public"
                           FontFamily="Segoe MDL2 Assets" 
                           Glyph="&#xE006;"/>
             </AppBarButton>
-            <AppBarButton Name="WebPageAppBarButton"
+            <AppBarButton x:Name="WebPageAppBarButton"
                           x:FieldModifier="public"
                           Label="访问网页"
                           ToolTipService.ToolTip="访问网页"
-                          Visibility="Collapsed">
+                          Visibility="Collapsed"
+                          AccessKey="U">
                 <FontIcon FontFamily="Segoe MDL2 Assets" 
                           Glyph="&#xE12A;" />
             </AppBarButton>
             <AppBarSeparator Visibility="{Binding ElementName=WebPageAppBarButton,Path=Visibility}" />
-            <AppBarButton Icon="Find" 
+            <AppBarButton x:Name="SearchButton" 
+                          Icon="Find" 
                           Label="搜索"
-                          ToolTipService.ToolTip="搜索"
-                          Click="SearchButton_Click"/>
-            <AppBarButton Name="RefreshAppBarButton" 
+                          ToolTipService.ToolTip="搜索 (Ctrl+Q)"
+                          AccessKey="Q">
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Modifiers="Control"
+                                         Key="Q"/>
+                </AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
+            <AppBarButton x:Name="RefreshButton" 
                           x:FieldModifier="public"
                           Icon="Refresh" 
                           Label="刷新"
-                          ToolTipService.ToolTip="刷新"/>
-            <AppBarButton Icon="Setting" 
+                          ToolTipService.ToolTip="刷新 (F5)"
+                          AccessKey="R">
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Modifiers="None"
+                                         Key="F5"/>
+                </AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
+            <AppBarButton x:Name="SettingButton"
+                          Icon="Setting" 
                           Label="设置"
                           ToolTipService.ToolTip="设置"
-                          Click="SettingButton_Click"/>
+                          AccessKey="I">
+            </AppBarButton>
             <CommandBar.SecondaryCommands>
-                <AppBarButton Name="LoginButton"
+                <AppBarButton x:Name="LoginButton"
                               Label="登录"
-                              Click="LoginButton_Click">
+                              Click="LoginButton_Click"
+                              AccessKey="L">
                     <AppBarButton.Icon>
-                        <FontIcon Name="UserIcon" 
+                        <FontIcon x:Name="UserIcon" 
                                   FontFamily="Segoe MDL2 Assets" 
                                   Glyph="&#xEE57;"/>
                     </AppBarButton.Icon>

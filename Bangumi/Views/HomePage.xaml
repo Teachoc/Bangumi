@@ -28,17 +28,20 @@
                SelectionChanged="HomePagePivot_SelectionChanged">
             <PivotItem Name="ProgressItem" 
                        Header="进度"
-                       Margin="0">
+                       Margin="0"
+                       AccessKey="A">
                 <Frame Name="ProgressPageFrame" />
             </PivotItem>
             <PivotItem Name="CollectionItem"
                        Header="收藏"
-                       Margin="0">
+                       Margin="0"
+                       AccessKey="S">
                 <Frame Name="CollectionPageFrame"/>
             </PivotItem>
             <PivotItem Name="TimeLineItem"
                        Header="时间表"
-                       Margin="0">
+                       Margin="0"
+                       AccessKey="D">
                 <Frame Name="TimeLinePageFrame"/>
             </PivotItem>
         </Pivot>

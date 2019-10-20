@@ -31,7 +31,7 @@ namespace Bangumi.ViewModels
             {
                 Set(ref _isLoading, value);
                 HomePage.homePage.IsLoading = value;
-                MainPage.RootPage.RefreshAppBarButton.IsEnabled = !value;
+                MainPage.RootPage.RefreshButton.IsEnabled = !value;
             }
         }
 

@@ -358,7 +358,7 @@ namespace Bangumi.ViewModels
                 IsDetailLoading = true;
                 IsProgressLoading = true;
                 IsStatusLoaded = false;
-                MainPage.RootPage.RefreshAppBarButton.IsEnabled = false;
+                MainPage.RootPage.RefreshButton.IsEnabled = false;
 
                 // 获取缓存
                 Subject subjectCache = null;
@@ -427,7 +427,7 @@ namespace Bangumi.ViewModels
                 IsDetailLoading = false;
                 IsProgressLoading = false;
                 IsStatusLoaded = true;
-                MainPage.RootPage.RefreshAppBarButton.IsEnabled = true;
+                MainPage.RootPage.RefreshButton.IsEnabled = true;
             }
         }
 

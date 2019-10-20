@@ -345,7 +345,8 @@
         <Pivot Name="MyPivot"
                Grid.Row="1">
             <PivotItem Header="章节"
-                       Margin="0">
+                       Margin="0"
+                       AccessKey="Z">
                 <Grid>
                     <controls:AdaptiveGridView Name="EpsGridView" 
                                                ItemsSource="{x:Bind ViewModel.Eps}" 
@@ -426,7 +427,8 @@
                                                   Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(SelectedTextBlock.Text),Mode=OneWay}"
                                                   RelativePanel.RightOf="BangumiImage"
                                                   RelativePanel.AlignBottomWith="BangumiImage"
-                                                  FontSize="14">
+                                                  FontSize="14"
+                                                  AccessKey="W">
                                     <TextBlock Name="SelectedTextBlock"/>
                                     <muxc:SplitButton.Flyout>
                                         <MenuFlyout x:Name="SitesMenuFlyout"/>
@@ -452,7 +454,8 @@
             </PivotItem>
 
             <PivotItem Header="详情"
-                       Margin="0">
+                       Margin="0"
+                       AccessKey="X">
                 <ScrollViewer>
                     <StackPanel Padding="10,5,10,50">
                         <TextBlock IsTextSelectionEnabled="True"

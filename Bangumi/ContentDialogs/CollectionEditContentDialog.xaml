@@ -93,11 +93,51 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <RadioButton Name="WishRadio" Grid.Column="0" Background="#ff7e8b" Style="{StaticResource CollectionStatusRadioButtonStyle}" Content="想看" Tag="wish" GroupName="CollectionStatus" Checked="StatusRadioButton_Checked" />
-            <RadioButton Name="CollectRadio" Grid.Column="1" Background="#ffc34d" Style="{StaticResource CollectionStatusRadioButtonStyle}" Content="看过" Tag="collect" GroupName="CollectionStatus" Checked="StatusRadioButton_Checked" />
-            <RadioButton Name="DoRadio" Grid.Column="2" Background="#33c5f9" Style="{StaticResource CollectionStatusRadioButtonStyle}" Content="在看" Tag="do" GroupName="CollectionStatus" Checked="StatusRadioButton_Checked" />
-            <RadioButton Name="OnHoldRadio" Grid.Column="3" Background="#cccccc" Style="{StaticResource CollectionStatusRadioButtonStyle}" Content="搁置" Tag="on_hold" GroupName="CollectionStatus" Checked="StatusRadioButton_Checked" />
-            <RadioButton Name="DroppedRadio" Grid.Column="4" Background="#9b9997" Style="{StaticResource CollectionStatusRadioButtonStyle}" Content="抛弃" Tag="dropped" GroupName="CollectionStatus" Checked="StatusRadioButton_Checked" />
+            <RadioButton Name="WishRadio" 
+                         Grid.Column="0" 
+                         Background="#ff7e8b" 
+                         Style="{StaticResource CollectionStatusRadioButtonStyle}" 
+                         Content="想看" 
+                         Tag="wish" 
+                         GroupName="CollectionStatus" 
+                         Checked="StatusRadioButton_Checked" 
+                         AccessKey="A"/>
+            <RadioButton Name="CollectRadio" 
+                         Grid.Column="1" 
+                         Background="#ffc34d" 
+                         Style="{StaticResource CollectionStatusRadioButtonStyle}" 
+                         Content="看过" 
+                         Tag="collect" 
+                         GroupName="CollectionStatus" 
+                         Checked="StatusRadioButton_Checked" 
+                         AccessKey="S"/>
+            <RadioButton Name="DoRadio" 
+                         Grid.Column="2" 
+                         Background="#33c5f9" 
+                         Style="{StaticResource CollectionStatusRadioButtonStyle}" 
+                         Content="在看" 
+                         Tag="do" 
+                         GroupName="CollectionStatus" 
+                         Checked="StatusRadioButton_Checked"
+                         AccessKey="D"/>
+            <RadioButton Name="OnHoldRadio" 
+                         Grid.Column="3" 
+                         Background="#cccccc" 
+                         Style="{StaticResource CollectionStatusRadioButtonStyle}" 
+                         Content="搁置" 
+                         Tag="on_hold" 
+                         GroupName="CollectionStatus" 
+                         Checked="StatusRadioButton_Checked" 
+                         AccessKey="F"/>
+            <RadioButton Name="DroppedRadio" 
+                         Grid.Column="4" 
+                         Background="#9b9997" 
+                         Style="{StaticResource CollectionStatusRadioButtonStyle}" 
+                         Content="抛弃" 
+                         Tag="dropped" 
+                         GroupName="CollectionStatus" 
+                         Checked="StatusRadioButton_Checked"
+                         AccessKey="G"/>
         </Grid>
         <TextBlock Text="评分："
                    Margin="0,5,0,0">
@@ -110,15 +150,18 @@
                 Height="31"
                 Minimum="0"
                 Maximum="10"
-                Value="{x:Bind Rate}"/>
+                Value="{x:Bind Rate}"
+                AccessKey="Z"/>
         <TextBlock Text="吐槽：" 
                    Margin="0,5,0,0"/>
         <TextBox Name="CommentTextBox"
                  Text="{x:Bind Comment}"
-                 TextWrapping="Wrap"/>
+                 TextWrapping="Wrap"
+                 AccessKey="X"/>
         <CheckBox Name="PrivacyCheckBox" 
                   Content="私密"
                   IsChecked="{x:Bind Privacy}"
-                  Margin="0,5,0,0"/>
+                  Margin="0,5,0,0"
+                  AccessKey="C"/>
     </StackPanel>
 </ContentDialog>

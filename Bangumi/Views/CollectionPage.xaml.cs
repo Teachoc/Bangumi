@@ -26,7 +26,7 @@ namespace Bangumi.Views
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.RefreshAppBarButton.Click += CollectionPageRefresh;
+            MainPage.RootPage.RefreshButton.Click += CollectionPageRefresh;
             if (ViewModel.SubjectCollection.Count == 0 && !ViewModel.IsLoading)
             {
                 ViewModel.LoadCollectionList();
@@ -35,7 +35,7 @@ namespace Bangumi.Views
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.RefreshAppBarButton.Click -= CollectionPageRefresh;
+            MainPage.RootPage.RefreshButton.Click -= CollectionPageRefresh;
         }
 
         private void CollectionPageRefresh(object sender, RoutedEventArgs e)

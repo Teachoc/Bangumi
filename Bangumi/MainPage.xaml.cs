@@ -28,8 +28,6 @@ namespace Bangumi
     /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        SystemNavigationManager systemNavigationManager;
-
         private bool _isOffline;
         public bool IsOffline
         {
@@ -83,10 +81,6 @@ namespace Bangumi
             // 设置窗口的最小大小
             ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(300, 200));
 
-            this.systemNavigationManager = SystemNavigationManager.GetForCurrentView();
-            systemNavigationManager.BackRequested += SystemNavigationManager_BackRequested;
-            Window.Current.CoreWindow.PointerPressed += CoreWindow_PointerPressed;
-
             // 初始化 Api 对象
             BangumiApi.Init(ApplicationData.Current.LocalFolder.Path,
                             ApplicationData.Current.LocalCacheFolder.Path,
@@ -97,9 +91,14 @@ namespace Bangumi
                             "b678c34dd896203627da308b6b453775", // ClientSecret
                             "BangumiGithubVersion", // RedirectUrl
                             "ms-appx:///Assets/resource/err_404.png",
-                            new FileHelper.EncryptionDelegate(EncryptionHelper.EncryptionAsync),
-                            new FileHelper.DecryptionDelegate(EncryptionHelper.DecryptionAsync),
-                            new BangumiApi.CheckNetworkDelegate(CheckNetworkStatus));
+                            EncryptionHelper.EncryptionAsync,
+                            EncryptionHelper.DecryptionAsync,
+                            new Func<bool>(() =>
+                            {
+                                // 检查网络状态
+                                IsOffline = Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile() == null;
+                                return IsOffline;
+                            }));
 
             if (SettingHelper.UseBangumiData)
             {
@@ -109,79 +108,44 @@ namespace Bangumi
             }
         }
 
-        /// <summary>
-        /// 检查网络状态
-        /// </summary>
-        /// <returns></returns>
-        private bool CheckNetworkStatus()
+        private async void Page_Loaded(object s, RoutedEventArgs ev)
         {
-            IsOffline = Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile() == null;
-            return IsOffline;
-        }
-
-        /// <summary>
-        /// 根据用户登录状态改变用户图标。
-        /// 只检查 Token 是否存在。
-        /// </summary>
-        /// <returns></returns>
-        private async Task UpdataUserStatusAsync()
-        {
-            bool result = await BangumiApi.CheckMyToken();
-            if (result)
+            // 标题栏后退按钮
+            SystemNavigationManager.GetForCurrentView().BackRequested += (sender, e) =>
             {
-                LoginButton.Label = "注销";
-                UserIcon.Glyph = "\uE7E8";
-                RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
-            }
-            else
+                if (!e.Handled)
+                {
+                    e.Handled = On_BackRequested();
+                }
+            };
+            // 将 Esc 添加为后导航的键盘快捷键
+            var goBack = new KeyboardAccelerator { Key = VirtualKey.Escape };
+            goBack.Invoked += (sender, args) =>
             {
-                LoginButton.Label = "登录";
-                UserIcon.Glyph = "\uEE57";
-                RootFrame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
-            }
-        }
-
-        private void BackInvoked(KeyboardAccelerator sender,
-                                 KeyboardAcceleratorInvokedEventArgs args)
-        {
-            On_BackRequested();
-            args.Handled = true;
-        }
-
-        /// <summary>
-        /// 鼠标后退键返回上一页。
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CoreWindow_PointerPressed(CoreWindow sender, PointerEventArgs args)
-        {
-            var properties = args.CurrentPoint.Properties;
-
-            // Ignore button chords with the left, right, and middle buttons
-            if (properties.IsLeftButtonPressed || properties.IsRightButtonPressed ||
-                properties.IsMiddleButtonPressed)
-                return;
-
-            // If back or foward are pressed (but not both) navigate appropriately
-            bool backPressed = properties.IsXButton1Pressed;
-            bool forwardPressed = properties.IsXButton2Pressed;
-            if (backPressed ^ forwardPressed)
+                On_BackRequested();
+                args.Handled = true;
+            };
+            this.KeyboardAccelerators.Add(goBack);
+            // 鼠标后退按钮
+            Window.Current.CoreWindow.PointerPressed += (sender, args) =>
             {
-                if (backPressed)
+                if (args.CurrentPoint.Properties.IsXButton1Pressed)
+                {
                     args.Handled = On_BackRequested();
-                // if (forwardPressed) this.TryGoForward();
-            }
+                }
+            };
+
+            SearchButton.Click += (sender, e) => RootFrame.Navigate(typeof(SearchPage), null, new DrillInNavigationTransitionInfo());
+            SettingButton.Click += (sender, e) => RootFrame.Navigate(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
+            OfflineAppBarButton.Click += (sender, e) => BangumiApi.RecheckNetworkStatus();
+
+            await UpdataUserStatusAsync();
         }
 
-        private void SystemNavigationManager_BackRequested(object sender, BackRequestedEventArgs e)
-        {
-            if (!e.Handled)
-            {
-                e.Handled = On_BackRequested();
-            }
-        }
-
-        // 页面向后导航
+        /// <summary>
+        /// 页面向后导航
+        /// </summary>
+        /// <returns></returns>
         private bool On_BackRequested()
         {
             if (!MainPage.RootFrame.CanGoBack)
@@ -198,30 +162,6 @@ namespace Bangumi
 
             MainPage.RootFrame.GoBack();
             return true;
-        }
-
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            // 将 Esc 添加为后导航的键盘快捷键
-            var goBack = new KeyboardAccelerator { Key = VirtualKey.Escape };
-            goBack.Invoked += BackInvoked;
-            this.KeyboardAccelerators.Add(goBack);
-
-            // 删除Json缓存文件夹，v0.5.5 及之前版本，在从旧版本升级时使用
-            if (System.IO.Directory.Exists(Path.Combine(ApplicationData.Current.LocalCacheFolder.Path, "JsonCache")))
-                await (await ApplicationData.Current.LocalCacheFolder.GetFolderAsync("JsonCache")).DeleteAsync();
-
-            await UpdataUserStatusAsync();
-        }
-
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            RootFrame.Navigate(typeof(SearchPage), null, new DrillInNavigationTransitionInfo());
-        }
-
-        private void SettingButton_Click(object sender, RoutedEventArgs e)
-        {
-            RootFrame.Navigate(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
         }
 
         /// <summary>
@@ -251,13 +191,26 @@ namespace Bangumi
         }
 
         /// <summary>
-        /// 检查网络状态
+        /// 根据用户登录状态改变用户图标。
+        /// 只检查 Token 是否存在。
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OfflineAppBarButton_Click(object sender, RoutedEventArgs e)
+        /// <returns></returns>
+        private async Task UpdataUserStatusAsync()
         {
-            BangumiApi.RecheckNetworkStatus();
+            bool result = await BangumiApi.CheckMyToken();
+            if (result)
+            {
+                LoginButton.Label = "注销";
+                UserIcon.Glyph = "\uE7E8";
+                RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
+            }
+            else
+            {
+                LoginButton.Label = "登录";
+                UserIcon.Glyph = "\uEE57";
+                RootFrame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
+            }
         }
+
     }
 }
