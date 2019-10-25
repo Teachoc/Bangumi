@@ -1,5 +1,4 @@
 ﻿using Bangumi.Api.Models;
-using Bangumi.Api.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ namespace Bangumi.Api
         /// <summary>
         /// 记录缓存是否更新过
         /// </summary>
-        private static bool _isCacheUpdated = false;
+        private static bool _isCacheUpdated;
 
         /// <summary>
         /// 定时器
@@ -32,28 +31,18 @@ namespace Bangumi.Api
         /// <summary>
         /// 定时器触发间隔
         /// </summary>
-        private const int _interval = 30000;
+        private const int TimerInterval = 30000;
 
         /// <summary>
         /// 缓存今天是否更新
         /// </summary>
         public static bool IsCacheUpdatedToday
         {
-            get
-            {
-                return BangumiCache.UpdateDate == DateTime.Today.ConvertDateTimeToJsTick();
-            }
+            get => BangumiCache.UpdateDate == DateTime.Today.ConvertDateTimeToJsTick();
             set
             {
                 _isCacheUpdated = false;
-                if (value)
-                {
-                    BangumiCache.UpdateDate = DateTime.Today.ConvertDateTimeToJsTick();
-                }
-                else
-                {
-                    BangumiCache.UpdateDate = DateTime.Today.AddDays(-1).ConvertDateTimeToJsTick();
-                }
+                BangumiCache.UpdateDate = (value ? DateTime.Today : DateTime.Today.AddDays(-1)).ConvertDateTimeToJsTick();
                 _isCacheUpdated = true;
             }
         }
@@ -175,7 +164,7 @@ namespace Bangumi.Api
         private static void UpdateProgressCache(int epId, EpStatusEnum status)
         {
             // 找到该章节所属的条目
-            var sub = BangumiCache.Subjects.Values.Where(s => s.Eps.Where(p => p.Id == epId).FirstOrDefault() != null).FirstOrDefault();
+            var sub = BangumiCache.Subjects.Values.FirstOrDefault(s => s.Eps.FirstOrDefault(p => p.Id == epId) != null);
             if (sub != null)
             {
                 _isCacheUpdated = false;
@@ -183,7 +172,7 @@ namespace Bangumi.Api
                 BangumiCache.Progresses.TryGetValue(sub.Id.ToString(), out var pro);
                 if (pro != null)
                 {
-                    var ep = pro.Eps.Where(e => e.Id == epId).FirstOrDefault();
+                    var ep = pro.Eps.FirstOrDefault(e => e.Id == epId);
                     if (status != EpStatusEnum.remove)
                     {
                         if (ep != null)
@@ -239,7 +228,7 @@ namespace Bangumi.Api
                     });
                 }
                 // 找到收视列表中的条目，修改 LastTouch
-                var watch = BangumiCache.Watchings.Where(w => w.SubjectId == sub.Id).FirstOrDefault();
+                var watch = BangumiCache.Watchings.FirstOrDefault(w => w.SubjectId == sub.Id);
                 if (watch != null)
                 {
                     watch.LastTouch = DateTime.Now.ConvertDateTimeToJsTick();
@@ -262,12 +251,11 @@ namespace Bangumi.Api
 
             if (dic.ContainsKey(key))
             {
-                if (!dic[key].EqualsExT(value))
-                {
-                    _isCacheUpdated = false;
-                    dic[key] = value;
-                    _isCacheUpdated = true;
-                }
+                if (dic[key].EqualsExT(value)) return;
+
+                _isCacheUpdated = false;
+                dic[key] = value;
+                _isCacheUpdated = true;
             }
             else
             {
@@ -285,12 +273,11 @@ namespace Bangumi.Api
         /// <param name="dest"></param>
         private static void UpdateCache<T>(ref List<T> source, List<T> dest)
         {
-            if (!source.SequenceEqualExT(dest))
-            {
-                _isCacheUpdated = false;
-                source = dest;
-                _isCacheUpdated = true;
-            }
+            if (source.SequenceEqualExT(dest)) return;
+
+            _isCacheUpdated = false;
+            source = dest;
+            _isCacheUpdated = true;
         }
         #endregion
 

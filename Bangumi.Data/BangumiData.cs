@@ -27,11 +27,11 @@ namespace Bangumi.Data
         /// 初始化 bangumi-data 数据，
         /// 读取文件，将数据加载到内存
         /// </summary>
-        /// <param name="datafolderpath">文件夹路径</param>
+        /// <param name="dataFolderPath">文件夹路径</param>
         /// <param name="useBiliApp">是否将链接转换为使用 哔哩哔哩动画 启动协议</param>
-        public static async Task Init(string datafolderpath, bool useBiliApp = false)
+        public static async Task Init(string dataFolderPath, bool useBiliApp = false)
         {
-            _folderPath = datafolderpath ?? throw new ArgumentNullException(nameof(datafolderpath));
+            _folderPath = dataFolderPath ?? throw new ArgumentNullException(nameof(dataFolderPath));
             UseBiliApp = useBiliApp;
             if (!Directory.Exists(_folderPath))
                 Directory.CreateDirectory(_folderPath);
@@ -66,21 +66,16 @@ namespace Bangumi.Data
         {
             var siteList = _dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
                                           .Where(s => _dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
-            string[] airSites = new string[] { "bilibili", "acfun", "iqiyi" , "qq" };
-            if (siteList != null)
+            string[] airSites = { "bilibili", "acfun", "iqiyi" , "qq" };
+            if (siteList == null) return null;
+            foreach (var siteName in airSites)
             {
-                foreach (var siteName in airSites)
-                {
-                    if (siteList.FirstOrDefault(s => s.SiteName == siteName) is Site site)
-                    {
-                        if (site.Begin is DateTime d)
-                        {
-                            d = d.ToLocalTime();
-                            return $"{System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetDayName(d.DayOfWeek)} {d.TimeOfDay.ToString(@"hh\:mm")}";
-                        }
-                    }
-                }
+                if (!(siteList.FirstOrDefault(s => s.SiteName == siteName) is Site site)) continue;
+                if (!(site.Begin is DateTime d)) continue;
+                d = d.ToLocalTime();
+                return $"{System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetDayName(d.DayOfWeek)} {d.TimeOfDay:hh\\:mm}";
             }
+
             return null;
         }
 
@@ -93,48 +88,47 @@ namespace Bangumi.Data
         {
             var siteList = _dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
                                          .Where(s => _dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
-            if (siteList != null)
+            if (siteList == null) return new List<Site>();
+
+            foreach (var site in siteList)
             {
-                foreach (var site in siteList)
+                site.Url = string.IsNullOrEmpty(site.Id)
+                           ? site.Url
+                           : _dataSet.SiteMeta[site.SiteName].UrlTemplate.Replace("{{id}}", site.Id);
+            }
+
+            // 启用设置，将mediaid转换为seasonid
+            if (UseBiliApp)
+            {
+                var biliSite = siteList.FirstOrDefault(s => s.SiteName == "bilibili");
+                if (biliSite != null)
                 {
-                    site.Url = string.IsNullOrEmpty(site.Id) ?
-                               site.Url :
-                               _dataSet.SiteMeta[site.SiteName].UrlTemplate.Replace("{{id}}", site.Id);
-                }
-                // 启用设置，将mediaid转换为seasonid
-                if (UseBiliApp)
-                {
-                    var biliSite = siteList.FirstOrDefault(s => s.SiteName == "bilibili");
-                    if (biliSite != null)
+                    if (!_seasonIdMap.TryGetValue(biliSite.Id, out var seasonId))
                     {
-                        string seasonId;
-                        if (!_seasonIdMap.TryGetValue(biliSite.Id, out seasonId))
+                        var url = $"https://bangumi.bilibili.com/view/web_api/media?media_id={biliSite.Id}";
+                        try
                         {
-                            var url = string.Format("https://bangumi.bilibili.com/view/web_api/media?media_id={0}", biliSite.Id);
-                            try
-                            {
-                                var result = await url.GetStringAsync();
-                                JObject jObject = JObject.Parse(result);
-                                seasonId = jObject.SelectToken("result.param.season_id").ToString();
-                                _seasonIdMap.Add(biliSite.Id, seasonId);
-                                _ = FileHelper.WriteTextAsync(AppFile.Map_json.GetFilePath(_folderPath), JsonConvert.SerializeObject(_seasonIdMap));
-                            }
-                            catch (Exception e)
-                            {
-                                Debug.WriteLine("获取seasonId失败");
-                                Debug.WriteLine(e.Message);
-                                return siteList;
-                            }
+                            var result = await url.GetStringAsync();
+                            JObject jObject = JObject.Parse(result);
+                            seasonId = jObject.SelectToken("result.param.season_id").ToString();
+                            _seasonIdMap.Add(biliSite.Id, seasonId);
+                            _ = FileHelper.WriteTextAsync(AppFile.Map_json.GetFilePath(_folderPath),
+                                                     JsonConvert.SerializeObject(_seasonIdMap));
                         }
-                        biliSite.Url = "bilibili://bangumi/season/" + seasonId;
+                        catch (Exception e)
+                        {
+                            Debug.WriteLine("获取seasonId失败");
+                            Debug.WriteLine(e.Message);
+                            return siteList;
+                        }
                     }
+
+                    biliSite.Url = "bilibili://bangumi/season/" + seasonId;
                 }
-                return siteList;
             }
-            else
-            {
-                return new List<Site>();
-            }
+
+            return siteList;
+
         }
         #endregion
 
@@ -169,25 +163,20 @@ namespace Bangumi.Data
         {
             if (string.IsNullOrEmpty(_latestVersion))
                 await GetLatestVersion();
-            if (!string.IsNullOrEmpty(_latestVersion))
+            if (string.IsNullOrEmpty(_latestVersion)) return false;
+
+            try
             {
-                try
-                {
-                    var data = await BangumiDataCDNUrl.GetStringAsync();
-                    _dataSet = JsonConvert.DeserializeObject<BangumiDataSet>(data);
-                    await FileHelper.WriteTextAsync(AppFile.Data_json.GetFilePath(_folderPath), data);
-                    Version = _latestVersion;
-                    await FileHelper.WriteTextAsync(AppFile.Version.GetFilePath(_folderPath), Version);
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e.Message);
-                    return false;
-                }
+                var data = await BangumiDataCDNUrl.GetStringAsync();
+                _dataSet = JsonConvert.DeserializeObject<BangumiDataSet>(data);
+                await FileHelper.WriteTextAsync(AppFile.Data_json.GetFilePath(_folderPath), data);
+                Version = _latestVersion;
+                await FileHelper.WriteTextAsync(AppFile.Version.GetFilePath(_folderPath), Version);
+                return true;
             }
-            else
+            catch (Exception e)
             {
+                Debug.WriteLine(e.Message);
                 return false;
             }
         }

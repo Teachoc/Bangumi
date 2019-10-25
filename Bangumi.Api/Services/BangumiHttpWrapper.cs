@@ -1,11 +1,9 @@
 ﻿using Bangumi.Api.Models;
-using Bangumi.Api.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Bangumi.Api.Services
@@ -27,7 +25,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Collection2> GetSubjectCollectionAsync(string userIdString, SubjectTypeEnum subjectType)
         {
-            string url = string.Format("{0}/user/{1}/collections/{2}?app_id={3}&max_results=25", BaseUrl, userIdString, subjectType.GetValue(), ClientId);
+            string url = $"{BaseUrl}/user/{userIdString}/collections/{subjectType.GetValue()}?app_id={ClientId}&max_results=25";
             try
             {
                 string response = await HttpHelper.GetAsync(url);
@@ -61,10 +59,10 @@ namespace Bangumi.Api.Services
                 }
                 return result.ElementAt(0);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("GetSubjectCollectionAsync Error.");
-                throw e;
+                throw;
             }
         }
 
@@ -76,17 +74,17 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<SubjectStatus2> GetCollectionStatusAsync(string accessTokenString, string subjectId)
         {
-            string url = string.Format("{0}/collection/{1}?access_token={2}", BaseUrl, subjectId, accessTokenString);
+            string url = $"{BaseUrl}/collection/{subjectId}?access_token={accessTokenString}";
 
             try
             {
                 string response = await HttpHelper.GetAsync(url);
                 return JsonConvert.DeserializeObject<SubjectStatus2>(response);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("GetCollectionStatusAsync Error.");
-                throw e;
+                throw;
             }
         }
 
@@ -99,16 +97,16 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Progress> GetProgressesAsync(string userIdString, string accessTokenString, string subjectId)
         {
-            string url = string.Format("{0}/user/{1}/progress?subject_id={2}&access_token={3}", BaseUrl, userIdString, subjectId, accessTokenString);
+            string url = $"{BaseUrl}/user/{userIdString}/progress?subject_id={subjectId}&access_token={accessTokenString}";
             try
             {
                 string response = await HttpHelper.GetAsync(url);
                 return JsonConvert.DeserializeObject<Progress>(response);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("GetProgressesAsync Error.");
-                throw e;
+                throw;
             }
         }
 
@@ -119,7 +117,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<List<Watching>> GetWatchingListAsync(string userIdString)
         {
-            string url = string.Format("{0}/user/{1}/collection?cat=watching&responseGroup=medium", BaseUrl, userIdString);
+            string url = $"{BaseUrl}/user/{userIdString}/collection?cat=watching&responseGroup=medium";
             try
             {
                 string response = await HttpHelper.GetAsync(url);
@@ -151,10 +149,10 @@ namespace Bangumi.Api.Services
                 }
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("GetWatchingListAsync Error.");
-                throw e;
+                throw;
             }
         }
 
@@ -175,7 +173,7 @@ namespace Bangumi.Api.Services
                                                                    string rating = "",
                                                                    string privace = "0")
         {
-            string url = string.Format("{0}/collection/{1}/update?access_token={2}", BaseUrl, subjectId, accessTokenString);
+            string url = $"{BaseUrl}/collection/{subjectId}/update?access_token={accessTokenString}";
             string postData = "status=" + collectionStatusEnum.GetValue();
             postData += "&comment=" + System.Net.WebUtility.UrlEncode(comment);
             postData += "&rating=" + rating;
@@ -184,16 +182,16 @@ namespace Bangumi.Api.Services
             try
             {
                 string response = await HttpHelper.PostAsync(url, postData);
-                if (response.Contains(string.Format("\"type\":\"{0}\"", collectionStatusEnum.GetValue())))
+                if (response.Contains($"\"type\":\"{collectionStatusEnum.GetValue()}\""))
                 {
                     return true;
                 }
                 return false;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("UpdateCollectionStatusAsync Error.");
-                throw e;
+                throw;
             }
         }
 
@@ -206,7 +204,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<bool> UpdateProgressAsync(string accessTokenString, string ep, EpStatusEnum status)
         {
-            string url = string.Format("{0}/ep/{1}/status/{2}?access_token={3}", BaseUrl, ep, status, accessTokenString);
+            string url = $"{BaseUrl}/ep/{ep}/status/{status}?access_token={accessTokenString}";
             try
             {
                 string response = await HttpHelper.GetAsync(url);
@@ -216,10 +214,10 @@ namespace Bangumi.Api.Services
                 }
                 return false;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("UpdateProgressAsync Error.");
-                throw e;
+                throw;
             }
         }
 
@@ -234,7 +232,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<bool> UpdateProgressBatchAsync(string accessTokenString, int ep, EpStatusEnum status, string epsId)
         {
-            string url = string.Format("{0}/ep/{1}/status/{2}?access_token={3}", BaseUrl, ep, status, accessTokenString);
+            string url = $"{BaseUrl}/ep/{ep}/status/{status}?access_token={accessTokenString}";
             string postData = "ep_id=" + epsId;
 
             try
@@ -246,10 +244,10 @@ namespace Bangumi.Api.Services
                 }
                 return false;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("UpdateProgressBatchAsync Error.");
-                throw e;
+                throw;
             }
         }
 
@@ -260,7 +258,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Subject> GetSubjectEpsAsync(string subjectId)
         {
-            string url = string.Format("{0}/subject/{1}/ep", BaseUrl, subjectId);
+            string url = $"{BaseUrl}/subject/{subjectId}/ep";
             try
             {
                 string response = await HttpHelper.GetAsync(url);
@@ -276,10 +274,10 @@ namespace Bangumi.Api.Services
                 }
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("GetSubjectEpsAsync Error.");
-                throw e;
+                throw;
             }
         }
 
@@ -290,7 +288,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Subject> GetSubjectAsync(string subjectId)
         {
-            string url = string.Format("{0}/subject/{1}?responseGroup=large", BaseUrl, subjectId);
+            string url = $"{BaseUrl}/subject/{subjectId}?responseGroup=large";
             try
             {
                 string response = await HttpHelper.GetAsync(url);
@@ -336,10 +334,10 @@ namespace Bangumi.Api.Services
                 }
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("GetSubjectAsync Error.");
-                throw e;
+                throw;
             }
         }
 
@@ -349,7 +347,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<List<BangumiTimeLine>> GetBangumiCalendarAsync()
         {
-            string url = string.Format("{0}/calendar", BaseUrl);
+            string url = $"{BaseUrl}/calendar";
             try
             {
                 string response = await HttpHelper.GetAsync(url);
@@ -379,10 +377,10 @@ namespace Bangumi.Api.Services
                 }
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("GetBangumiCalendarAsync Error.");
-                throw e;
+                throw;
             }
         }
         /// <summary>
@@ -395,7 +393,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<SearchResult> GetSearchResultAsync(string keyWord, string type, int start, int n)
         {
-            string url = string.Format("{0}/search/subject/{1}?type={2}&responseGroup=small&start={3}&max_results={4}", BaseUrl, keyWord, type, start, n);
+            string url = $"{BaseUrl}/search/subject/{keyWord}?type={type}&responseGroup=small&start={start}&max_results={n}";
             try
             {
                 string response = await HttpHelper.GetAsync(url);
@@ -429,10 +427,10 @@ namespace Bangumi.Api.Services
                 }
                 return new SearchResult { ResultCount = 0, Results = new List<Subject>() };
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.WriteLine("GetSearchResultAsync Error.");
-                throw e;
+                throw;
             }
         }
 
@@ -467,7 +465,7 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="token"></param>
         /// <returns>获取失败返回 null。</returns>
-        internal async Task<AccessToken> RefreshTokenAsync(AccessToken token)
+        private async Task<AccessToken> RefreshTokenAsync(AccessToken token)
         {
             string url = $"{OAuthBaseUrl}/access_token";
             string postData = "grant_type=refresh_token";
@@ -495,7 +493,7 @@ namespace Bangumi.Api.Services
         /// <returns>获取失败返回 null，可能会抛出异常。</returns>
         internal async Task<AccessToken> CheckTokenAsync(AccessToken token)
         {
-            string url = string.Format("{0}/token_status?access_token={1}", OAuthBaseUrl, token.Token);
+            string url = $"{OAuthBaseUrl}/token_status?access_token={token.Token}";
 
             try
             {
@@ -513,7 +511,7 @@ namespace Bangumi.Api.Services
                     return await RefreshTokenAsync(token);
                 }
                 Debug.WriteLine(e.Message);
-                throw e;
+                throw;
             }
         }
 

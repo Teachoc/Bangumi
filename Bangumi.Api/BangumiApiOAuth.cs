@@ -1,5 +1,4 @@
 ﻿using Bangumi.Api.Models;
-using Bangumi.Api.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -71,7 +70,7 @@ namespace Bangumi.Api
         {
             if (MyToken == null)
             {
-                MyToken = JsonConvert.DeserializeObject<AccessToken>(await FileHelper.ReadAndDecryptFileAsync(AppFile.Token_Data.GetFilePath(_localFolderPath)));
+                MyToken = JsonConvert.DeserializeObject<AccessToken>(await FileHelper.ReadAndDecryptFileAsync(AppFile.Token_data.GetFilePath(_localFolderPath)));
                 if (MyToken == null)
                 {
                     //DeleteTokens();
@@ -80,7 +79,7 @@ namespace Bangumi.Api
             }
             // 检查是否在有效期内，接近过期或过期则刷新token
             _isLogin = true;
-            _ = CheckToken();
+            CheckToken();
             return true;
         }
 
@@ -92,7 +91,7 @@ namespace Bangumi.Api
         {
             // 删除用户认证文件
             MyToken = null;
-            FileHelper.DeleteFile(AppFile.Token_Data.GetFilePath(_localFolderPath));
+            FileHelper.DeleteFile(AppFile.Token_data.GetFilePath(_localFolderPath));
             // 清空用户缓存
             DeleteCache();
         }
@@ -103,13 +102,12 @@ namespace Bangumi.Api
         /// <summary>
         /// 查询授权信息，并在满足条件时刷新Token。
         /// </summary>
-        private static async Task CheckToken()
+        private static async void CheckToken()
         {
             try
             {
-                AccessToken token;
                 Debug.WriteLine("尝试刷新Token。");
-                token = await _wrapper.CheckTokenAsync(MyToken);
+                var token = await _wrapper.CheckTokenAsync(MyToken);
                 if (token != null)
                 {
                     // 将信息写入本地文件
@@ -139,7 +137,7 @@ namespace Bangumi.Api
             MyToken = token;
             _isLogin = true;
             // 将信息写入本地文件
-            await FileHelper.EncryptAndWriteFileAsync(AppFile.Token_Data.GetFilePath(_localFolderPath),
+            await FileHelper.EncryptAndWriteFileAsync(AppFile.Token_data.GetFilePath(_localFolderPath),
                                                       JsonConvert.SerializeObject(token));
         }
         #endregion

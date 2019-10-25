@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Bangumi.Api.Utils
+namespace Bangumi.Api
 {
     public static class Utils
     {

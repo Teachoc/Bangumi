@@ -59,7 +59,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("GetSubjectCollectionAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
 
@@ -86,7 +86,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("GetCollectionStatusAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
 
@@ -113,7 +113,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("GetProgressesAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
 
@@ -138,7 +138,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("GetWatchingListAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
 
@@ -176,7 +176,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("UpdateCollectionStatusAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
 
@@ -206,7 +206,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("UpdateProgressAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
 
@@ -234,7 +234,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("UpdateProgressBatchAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
 
@@ -271,7 +271,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("GetSubjectEpsAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
 
@@ -298,7 +298,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("GetSubjectAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
 
@@ -323,7 +323,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("GetBangumiCalendarAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
         /// <summary>
@@ -350,7 +350,7 @@ namespace Bangumi.Api
                 Debug.WriteLine("GetSearchResultAsync Error.");
                 Debug.WriteLine(e);
                 RecheckNetworkStatus();
-                throw e;
+                throw;
             }
         }
 

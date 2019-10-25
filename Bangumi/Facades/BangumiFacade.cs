@@ -1,5 +1,4 @@
 ﻿using Bangumi.Api.Models;
-using Bangumi.Api.Utils;
 using Bangumi.ViewModels;
 using Newtonsoft.Json;
 using System;

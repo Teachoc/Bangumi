@@ -1,5 +1,4 @@
-﻿using Bangumi.Api.Utils;
-using System;
+﻿using System;
 using Windows.Storage;
 
 namespace Bangumi.Helper

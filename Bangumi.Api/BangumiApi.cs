@@ -73,7 +73,7 @@ namespace Bangumi.Api
                 }
 
                 // 启动定时器，定时将缓存写入文件，30 秒
-                _timer = new Timer(_interval);
+                _timer = new Timer(TimerInterval);
                 _timer.Elapsed += WriteCacheToFileTimer_Elapsed;
                 _timer.AutoReset = true;
                 _timer.Start();
@@ -91,7 +91,7 @@ namespace Bangumi.Api
         /// </summary>
         private enum AppFile
         {
-            Token_Data,
+            Token_data,
             BangumiCache,
         }
 

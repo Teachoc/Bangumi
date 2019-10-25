@@ -1,5 +1,4 @@
-﻿using Bangumi.Api.Utils;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Bangumi.Api.Models
 {
