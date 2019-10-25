@@ -1,8 +1,8 @@
 ﻿using Bangumi.Api;
 using Bangumi.Api.Models;
-using Bangumi.Common;
-using Bangumi.Helper;
 using Bangumi.ViewModels;
+using Windows.Devices.Input;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -21,7 +21,7 @@ namespace Bangumi.Views
 
         public CollectionPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -40,10 +40,12 @@ namespace Bangumi.Views
 
         private void CollectionPageRefresh(object sender, RoutedEventArgs e)
         {
-            var button = sender as AppBarButton;
-            var tag = button.Tag;
-            if (tag.Equals("收藏"))
-                ViewModel.LoadCollectionList();
+            if (sender is AppBarButton button)
+            {
+                var tag = button.Tag;
+                if (tag.Equals("收藏"))
+                    ViewModel.LoadCollectionList();
+            }
         }
 
         private void TypeCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -60,26 +62,26 @@ namespace Bangumi.Views
         // 更新条目收藏状态
         private void UpdateCollectionStatusMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var item = sender as MenuFlyoutItem;
-            switch (item.Tag)
+            if (sender is MenuFlyoutItem item)
             {
-                case "Wish":
-                    ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Wish);
-                    break;
-                case "Collect":
-                    ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Collect);
-                    break;
-                case "Doing":
-                    ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Do);
-                    break;
-                case "OnHold":
-                    ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.OnHold);
-                    break;
-                case "Dropped":
-                    ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Dropped);
-                    break;
-                default:
-                    break;
+                switch (item.Tag)
+                {
+                    case "Wish":
+                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Wish);
+                        break;
+                    case "Collect":
+                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Collect);
+                        break;
+                    case "Doing":
+                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Do);
+                        break;
+                    case "OnHold":
+                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.OnHold);
+                        break;
+                    case "Dropped":
+                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Dropped);
+                        break;
+                }
             }
         }
 
@@ -88,7 +90,7 @@ namespace Bangumi.Views
         {
             if (BangumiApi.IsLogin && !ViewModel.IsLoading)
             {
-                if (e.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+                if (e.PointerDeviceType == PointerDeviceType.Mouse)
                 {
                     SetMenuFlyoutByType();
                     CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
@@ -101,7 +103,7 @@ namespace Bangumi.Views
         {
             if (BangumiApi.IsLogin && !ViewModel.IsLoading)
             {
-                if (e.HoldingState == Windows.UI.Input.HoldingState.Started)
+                if (e.HoldingState == HoldingState.Started)
                 {
                     SetMenuFlyoutByType();
                     CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));

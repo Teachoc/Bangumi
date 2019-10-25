@@ -3,6 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Bangumi.Views">
 
-    <Color x:Key="BangumiPinkColor">#d26585</Color>
+    <Brush x:Key="BangumiPinkBrush">#d26585</Brush>
 
 </ResourceDictionary>

@@ -6,12 +6,9 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.System;
-using Windows.System.Profile;
-using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -32,10 +29,7 @@ namespace Bangumi
         public bool IsOffline
         {
             get => _isOffline;
-            set
-            {
-                Set(ref _isOffline, value);
-            }
+            private set => Set(ref _isOffline, value);
         }
         public static MainPage RootPage;
         public static Frame RootFrame;
@@ -139,7 +133,7 @@ namespace Bangumi
             SettingButton.Click += (sender, e) => RootFrame.Navigate(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
             OfflineAppBarButton.Click += (sender, e) => BangumiApi.RecheckNetworkStatus();
 
-            await UpdataUserStatusAsync();
+            await UpdateUserStatusAsync();
         }
 
         /// <summary>
@@ -173,7 +167,7 @@ namespace Bangumi
         {
             if (LoginButton.Label == "登录")
             {
-                await UpdataUserStatusAsync();
+                await UpdateUserStatusAsync();
             }
             else if (LoginButton.Label == "注销")
             {
@@ -185,7 +179,7 @@ namespace Bangumi
                 if (choice == "确定")
                 {
                     BangumiApi.DeleteToken();
-                    await UpdataUserStatusAsync();
+                    await UpdateUserStatusAsync();
                 }
             }
         }
@@ -195,7 +189,7 @@ namespace Bangumi
         /// 只检查 Token 是否存在。
         /// </summary>
         /// <returns></returns>
-        private async Task UpdataUserStatusAsync()
+        private async Task UpdateUserStatusAsync()
         {
             bool result = await BangumiApi.CheckMyToken();
             if (result)

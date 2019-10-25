@@ -87,17 +87,19 @@ namespace Bangumi.ViewModels
         /// <param name="collectionStatus"></param>
         public async void UpdateCollectionStatus(Subject2 subject, CollectionStatusEnum collectionStatus)
         {
-            if (subject != null)
+            if (subject == null) return;
+
+            // 由于服务器原因，导致条目在多个类别下出现，则有不属于同一类别的存在，则进行更新
+            var cols = SubjectCollection.Where(sub => sub.Items.FirstOrDefault(it => it.SubjectId == subject.SubjectId) != null).ToList();
+            if (cols.All(c => c.Status.Name == collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type)))
+                return;
+            var col = cols.FirstOrDefault(c => c.Status.Name != collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type));
+            IsUpdating = true;
+            if (await BangumiFacade.UpdateCollectionStatusAsync(subject.SubjectId.ToString(), collectionStatus))
             {
-                // 由于服务器原因，导致条目在多个类别下出现，则有不属于同一类别的存在，则进行更新
-                var cols = SubjectCollection.Where(sub => sub.Items.Where(it => it.SubjectId == subject.SubjectId).FirstOrDefault() != null);
-                if (cols.Where(c => c.Status.Name != collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type)).Count() == 0)
-                    return;
-                var col = cols.Where(c => c.Status.Name != collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type)).FirstOrDefault();
-                IsUpdating = true;
-                if (await BangumiFacade.UpdateCollectionStatusAsync(subject.SubjectId.ToString(), collectionStatus))
+                // 将条目从原类别中删除
+                if (col != null)
                 {
-                    // 将条目从原类别中删除
                     col.Items.Remove(subject);
                     col.Count--;
                     var index = SubjectCollection.IndexOf(col);
@@ -105,7 +107,8 @@ namespace Bangumi.ViewModels
                     if (col.Items.Count != 0)
                         SubjectCollection.Insert(index, col);
                     // 找到新所属类别，有则加入，无则新增
-                    var newCol = SubjectCollection.Where(sub => sub.Status.Name == collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type)).FirstOrDefault();
+                    var newCol = SubjectCollection.FirstOrDefault(sub =>
+                        sub.Status.Name == collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type));
                     if (newCol != null)
                     {
                         newCol.Items.Insert(0, subject);
@@ -119,14 +122,15 @@ namespace Bangumi.ViewModels
                         newCol = new Collection()
                         {
                             Items = new List<Subject2>() { subject },
-                            Status = new SubjectStatus() { Name = collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type) },
+                            Status = new SubjectStatus()
+                            { Name = collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type) },
                             Count = 1
                         };
                         SubjectCollection.Add(newCol);
                     }
                 }
-                IsUpdating = false;
             }
+            IsUpdating = false;
         }
 
         /// <summary>
@@ -167,7 +171,7 @@ namespace Bangumi.ViewModels
             {
                 Debug.WriteLine("显示用户选定类别收藏信息失败。");
                 Debug.WriteLine(e.Message);
-                throw e;
+                throw;
             }
         }
 

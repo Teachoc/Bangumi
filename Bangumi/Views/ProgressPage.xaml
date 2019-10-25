@@ -47,7 +47,7 @@
                                FontSize="14" 
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.AlignTopWithPanel="True"
-                               Foreground="{StaticResource BangumiPinkColor}"
+                               Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock Name="AirWeekdayTextBlock"
                                Text="{x:Bind AirTime}" 
@@ -117,7 +117,7 @@
                                  ToolTipService.ToolTip="{x:Bind common:Converters.GetProgress(WatchedEps, Eps.Count), Mode=OneWay}"
                                  Margin="0,1,0,0"
                                  Background="{ThemeResource SystemChromeHighColor}"
-                                 Foreground="{StaticResource BangumiPinkColor}" />
+                                 Foreground="{StaticResource BangumiPinkBrush}" />
 
                     <ProgressRing IsActive="True"
                                   Visibility="{x:Bind IsUpdating, Mode=OneWay}"
@@ -164,7 +164,7 @@
                                TextTrimming="CharacterEllipsis"
                                TextWrapping="Wrap">
                         <Run Text="{x:Bind NameCn}"
-                             Foreground="{StaticResource BangumiPinkColor}"/>
+                             Foreground="{StaticResource BangumiPinkBrush}"/>
                         <Run Text="/"
                              Foreground="Gray"/>
                         <Run Text="{x:Bind Name}"
@@ -239,7 +239,7 @@
                                  ToolTipService.ToolTip="{x:Bind common:Converters.GetProgress(WatchedEps, Eps.Count), Mode=OneWay}"
                                  Margin="0,1,0,0"
                                  Background="{ThemeResource SystemChromeHighColor}"
-                                 Foreground="{StaticResource BangumiPinkColor}" />
+                                 Foreground="{StaticResource BangumiPinkBrush}" />
 
                     <ProgressRing IsActive="True"
                                   Visibility="{x:Bind IsUpdating, Mode=OneWay}"

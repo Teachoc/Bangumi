@@ -3,10 +3,8 @@ using Bangumi.Data;
 using Bangumi.Helper;
 using System;
 using System.IO;
-using Windows.ApplicationModel.Core;
+using Windows.ApplicationModel;
 using Windows.Storage;
-using Windows.System.Profile;
-using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -23,14 +21,14 @@ namespace Bangumi.Views
         {
             get
             {
-                var version = Windows.ApplicationModel.Package.Current.Id.Version;
+                var version = Package.Current.Id.Version;
                 return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
             }
         }
 
         public SettingsPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -109,9 +107,6 @@ namespace Bangumi.Views
                         break;
                     case "UseBangumiDataAirTime":
                         SettingHelper.UseBangumiDataAirTime = toggleSwitch.IsOn;
-                        break;
-
-                    default:
                         break;
                 }
             }

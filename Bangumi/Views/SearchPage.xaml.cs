@@ -1,23 +1,16 @@
-﻿using Bangumi.Common;
-using Bangumi.Facades;
-using Bangumi.Helper;
+﻿using Bangumi.Api;
 using Bangumi.Api.Models;
 using Bangumi.ViewModels;
 using System;
-using System.Collections.ObjectModel;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
-using Windows.Foundation;
+using Windows.Devices.Input;
 using Windows.System.Profile;
 using Windows.System.Threading;
 using Windows.UI.Core;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Controls.Primitives;
-using Bangumi.Api;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -33,7 +26,7 @@ namespace Bangumi.Views
 
         public SearchPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
@@ -52,7 +45,7 @@ namespace Bangumi.Views
                         delayTimer.Cancel();
                     TimeSpan delay = TimeSpan.FromMilliseconds(1000);
                     delayTimer = ThreadPoolTimer.CreateTimer(
-                        async (source) =>
+                        async source =>
                         {
                             await Dispatcher.RunAsync(
                                 CoreDispatcherPriority.High,
@@ -82,8 +75,7 @@ namespace Bangumi.Views
             else
             {
                 // Use args.QueryText to determine what to do.
-                int result = 0;
-                int.TryParse(args.QueryText, out result);
+                int.TryParse(args.QueryText, out var result);
                 if (result > 0)
                 {
                     Frame.Navigate(typeof(DetailsPage), result, new DrillInNavigationTransitionInfo());
@@ -111,13 +103,13 @@ namespace Bangumi.Views
         /// <summary>
         /// 执行搜索操作。
         /// </summary>
-        public void Search()
+        private void Search()
         {
             if (string.IsNullOrEmpty(ViewModel.SearchText))
             {
                 return;
             }
-            string type = "";
+            string type;
             ViewModel.PreSearch[ViewModel.SelectedIndex] = ViewModel.SearchText;
             switch (ViewModel.SelectedIndex)
             {
@@ -162,11 +154,11 @@ namespace Bangumi.Views
         }
 
         // 鼠标右键弹出菜单
-        private void ItemRelativePanel_RightTapped(object sender, Windows.UI.Xaml.Input.RightTappedRoutedEventArgs e)
+        private void ItemRelativePanel_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             if (BangumiApi.IsLogin)
             {
-                if (e.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+                if (e.PointerDeviceType == PointerDeviceType.Mouse)
                 {
                     SetMenuFlyoutByType();
                     CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
@@ -175,11 +167,11 @@ namespace Bangumi.Views
         }
 
         // 触摸长按弹出菜单
-        private void ItemRelativePanel_Holding(object sender, Windows.UI.Xaml.Input.HoldingRoutedEventArgs e)
+        private void ItemRelativePanel_Holding(object sender, HoldingRoutedEventArgs e)
         {
             if (BangumiApi.IsLogin)
             {
-                if (e.HoldingState == Windows.UI.Input.HoldingState.Started)
+                if (e.HoldingState == HoldingState.Started)
                 {
                     SetMenuFlyoutByType();
                     CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
@@ -190,26 +182,26 @@ namespace Bangumi.Views
         // 更新条目收藏状态
         private void UpdateCollectionStatusMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var item = sender as MenuFlyoutItem;
-            switch (item.Tag)
+            if (sender is MenuFlyoutItem item)
             {
-                case "Wish":
-                    ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Wish);
-                    break;
-                case "Collect":
-                    ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Collect);
-                    break;
-                case "Doing":
-                    ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Do);
-                    break;
-                case "OnHold":
-                    ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.OnHold);
-                    break;
-                case "Dropped":
-                    ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Dropped);
-                    break;
-                default:
-                    break;
+                switch (item.Tag)
+                {
+                    case "Wish":
+                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Wish);
+                        break;
+                    case "Collect":
+                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Collect);
+                        break;
+                    case "Doing":
+                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Do);
+                        break;
+                    case "OnHold":
+                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.OnHold);
+                        break;
+                    case "Dropped":
+                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Dropped);
+                        break;
+                }
             }
         }
 

@@ -66,7 +66,7 @@
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.AlignTopWithPanel="True"
                                FontSize="14" 
-                               Foreground="{StaticResource BangumiPinkColor}"
+                               Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock Name="SubTitleTextBlock" Text="{x:Bind Name}" 
                                RelativePanel.RightOf="BangumiImage"
@@ -75,8 +75,7 @@
                                FontSize="12"
                                Foreground="Gray"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Row="2"
-                               Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
+                    <TextBlock Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="SubTitleTextBlock"
                                x:Phase="1"
@@ -109,7 +108,7 @@
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.AlignTopWithPanel="True"
                                FontSize="20" 
-                               Foreground="{StaticResource BangumiPinkColor}"
+                               Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock Name="SubTitleTextBlock" Text="{x:Bind Name}" 
                                RelativePanel.RightOf="BangumiImage"
@@ -118,8 +117,7 @@
                                FontSize="16"
                                Foreground="Gray"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Row="2"
-                               Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
+                    <TextBlock Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="SubTitleTextBlock"
                                x:Phase="1"
@@ -152,7 +150,7 @@
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.AlignTopWithPanel="True"
                                FontSize="14" 
-                               Foreground="{StaticResource BangumiPinkColor}"
+                               Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock Text="{x:Bind Name}" 
                                RelativePanel.RightOf="BangumiImage"
@@ -187,7 +185,7 @@
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.AlignTopWithPanel="True"
                                FontSize="20" 
-                               Foreground="{StaticResource BangumiPinkColor}"
+                               Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock Text="{x:Bind Name}" 
                                RelativePanel.RightOf="BangumiImage"

@@ -65,7 +65,7 @@
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.AlignTopWithPanel="True"
                                FontSize="14"
-                               Foreground="{StaticResource BangumiPinkColor}"
+                               Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock Text="{x:Bind Name}"
                                RelativePanel.RightOf="BangumiImage"
@@ -100,7 +100,7 @@
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.AlignTopWithPanel="True"
                                FontSize="20"
-                               Foreground="{StaticResource BangumiPinkColor}"
+                               Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock Text="{x:Bind Name}"
                                RelativePanel.RightOf="BangumiImage"
@@ -156,8 +156,7 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <SemanticZoom Name="TimeLineSemanticZoom"
-                      Grid.Row="1">
+        <SemanticZoom Name="TimeLineSemanticZoom" >
             <SemanticZoom.ZoomedInView>
                 <controls:AdaptiveGridView Name="MyGridView"
                                            ItemsSource="{x:Bind cvsGroups.View}"
@@ -190,7 +189,6 @@
         </SemanticZoom>
 
         <ProgressBar Name="MyProgressBar"
-                     Grid.Row="1"
                      Visibility="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
                      IsIndeterminate="True"
                      VerticalAlignment="Top"/>

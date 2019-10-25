@@ -1,9 +1,6 @@
 ﻿using Bangumi.Api;
 using Bangumi.Helper;
 using System;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
-using Windows.System.Profile;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -22,7 +19,7 @@ namespace Bangumi.Views
     {
         public LoginPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -32,19 +29,18 @@ namespace Bangumi.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Parameter != null)
+            if (e.Parameter is string uri)
             {
-                BitmapImage image = new BitmapImage();
-                image.UriSource = new Uri(e.Parameter as string);
+                BitmapImage image = new BitmapImage {UriSource = new Uri(uri)};
                 WelcomeImage.Source = image;
             }
         }
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Wait, 10);
+            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Wait, 10);
             await OAuthHelper.Authorize();
-            Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 10);
+            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 10);
             if (BangumiApi.IsLogin)
             {
                 MainPage.RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());

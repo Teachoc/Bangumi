@@ -85,7 +85,7 @@
                                RelativePanel.AlignRightWithPanel="True"
                                RelativePanel.AlignTopWithPanel="True"
                                FontSize="12" 
-                               Foreground="{StaticResource BangumiPinkColor}"/>
+                               Foreground="{StaticResource BangumiPinkBrush}"/>
                     <TextBlock Grid.Row="1"
                                Text="{x:Bind NameCn,Mode=OneWay}" 
                                x:Phase="1"
@@ -287,12 +287,12 @@
                         <Setter Target="BangumiImage.Width" Value="75"/>
                         <Setter Target="BangumiImage.Height" Value="107"/>
                         <Setter Target="NameTextBlock.FontSize" Value="16"/>
-                        <Setter Target="air_dateTextBlock.FontSize" Value="14"/>
-                        <Setter Target="air_weekdayTextBlock.FontSize" Value="14"/>
-                        <Setter Target="collectionTextBlock.FontSize" Value="12"/>
-                        <Setter Target="ratingTextBlock.FontSize" Value="24"/>
-                        <Setter Target="ratingTextBlock.Margin" Value="10"/>
-                        <Setter Target="ratingTextBlockDesc.FontSize" Value="12"/>
+                        <Setter Target="AirDateTextBlock.FontSize" Value="14"/>
+                        <Setter Target="AirWeekdayTextBlock.FontSize" Value="14"/>
+                        <Setter Target="CollectionTextBlock.FontSize" Value="12"/>
+                        <Setter Target="RatingTextBlock.FontSize" Value="24"/>
+                        <Setter Target="RatingTextBlock.Margin" Value="10"/>
+                        <Setter Target="RatingTextBlockDesc.FontSize" Value="12"/>
                         <Setter Target="RateItemsControl.Visibility" Value="Collapsed"/>
                     </VisualState.Setters>
                 </VisualState>
@@ -304,12 +304,12 @@
                         <Setter Target="BangumiImage.Width" Value="150"/>
                         <Setter Target="BangumiImage.Height" Value="214"/>
                         <Setter Target="NameTextBlock.FontSize" Value="24"/>
-                        <Setter Target="air_dateTextBlock.FontSize" Value="16"/>
-                        <Setter Target="air_weekdayTextBlock.FontSize" Value="16"/>
-                        <Setter Target="collectionTextBlock.FontSize" Value="14"/>
-                        <Setter Target="ratingTextBlock.FontSize" Value="48"/>
-                        <Setter Target="ratingTextBlock.Margin" Value="25,20"/>
-                        <Setter Target="ratingTextBlockDesc.FontSize" Value="18"/>
+                        <Setter Target="AirDateTextBlock.FontSize" Value="16"/>
+                        <Setter Target="AirWeekdayTextBlock.FontSize" Value="16"/>
+                        <Setter Target="CollectionTextBlock.FontSize" Value="14"/>
+                        <Setter Target="RatingTextBlock.FontSize" Value="48"/>
+                        <Setter Target="RatingTextBlock.Margin" Value="25,20"/>
+                        <Setter Target="RatingTextBlockDesc.FontSize" Value="18"/>
                         <Setter Target="RateItemsControl.Visibility" Value="Collapsed"/>
                     </VisualState.Setters>
                 </VisualState>
@@ -321,12 +321,12 @@
                         <Setter Target="BangumiImage.Width" Value="150"/>
                         <Setter Target="BangumiImage.Height" Value="214"/>
                         <Setter Target="NameTextBlock.FontSize" Value="24"/>
-                        <Setter Target="air_dateTextBlock.FontSize" Value="16"/>
-                        <Setter Target="air_weekdayTextBlock.FontSize" Value="16"/>
-                        <Setter Target="collectionTextBlock.FontSize" Value="14"/>
-                        <Setter Target="ratingTextBlock.FontSize" Value="48"/>
-                        <Setter Target="ratingTextBlock.Margin" Value="25,20"/>
-                        <Setter Target="ratingTextBlockDesc.FontSize" Value="18"/>
+                        <Setter Target="AirDateTextBlock.FontSize" Value="16"/>
+                        <Setter Target="AirWeekdayTextBlock.FontSize" Value="16"/>
+                        <Setter Target="CollectionTextBlock.FontSize" Value="14"/>
+                        <Setter Target="RatingTextBlock.FontSize" Value="48"/>
+                        <Setter Target="RatingTextBlock.Margin" Value="25,20"/>
+                        <Setter Target="RatingTextBlockDesc.FontSize" Value="18"/>
                         <Setter Target="RateItemsControl.Visibility" Value="Visible"/>
                     </VisualState.Setters>
                 </VisualState>
@@ -370,7 +370,7 @@
                                                   Margin="0,0,5,0"
                                                   Stretch="UniformToFill"/>
                                 <ItemsControl Name="RateItemsControl"
-                                              RelativePanel.Above="collectionTextBlock"
+                                              RelativePanel.Above="CollectionTextBlock"
                                               RelativePanel.AlignRightWithPanel="True"
                                               ItemTemplate="{StaticResource RateTemplate}"
                                               ItemsSource="{x:Bind ViewModel.OthersRates}">
@@ -388,29 +388,29 @@
                                            RelativePanel.AlignTopWithPanel="True"
                                            IsTextSelectionEnabled="True"
                                            TextWrapping="Wrap"
-                                           Foreground="{StaticResource BangumiPinkColor}" />
-                                <TextBlock Name="air_dateTextBlock" 
+                                           Foreground="{StaticResource BangumiPinkBrush}" />
+                                <TextBlock Name="AirDateTextBlock" 
                                            Text="{x:Bind sys:String.Format('开播时间：{0}',ViewModel.AirDate), Mode=OneWay}" 
                                            RelativePanel.RightOf="BangumiImage"
                                            RelativePanel.Below="NameTextBlock"
                                            Foreground="#666666" 
                                            Margin="0,2,0,0" />
-                                <TextBlock Name="air_weekdayTextBlock" 
+                                <TextBlock Name="AirWeekdayTextBlock" 
                                            Text="{x:Bind sys:String.Format('更新时间：{0}',ViewModel.AirTime), Mode=OneWay}" 
                                            RelativePanel.RightOf="BangumiImage"
-                                           RelativePanel.Below="air_dateTextBlock"
+                                           RelativePanel.Below="AirDateTextBlock"
                                            Foreground="#666666" 
                                            Margin="0,2,0,0" />
-                                <TextBlock Name="ratingTextBlock" 
+                                <TextBlock Name="RatingTextBlock" 
                                            HorizontalTextAlignment="Center"
                                            RelativePanel.LeftOf="RateItemsControl"
-                                           RelativePanel.Above="collectionTextBlock"
-                                           Foreground="{StaticResource BangumiPinkColor}" >
+                                           RelativePanel.Above="CollectionTextBlock"
+                                           Foreground="{StaticResource BangumiPinkBrush}" >
                                     <Run Text="{x:Bind common:Converters.DoubleToString(ViewModel.Score,1), Mode=OneWay}"/>
                                     <LineBreak/>
-                                    <Run x:Name="ratingTextBlockDesc" Text="{x:Bind common:Converters.GetRateDesc(ViewModel.Score), Mode=OneWay}"/>
+                                    <Run x:Name="RatingTextBlockDesc" Text="{x:Bind common:Converters.GetRateDesc(ViewModel.Score), Mode=OneWay}"/>
                                 </TextBlock>
-                                <TextBlock Name="collectionTextBlock" 
+                                <TextBlock Name="CollectionTextBlock" 
                                            Text="{x:Bind ViewModel.OthersCollection,Mode=OneWay}" 
                                            ToolTipService.ToolTip="{x:Bind ViewModel.OthersCollection,Mode=OneWay}"
                                            RelativePanel.AlignRightWithPanel="True"
@@ -446,7 +446,6 @@
                     </controls:AdaptiveGridView>
 
                     <ProgressBar Name="MyProgressBar"
-                                 Grid.Row="1"
                                  Visibility="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
                                  IsIndeterminate="True"
                                  VerticalAlignment="Top"/>
@@ -461,11 +460,11 @@
                         <TextBlock IsTextSelectionEnabled="True"
                                    TextWrapping="Wrap"
                                    FontSize="18">
-                            <Bold Foreground="{StaticResource BangumiPinkColor}">原名：</Bold><Run Text="{x:Bind ViewModel.Name,Mode=OneWay}"></Run>
+                            <Bold Foreground="{StaticResource BangumiPinkBrush}">原名：</Bold><Run Text="{x:Bind ViewModel.Name,Mode=OneWay}"></Run>
                         </TextBlock>
                         <TextBlock LineHeight="34"
                                    FontSize="18"
-                                   Foreground="{StaticResource BangumiPinkColor}"
+                                   Foreground="{StaticResource BangumiPinkBrush}"
                                    Padding="0,15,0,0"><Bold>影片信息</Bold></TextBlock>
                         <TextBlock LineHeight="22" 
                                    Text="{x:Bind ViewModel.MoreInfo,Mode=OneWay}"
@@ -473,7 +472,7 @@
                         <TextBlock LineHeight="34"
                                    FontSize="18"
                                    Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(ViewModel.MoreSummary),Mode=OneWay}"
-                                   Foreground="{StaticResource BangumiPinkColor}"
+                                   Foreground="{StaticResource BangumiPinkBrush}"
                                    Padding="0,15,0,0"><Bold>简介</Bold></TextBlock>
                         <TextBlock LineHeight="22" 
                                    IsTextSelectionEnabled="True"
@@ -485,7 +484,7 @@
                         <TextBlock LineHeight="34"
                                    FontSize="18"
                                    Visibility="{x:Bind common:Converters.CollapsedIfZero(ViewModel.Characters.Count),Mode=OneWay}"
-                                   Foreground="{StaticResource BangumiPinkColor}"
+                                   Foreground="{StaticResource BangumiPinkBrush}"
                                    Padding="0,15,0,0"><Bold>角色资料</Bold></TextBlock>
                         <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.Characters}"
                                             ItemTemplate="{StaticResource CrtTemplate}">
@@ -501,7 +500,7 @@
                         <TextBlock LineHeight="34"
                                    FontSize="18"
                                    Visibility="{x:Bind common:Converters.CollapsedIfZero(ViewModel.Staffs.Count),Mode=OneWay}"
-                                   Foreground="{StaticResource BangumiPinkColor}"
+                                   Foreground="{StaticResource BangumiPinkBrush}"
                                    Padding="0,15,0,0"><Bold>演职资料</Bold></TextBlock>
                         <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.Staffs}"
                                             ItemTemplate="{StaticResource StaffTemplate}">
@@ -517,7 +516,7 @@
                         <TextBlock LineHeight="34"
                                    FontSize="18"
                                    Visibility="{x:Bind common:Converters.CollapsedIfZero(ViewModel.Blogs.Count),Mode=OneWay}"
-                                   Foreground="{StaticResource BangumiPinkColor}"
+                                   Foreground="{StaticResource BangumiPinkBrush}"
                                    Padding="0,15,0,0"><Bold>评论</Bold></TextBlock>
                         <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.Blogs}"
                                             ItemTemplate="{StaticResource BlogTemplate}">
@@ -530,7 +529,7 @@
                         <TextBlock LineHeight="34"
                                    FontSize="18"
                                    Visibility="{x:Bind common:Converters.CollapsedIfZero(ViewModel.Topics.Count),Mode=OneWay}"
-                                   Foreground="{StaticResource BangumiPinkColor}"
+                                   Foreground="{StaticResource BangumiPinkBrush}"
                                    Padding="0,15,0,0"><Bold>讨论版</Bold></TextBlock>
                         <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.Topics}"
                                             ItemTemplate="{StaticResource TopicTemplate}">

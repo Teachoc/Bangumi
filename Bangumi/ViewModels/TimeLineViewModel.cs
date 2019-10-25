@@ -130,7 +130,7 @@ namespace Bangumi.ViewModels
             {
                 Debug.WriteLine("显示时间表失败。");
                 Debug.WriteLine(e.Message);
-                throw e;
+                throw;
             }
         }
 

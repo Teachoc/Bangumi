@@ -52,13 +52,13 @@ namespace Bangumi.Controls.TitleBar
             set => SetValue(IsBackEnabledProperty, value);
         }
 
-        private static bool firstInit = true;
+        private static bool _firstInit = true;
 
         public TitleBarEx()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             Window.Current.CoreWindow.Activated += CoreWindow_Activated;
-            if (firstInit)
+            if (_firstInit)
             {
                 // 将内容拓展到标题栏
                 var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
@@ -78,7 +78,7 @@ namespace Bangumi.Controls.TitleBar
                 appTitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
                 appTitleBar.ButtonInactiveForegroundColor = Colors.White;
 
-                firstInit = false;
+                _firstInit = false;
             }
         }
 
@@ -87,21 +87,21 @@ namespace Bangumi.Controls.TitleBar
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void CoreWindow_Activated(Windows.UI.Core.CoreWindow sender, Windows.UI.Core.WindowActivatedEventArgs args)
+        private void CoreWindow_Activated(CoreWindow sender, WindowActivatedEventArgs args)
         {
             SolidColorBrush brush;
             switch (sender.ActivationMode)
             {
-                case Windows.UI.Core.CoreWindowActivationMode.None:
+                case CoreWindowActivationMode.None:
                     brush = new SolidColorBrush(Color.FromArgb(0xff, 0xf5, 0xe0, 0xe6));
                     break;
-                case Windows.UI.Core.CoreWindowActivationMode.Deactivated:
+                case CoreWindowActivationMode.Deactivated:
                     brush = new SolidColorBrush(Color.FromArgb(0xff, 0xf5, 0xe0, 0xe6));
                     break;
-                case Windows.UI.Core.CoreWindowActivationMode.ActivatedNotForeground:
+                case CoreWindowActivationMode.ActivatedNotForeground:
                     brush = new SolidColorBrush(Color.FromArgb(0xff, 0xf5, 0xe0, 0xe6));
                     break;
-                case Windows.UI.Core.CoreWindowActivationMode.ActivatedInForeground:
+                case CoreWindowActivationMode.ActivatedInForeground:
                     brush = new SolidColorBrush(Colors.White);
                     break;
                 default:
@@ -112,9 +112,9 @@ namespace Bangumi.Controls.TitleBar
             var appTitleBar = ApplicationView.GetForCurrentView().TitleBar;
             appTitleBar.ButtonInactiveForegroundColor = brush.Color;
 
-            this.AppTitleTextBlock.Foreground = brush;
-            this.TitleBarLoadingTextBlock.Foreground = brush;
-            this.TitleBarProgressRing.Foreground = brush;
+            AppTitleTextBlock.Foreground = brush;
+            TitleBarLoadingTextBlock.Foreground = brush;
+            TitleBarProgressRing.Foreground = brush;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)

@@ -17,10 +17,6 @@ namespace Bangumi.ViewModels
 {
     public class SearchViewModel : ViewModelBase
     {
-        public SearchViewModel()
-        {
-        }
-
         public ObservableCollection<string> Suggestions { get; private set; } = new ObservableCollection<string>();
         public SearchResultIncrementalLoadingCollection SearchResultCollection;
 
@@ -28,10 +24,7 @@ namespace Bangumi.ViewModels
         public bool IsUpdating
         {
             get => _isUpdating;
-            set
-            {
-                Set(ref _isUpdating, value);
-            }
+            set => Set(ref _isUpdating, value);
         }
 
         private int _selectedIndex;
@@ -137,12 +130,14 @@ namespace Bangumi.ViewModels
         /// 加载完成。
         /// </summary>
         /// <param name="index">当前搜索所属类型所在的Pivot索引。</param>
-        public void OnLoadMoreCompleted(int index, int ItemsCount, bool HasMoreItems)
+        /// <param name="itemsCount"></param>
+        /// <param name="hasMoreItems"></param>
+        public void OnLoadMoreCompleted(int index, int itemsCount, bool hasMoreItems)
         {
-            ResultNumber[index] = "(" + ItemsCount + ")";
-            if (!HasMoreItems)
+            ResultNumber[index] = "(" + itemsCount + ")";
+            if (!hasMoreItems)
             {
-                if (ItemsCount == 0)
+                if (itemsCount == 0)
                 {
                     SearchStatus[index] = "";
                     ResultNumber[index] = "";
@@ -192,7 +187,7 @@ namespace Bangumi.ViewModels
             this.index = index;
         }
 
-        public bool HasMoreItems { get { return offset < max; } }
+        public bool HasMoreItems => offset < max;
 
         public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
         {
@@ -251,7 +246,7 @@ namespace Bangumi.ViewModels
             });
         }
         public delegate void LoadMoreStarted(int index);
-        public delegate void LoadMoreCompleted(int index, int ItemsCount, bool HasMoreItems);
+        public delegate void LoadMoreCompleted(int index, int itemsCount, bool hasMoreItems);
 
         public event LoadMoreStarted OnLoadMoreStarted;
         public event LoadMoreCompleted OnLoadMoreCompleted;

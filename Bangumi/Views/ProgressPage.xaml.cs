@@ -1,19 +1,16 @@
-﻿using Bangumi.Facades;
+﻿using Bangumi.Data;
 using Bangumi.Helper;
-using Bangumi.Api.Models;
 using Bangumi.ViewModels;
 using System;
-using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using Windows.Devices.Input;
 using Windows.Foundation;
-using Windows.UI.Core;
+using Windows.System;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Navigation;
-using Windows.System;
-using Bangumi.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -28,7 +25,7 @@ namespace Bangumi.Views
 
         public ProgressPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -47,11 +44,13 @@ namespace Bangumi.Views
 
         private async void ProgressPageRefresh(object sender, RoutedEventArgs e)
         {
-            var button = sender as AppBarButton;
-            var tag = button.Tag;
-            if (tag.Equals("进度"))
+            if (sender is AppBarButton button)
             {
-                await ViewModel.LoadWatchingListAsync(false);
+                var tag = button.Tag;
+                if (tag.Equals("进度"))
+                {
+                    await ViewModel.LoadWatchingListAsync(false);
+                }
             }
         }
 
@@ -61,18 +60,26 @@ namespace Bangumi.Views
             MainPage.RootFrame.Navigate(typeof(DetailsPage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
         }
 
-        // 将下一话标记为看过
+        /// <summary>
+        /// 将下一话标记为看过
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NextEpButton_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Windows.UI.Xaml.Controls.Button)sender;
+            var button = (Button)sender;
             var item = (WatchingStatus)button.DataContext;
             ViewModel.UpdateNextEpStatus(item);
         }
 
-        // 修改收藏状态
+        /// <summary>
+        /// 修改收藏状态
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CollectionButton_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Windows.UI.Xaml.Controls.Button)sender;
+            var button = (Button)sender;
             var item = (WatchingStatus)button.DataContext;
             ViewModel.EditCollectionStatus(item);
         }
@@ -84,14 +91,18 @@ namespace Bangumi.Views
         /// <param name="e"></param>
         private async void SiteMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var item = sender as MenuFlyoutItem;
-            var uri = item.DataContext as string;
-            await Launcher.LaunchUriAsync(new Uri(uri));
+            if (sender is MenuFlyoutItem item)
+            {
+                var uri = item.DataContext as string;
+                await Launcher.LaunchUriAsync(new Uri(uri));
+            }
         }
 
         /// <summary>
         /// 初始化放送站点及拆分按钮
         /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         private async Task InitAirSites(string id)
         {
             SitesMenuFlyout.Items.Clear();
@@ -100,7 +111,7 @@ namespace Bangumi.Views
             {
                 foreach (var site in airSites)
                 {
-                    MenuFlyoutItem menuFlyoutItem = new MenuFlyoutItem()
+                    MenuFlyoutItem menuFlyoutItem = new MenuFlyoutItem
                     {
                         Text = site.SiteName,
                         DataContext = site.Url
@@ -111,7 +122,7 @@ namespace Bangumi.Views
             }
             else
             {
-                MenuFlyoutItem menuFlyoutItem = new MenuFlyoutItem()
+                MenuFlyoutItem menuFlyoutItem = new MenuFlyoutItem
                 {
                     Text = "无放送站点"
                 };
@@ -123,12 +134,17 @@ namespace Bangumi.Views
         /// 显示右键菜单
         /// </summary>
         /// <param name="sender"></param>
+        /// <param name="point"></param>
         private async void ShowSitesMenuFlyout(FrameworkElement sender, Point point)
         {
-            var panel = sender as RelativePanel;
-            var watch = panel.DataContext as WatchingStatus;
-            await InitAirSites(watch.SubjectId.ToString());
-            SitesMenuFlyout.ShowAt(sender, point);
+            if (sender is RelativePanel panel)
+            {
+                if (panel.DataContext is WatchingStatus watch)
+                {
+                    await InitAirSites(watch.SubjectId.ToString());
+                    SitesMenuFlyout.ShowAt(sender, point);
+                }
+            }
         }
 
         /// <summary>
@@ -136,11 +152,11 @@ namespace Bangumi.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void RelativePanel_RightTapped(object sender, Windows.UI.Xaml.Input.RightTappedRoutedEventArgs e)
+        private void RelativePanel_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             if (SettingHelper.UseBangumiDataAirSites)
             {
-                if (e.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+                if (e.PointerDeviceType == PointerDeviceType.Mouse)
                 {
                     ShowSitesMenuFlyout((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
                     e.Handled = true;
@@ -153,11 +169,11 @@ namespace Bangumi.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void RelativePanel_Holding(object sender, Windows.UI.Xaml.Input.HoldingRoutedEventArgs e)
+        private void RelativePanel_Holding(object sender, HoldingRoutedEventArgs e)
         {
             if (SettingHelper.UseBangumiDataAirSites)
             {
-                if (e.HoldingState == Windows.UI.Input.HoldingState.Started)
+                if (e.HoldingState == HoldingState.Started)
                 {
                     ShowSitesMenuFlyout((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
                     e.Handled = true;

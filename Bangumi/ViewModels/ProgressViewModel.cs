@@ -24,13 +24,13 @@ namespace Bangumi.ViewModels
 
         public ObservableCollection<WatchingStatus> WatchingCollection { get; private set; } = new ObservableCollection<WatchingStatus>();
 
-        private object lockObj = new object();
+        private readonly object lockObj = new object();
 
         private bool _isLoading;
         public bool IsLoading
         {
             get => _isLoading;
-            set
+            private set
             {
                 Set(ref _isLoading, value);
                 HomePage.homePage.IsLoading = value;
@@ -66,7 +66,7 @@ namespace Bangumi.ViewModels
                                                                     collectionEditContentDialog.CollectionStatus,
                                                                     collectionEditContentDialog.Comment,
                                                                     collectionEditContentDialog.Rate.ToString(),
-                                                                    collectionEditContentDialog.Privacy == true ? "1" : "0"))
+                                                                    collectionEditContentDialog.Privacy ? "1" : "0"))
                 {
                     // 若修改后状态不是在看，则从进度页面删除
                     if (collectionEditContentDialog.CollectionStatus != CollectionStatusEnum.Do)
@@ -176,31 +176,24 @@ namespace Bangumi.ViewModels
         /// <returns></returns>
         private async Task PopulateWatchingListAsync(ObservableCollection<WatchingStatus> watchingCollection, bool fromCache)
         {
-            try
+            List<Watching> watchingsCache = BangumiApi.BangumiCache.Watchings.ToList();
+            // 加载缓存
+            var cachedList = await ProcessWatchings(watchingsCache);
+            DiffListToObservableCollection(watchingCollection, cachedList);
+            if (!fromCache)
             {
-                List<Watching> watchingsCache = BangumiApi.BangumiCache.Watchings.ToList();
-                // 加载缓存
-                var cachedList = await ProcessWatchings(watchingsCache);
-                DiffListToObservableCollection(watchingCollection, cachedList);
-                if (!fromCache)
+                var watchings = await BangumiApi.GetWatchingListAsync();
+                // 当天首次更新或内容有变更
+                if (!BangumiApi.IsCacheUpdatedToday || !watchingsCache.SequenceEqualExT(watchings))
                 {
-                    var watchings = await BangumiApi.GetWatchingListAsync();
-                    // 当天首次更新或内容有变更
-                    if (!BangumiApi.IsCacheUpdatedToday || !watchingsCache.SequenceEqualExT(watchings))
+                    var newList = await ProcessWatchings(watchings, watchingCollection.ToList(), false);
+                    DiffListToObservableCollection(watchingCollection, newList);
+                    // 当天成功更新
+                    if (!BangumiApi.IsCacheUpdatedToday)
                     {
-                        var newList = await ProcessWatchings(watchings, watchingCollection.ToList(), false);
-                        DiffListToObservableCollection(watchingCollection, newList);
-                        // 当天成功更新
-                        if (!BangumiApi.IsCacheUpdatedToday)
-                        {
-                            BangumiApi.IsCacheUpdatedToday = true;
-                        }
+                        BangumiApi.IsCacheUpdatedToday = true;
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
         }
 
@@ -249,7 +242,7 @@ namespace Bangumi.ViewModels
                             // 加载缓存
                             if (fromCache && BangumiApi.BangumiCache.Subjects.TryGetValue(item.SubjectId.ToString(), out Subject subjectCache))
                             {
-                                await ProcessSubject(item, subjectCache, fromCache);
+                                await ProcessSubject(item, subjectCache, true);
                             }
                             else
                             {
@@ -274,11 +267,12 @@ namespace Bangumi.ViewModels
                         }
                         catch (Exception e)
                         {
+                            Debug.WriteLine(e);
                             if (Debugger.IsAttached)
                             {
                                 Debugger.Break();
                             }
-                            throw e;
+                            throw;
                         }
                         finally
                         {
@@ -319,7 +313,7 @@ namespace Bangumi.ViewModels
                     };
                     item.Eps.Add(simpleEp);
                 }
-                item.UpdatedEps = item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(Air|Today)")).Count();
+                item.UpdatedEps = item.Eps.Count(ep => Regex.IsMatch(ep.Status, "(Air|Today)"));
 
                 if (fromCache && BangumiApi.BangumiCache.Progresses.TryGetValue(item.SubjectId.ToString(), out Progress progressCache))
                 {
@@ -482,32 +476,32 @@ namespace Bangumi.ViewModels
             set => Set(ref _isUpdating, value);
         }
 
-        private int _watched_eps;
+        private int _watchedEps;
         public int WatchedEps
         {
-            get { return _watched_eps; }
-            set => Set(ref _watched_eps, value);
+            get => _watchedEps;
+            set => Set(ref _watchedEps, value);
         }
 
-        private int _updated_eps;
+        private int _updatedEps;
         public int UpdatedEps
         {
-            get { return _updated_eps; }
-            set => Set(ref _updated_eps, value);
+            get => _updatedEps;
+            set => Set(ref _updatedEps, value);
         }
 
-        private double _next_ep;
+        private double _nextEp;
         public double NextEp
         {
-            get => _next_ep;
-            set => Set(ref _next_ep, value);
+            get => _nextEp;
+            set => Set(ref _nextEp, value);
         }
 
-        private string _ep_color;
+        private string _epColor;
         public string EpColor
         {
-            get { return _ep_color; }
-            set => Set(ref _ep_color, value);
+            get => _epColor;
+            set => Set(ref _epColor, value);
         }
 
         // override object.Equals

@@ -5,15 +5,17 @@ using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.ViewModels;
 using System;
-using Windows.ApplicationModel.Core;
+using Windows.Devices.Input;
 using Windows.System;
-using Windows.System.Profile;
-using Windows.UI.Core;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using SplitButton = Microsoft.UI.Xaml.Controls.SplitButton;
+using SplitButtonClickEventArgs = Microsoft.UI.Xaml.Controls.SplitButtonClickEventArgs;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -24,16 +26,16 @@ namespace Bangumi.Views
     /// </summary>
     public sealed partial class DetailsPage : Page
     {
-        public DetailsViewModel ViewModel { get; set; } = new DetailsViewModel();
+        public DetailsViewModel ViewModel { get; private set; } = new DetailsViewModel();
 
         public DetailsPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Parameter.GetType() == typeof(Int32))
+            if (e.Parameter?.GetType() == typeof(int))
             {
                 ViewModel.SubjectId = e.Parameter.ToString();
             }
@@ -77,7 +79,7 @@ namespace Bangumi.Views
                 Binding labelBinding = new Binding
                 {
                     Source = ViewModel,
-                    Path = new PropertyPath("CollectionStatusText"),
+                    Path = new PropertyPath("CollectionStatusText")
                 };
                 MainPage.RootPage.CollectionAppBarButton.SetBinding(AppBarButton.LabelProperty, labelBinding);
                 MainPage.RootPage.CollectionAppBarButton.SetBinding(ToolTipService.ToolTipProperty, labelBinding);
@@ -85,16 +87,16 @@ namespace Bangumi.Views
                 Binding glyphBinding = new Binding
                 {
                     Source = ViewModel,
-                    Path = new PropertyPath("CollectionStatusIcon"),
+                    Path = new PropertyPath("CollectionStatusIcon")
                 };
                 MainPage.RootPage.CollectionAppBarButtonFontIcon.SetBinding(FontIcon.GlyphProperty, glyphBinding);
                 // 是否启用
                 Binding isEnabledBinding = new Binding
                 {
                     Source = ViewModel,
-                    Path = new PropertyPath("IsStatusLoaded"),
+                    Path = new PropertyPath("IsStatusLoaded")
                 };
-                MainPage.RootPage.CollectionAppBarButton.SetBinding(AppBarButton.IsEnabledProperty, isEnabledBinding);
+                MainPage.RootPage.CollectionAppBarButton.SetBinding(IsEnabledProperty, isEnabledBinding);
                 MainPage.RootPage.CollectionAppBarButton.Click += CollectionAppBarButton_Click;
                 MainPage.RootPage.CollectionAppBarButton.Visibility = Visibility.Visible;
             }
@@ -105,7 +107,7 @@ namespace Bangumi.Views
             }
             else
             {
-                SitesMenuFlyout.Items.Clear();
+                SitesMenuFlyout.Items?.Clear();
                 SelectedTextBlock.Text = "";
                 SelectedTextBlock.DataContext = null;
             }
@@ -116,30 +118,29 @@ namespace Bangumi.Views
         /// </summary>
         private void UpdateEpStatusMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var item = sender as MenuFlyoutItem;
-            var tag = item.Tag;
-            var ep = item.DataContext as Ep;
-            switch (tag)
+            if (sender is MenuFlyoutItem item)
             {
-                case "Watched":
-                    ViewModel.UpdateEpStatus(ep, EpStatusEnum.watched);
-                    break;
-                case "WatchedTo":
-                    ViewModel.UpdateEpStatusBatch(ep, EpStatusEnum.watched);
-                    break;
-                case "Queue":
-                    ViewModel.UpdateEpStatus(ep, EpStatusEnum.queue);
-                    break;
-                case "Drop":
-                    ViewModel.UpdateEpStatus(ep, EpStatusEnum.drop);
-                    break;
-                case "Remove":
-                    ViewModel.UpdateEpStatus(ep, EpStatusEnum.remove);
-                    break;
-                default:
-                    break;
+                var tag = item.Tag;
+                var ep = item.DataContext as Ep;
+                switch (tag)
+                {
+                    case "Watched":
+                        ViewModel.UpdateEpStatus(ep, EpStatusEnum.watched);
+                        break;
+                    case "WatchedTo":
+                        ViewModel.UpdateEpStatusBatch(ep, EpStatusEnum.watched);
+                        break;
+                    case "Queue":
+                        ViewModel.UpdateEpStatus(ep, EpStatusEnum.queue);
+                        break;
+                    case "Drop":
+                        ViewModel.UpdateEpStatus(ep, EpStatusEnum.drop);
+                        break;
+                    case "Remove":
+                        ViewModel.UpdateEpStatus(ep, EpStatusEnum.remove);
+                        break;
+                }
             }
-
         }
 
         /// <summary>
@@ -147,7 +148,7 @@ namespace Bangumi.Views
         /// </summary>
         private void Eps_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if (BangumiApi.IsLogin && !ViewModel.IsProgressLoading && ((sender as RelativePanel).DataContext as Ep).Status != "NA")
+            if (BangumiApi.IsLogin && !ViewModel.IsProgressLoading && ((sender as RelativePanel)?.DataContext as Ep)?.Status != "NA")
             {
                 EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
@@ -160,7 +161,7 @@ namespace Bangumi.Views
         {
             if (BangumiApi.IsLogin && !ViewModel.IsProgressLoading)
             {
-                if (e.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+                if (e.PointerDeviceType == PointerDeviceType.Mouse)
                 {
                     EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
                 }
@@ -174,7 +175,7 @@ namespace Bangumi.Views
         {
             if (BangumiApi.IsLogin && !ViewModel.IsProgressLoading)
             {
-                if (e.HoldingState == Windows.UI.Input.HoldingState.Started)
+                if (e.HoldingState == HoldingState.Started)
                 {
                     EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
                 }
@@ -200,37 +201,46 @@ namespace Bangumi.Views
             var uriWebPage = new Uri("https://bgm.tv/subject/" + ViewModel.SubjectId);
 
             // Launch the URI
-            var success = await Windows.System.Launcher.LaunchUriAsync(uriWebPage);
+            var success = await Launcher.LaunchUriAsync(uriWebPage);
         }
 
         private async void ItemsRepeater_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            // The URI to launch
-            var uriWebPage = new Uri((sender as RelativePanel).DataContext.ToString());
+            if (sender is RelativePanel panel)
+            {
+                // The URI to launch
+                var uriWebPage = new Uri(panel.DataContext.ToString());
 
-            // Launch the URI
-            var success = await Windows.System.Launcher.LaunchUriAsync(uriWebPage);
+                // Launch the URI
+                var success = await Launcher.LaunchUriAsync(uriWebPage);
+            }
         }
 
         private void RelativePanel_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            var item = sender as RelativePanel;
-            item.Background = Resources["ListViewItemBackgroundPointerOver"] as Windows.UI.Xaml.Media.SolidColorBrush;
-            //Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 10);
+            if (sender is RelativePanel panel)
+            {
+                panel.Background = Resources["ListViewItemBackgroundPointerOver"] as SolidColorBrush;
+                //Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 10);
+            }
         }
 
         private void RelativePanel_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            var item = sender as RelativePanel;
-            item.Background = Resources["ListViewItemBackgroundPressed"] as Windows.UI.Xaml.Media.SolidColorBrush;
-            //Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 10);
+            if (sender is RelativePanel panel)
+            {
+                panel.Background = Resources["ListViewItemBackgroundPressed"] as SolidColorBrush;
+                //Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 10);
+            }
         }
 
         private void RelativePanel_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            var item = sender as RelativePanel;
-            item.Background = Converters.ConvertBrushFromString("Transparent");
-            //Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 10);
+            if (sender is RelativePanel panel)
+            {
+                panel.Background = Converters.ConvertBrushFromString("Transparent");
+                //Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 10);
+            }
         }
 
         /// <summary>
@@ -238,11 +248,13 @@ namespace Bangumi.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private async void SitesSplitButton_Click(Microsoft.UI.Xaml.Controls.SplitButton sender, Microsoft.UI.Xaml.Controls.SplitButtonClickEventArgs args)
+        private async void SitesSplitButton_Click(SplitButton sender, SplitButtonClickEventArgs args)
         {
-            var textBlock = sender.Content as TextBlock;
-            var uri = textBlock.DataContext as string;
-            await Launcher.LaunchUriAsync(new Uri(uri));
+            if (sender.Content is TextBlock textBlock)
+            {
+                var uri = textBlock.DataContext as string;
+                await Launcher.LaunchUriAsync(new Uri(uri));
+            }
         }
 
         /// <summary>
@@ -252,11 +264,13 @@ namespace Bangumi.Views
         /// <param name="e"></param>
         private async void SiteMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var item = sender as MenuFlyoutItem;
-            var uri = item.DataContext as string;
-            SelectedTextBlock.Text = item.Text;
-            SelectedTextBlock.DataContext = uri;
-            await Launcher.LaunchUriAsync(new Uri(uri));
+            if (sender is MenuFlyoutItem item)
+            {
+                var uri = item.DataContext as string;
+                SelectedTextBlock.Text = item.Text;
+                SelectedTextBlock.DataContext = uri;
+                await Launcher.LaunchUriAsync(new Uri(uri));
+            }
         }
 
         /// <summary>
@@ -272,7 +286,7 @@ namespace Bangumi.Views
             {
                 foreach (var site in airSites)
                 {
-                    MenuFlyoutItem menuFlyoutItem = new MenuFlyoutItem()
+                    MenuFlyoutItem menuFlyoutItem = new MenuFlyoutItem
                     {
                         Text = site.SiteName,
                         DataContext = site.Url

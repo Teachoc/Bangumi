@@ -151,39 +151,41 @@ namespace Bangumi.Common
         /// <summary>
         /// 根据观看进度返回相应描述
         /// </summary>
-        /// <param name="watched_eps"></param>
+        /// <param name="watchedEps"></param>
         /// <returns></returns>
-        public static string GetWatchedEpsDesc(int watched_eps)
+        public static string GetWatchedEpsDesc(int watchedEps)
         {
-            if (watched_eps == -1)
+            if (watchedEps == -1)
                 return string.Empty;
-            if (watched_eps == 0)
+            if (watchedEps == 0)
                 return "尚未观看";
-            return "看到" + watched_eps + "话";
+            return "看到" + watchedEps + "话";
         }
 
         /// <summary>
         /// 根据更新进度返回相应描述
         /// </summary>
-        /// <param name="updated_eps"></param>
+        /// <param name="updatedEps"></param>
+        /// <param name="eps"></param>
         /// <returns></returns>
-        public static string GetUpdatedEpsDesc(int updated_eps, List<ViewModels.SimpleEp> eps)
+        public static string GetUpdatedEpsDesc(int updatedEps, List<ViewModels.SimpleEp> eps)
         {
-            if (updated_eps == -1)
+            if (updatedEps == -1)
                 return "无章节";
-            if (updated_eps == 0)
+            if (updatedEps == 0)
                 return "尚未放送";
             if (eps != null)
             {
-                return eps.Count == updated_eps ? "全" + updated_eps + "话" : "更新到" + updated_eps + "话";
+                return eps.Count == updatedEps ? "全" + updatedEps + "话" : "更新到" + updatedEps + "话";
             }
-            return "共" + updated_eps + "话";
+            return "共" + updatedEps + "话";
         }
 
         /// <summary>
         /// 根据sort和type返回章节相应描述
         /// </summary>
         /// <param name="sort"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
         public static string GetEpSortDesc(double sort, int type)
         {
@@ -200,15 +202,16 @@ namespace Bangumi.Common
         /// <summary>
         /// 根据next_ep和eps返回非正片章节相应描述
         /// </summary>
-        /// <param name="next_ep"></param>
+        /// <param name="nextEp"></param>
+        /// <param name="eps"></param>
         /// <returns></returns>
-        public static string GetEpNextSortDesc(double next_ep, List<ViewModels.SimpleEp> eps)
+        public static string GetEpNextSortDesc(double nextEp, List<ViewModels.SimpleEp> eps)
         {
-            if (next_ep == -1)
+            if (nextEp == -1)
             {
                 return "EP.";
             }
-            var ep = eps?.Where(p => p.Sort == next_ep && Regex.IsMatch(p.Status, "(Air|Today|NA)")).FirstOrDefault();
+            var ep = eps?.Where(p => p.Sort == nextEp && Regex.IsMatch(p.Status, "(Air|Today|NA)")).FirstOrDefault();
             if (ep == null)
             {
                 return "EP.";
@@ -216,13 +219,13 @@ namespace Bangumi.Common
             else if (ep.Type == 0)
             {
                 return "EP." +
-                       next_ep.ToString() +
+                       nextEp.ToString() +
                        (string.IsNullOrEmpty(ep.Name) ? string.Empty : " " + ep.Name);
             }
             else
             {
                 return "EP." +
-                       ep.Type.GetEpisodeType() + " " + next_ep +
+                       ep.Type.GetEpisodeType() + " " + nextEp +
                        (string.IsNullOrEmpty(ep.Name) ? string.Empty : " " + ep.Name);
             }
         }
@@ -259,7 +262,7 @@ namespace Bangumi.Common
         /// <returns></returns>
         public static string GetRateDesc(double rate)
         {
-            string[] descs = new string[] { string.Empty, "不忍直视", "很差", "差", "较差", "不过不失", "还行", "推荐", "力荐", "神作", "超神作 (请谨慎评价)" };
+            string[] descs = { string.Empty, "不忍直视", "很差", "差", "较差", "不过不失", "还行", "推荐", "力荐", "神作", "超神作 (请谨慎评价)" };
             return descs[(int)Math.Round(rate, 0, MidpointRounding.AwayFromZero)];
         }
 

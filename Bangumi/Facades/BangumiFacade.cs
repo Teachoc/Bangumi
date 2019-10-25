@@ -1,14 +1,8 @@
-﻿using Bangumi.Api.Models;
-using Bangumi.ViewModels;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Bangumi.Api;
+﻿using Bangumi.Api;
+using Bangumi.Api.Models;
 using Bangumi.Helper;
+using System;
+using System.Threading.Tasks;
 
 namespace Bangumi.Facades
 {
