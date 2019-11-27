@@ -132,10 +132,9 @@ namespace Bangumi.ViewModels
                 {
                     item.Eps.FirstOrDefault(ep => Regex.IsMatch(ep.Status, "(Air|Today|NA)") && ep.Sort == item.NextEp).Status = "看过";
                     item.WatchedEps++;
-                    item.NextEp = item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(Air|Today)")).OrderBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
-                                  item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(NA)")).OrderBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
+                    item.NextEp = item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(Air|Today)")).OrderBy(ep => ep.Type).ThenBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
+                                  item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(NA)")).OrderBy(ep => ep.Type).ThenBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
                                   -1;
-
                     // 若未看到最新一集，则使用粉色，否则使用灰色
                     if (item.Eps.FirstOrDefault(ep => Regex.IsMatch(ep.Status, "(Air|Today)")) != null)
                     {
@@ -336,8 +335,8 @@ namespace Bangumi.ViewModels
 
             if (item.NextEp != -1 && item.Eps.Count != 0)
             {
-                item.NextEp = item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(Air|Today)")).OrderBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
-                              item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(NA)")).OrderBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
+                item.NextEp = item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(Air|Today)")).OrderBy(ep => ep.Type).ThenBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
+                              item.Eps.Where(ep => Regex.IsMatch(ep.Status, "(NA)")).OrderBy(ep => ep.Type).ThenBy(ep => ep.Sort).FirstOrDefault()?.Sort ??
                               -1;
             }
         }

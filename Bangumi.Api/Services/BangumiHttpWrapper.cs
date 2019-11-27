@@ -266,7 +266,7 @@ namespace Bangumi.Api.Services
                 result.Name = System.Net.WebUtility.HtmlDecode(result.Name);
                 result.NameCn = string.IsNullOrEmpty(result.NameCn) ? result.Name : System.Net.WebUtility.HtmlDecode(result.NameCn);
                 // 将章节按类别排序
-                result._eps = result.Eps.OrderBy(c => c.Type).ToList();
+                result._eps = result.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
                 foreach (var ep in result.Eps)
                 {
                     ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
@@ -311,7 +311,7 @@ namespace Bangumi.Api.Services
                     result.Images.ConvertImageHttpToHttps();
                 }
                 // 将章节按类别排序
-                result._eps = result.Eps.OrderBy(c => c.Type).ToList();
+                result._eps = result.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
                 foreach (var ep in result.Eps)
                 {
                     ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
