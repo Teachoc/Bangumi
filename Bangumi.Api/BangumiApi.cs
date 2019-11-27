@@ -1,8 +1,11 @@
-﻿using Bangumi.Api.Models;
+﻿using Bangumi.Api.Exceptions;
+using Bangumi.Api.Models;
 using Bangumi.Api.Services;
+using Flurl.Http;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -57,6 +60,29 @@ namespace Bangumi.Api
                     RedirectUrl = redirectUrl ?? throw new ArgumentNullException(nameof(redirectUrl)),
                     NoImageUri = noImageUri ?? throw new ArgumentNullException(nameof(noImageUri))
                 };
+
+                FlurlHttp.Configure(settings =>
+                {
+                    settings.BeforeCall = call =>
+                    {
+                        call.Request.Headers.Add("Cookie",
+                            string.Join(";", $"chii_searchDateLine={DateTime.Now.ToString()}"));
+                    };
+                    settings.OnErrorAsync = async call =>
+                    {
+                        if (call.HttpStatus == HttpStatusCode.Unauthorized)
+                        {
+                            throw new BgmUnauthorizedException();
+                        }
+                        else if (call.HttpStatus == HttpStatusCode.BadRequest)
+                        {
+                            if ((await call.Response.Content.ReadAsStringAsync()).Contains("Invalid refresh token"))
+                            {
+                                throw new BgmUnauthorizedException();
+                            }
+                        }
+                    };
+                });
 
                 // 加载缓存
                 BangumiCache = new BangumiCache();
