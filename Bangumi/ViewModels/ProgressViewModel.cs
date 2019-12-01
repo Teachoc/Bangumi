@@ -1,4 +1,5 @@
 ﻿using Bangumi.Api;
+using Bangumi.Api.Exceptions;
 using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.ContentDialogs;
@@ -98,18 +99,10 @@ namespace Bangumi.ViewModels
             }
             catch (Exception e)
             {
-                if (e.Message.Equals("401"))
-                {
-                    // 授权过期，返回登录界面
-                    MainPage.RootFrame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
-                }
-                else
-                {
-                    Debug.WriteLine("获取收视进度列表失败。");
-                    Debug.WriteLine(e.Message);
-                    NotificationHelper.Notify("获取收视进度失败！\n" + e.Message.Replace("\r\n\r\n", "\r\n").TrimEnd('\n').TrimEnd('\r'),
-                                              NotificationHelper.NotifyType.Error);
-                }
+                Debug.WriteLine("获取收视进度列表失败。");
+                Debug.WriteLine(e.Message);
+                NotificationHelper.Notify("获取收视进度失败！\n" + e.Message.Replace("\r\n\r\n", "\r\n").TrimEnd('\n').TrimEnd('\r'),
+                                          NotificationHelper.NotifyType.Error);
             }
             finally
             {

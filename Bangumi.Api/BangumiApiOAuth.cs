@@ -1,4 +1,5 @@
-﻿using Bangumi.Api.Models;
+﻿using Bangumi.Api.Exceptions;
+using Bangumi.Api.Models;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -19,7 +20,7 @@ namespace Bangumi.Api
         /// <summary>
         /// 用来表示 Token 过期或不可用
         /// </summary>
-        private static bool _isLogin = true;
+        private static bool _isLogin;
 
         /// <summary>
         /// 用户认证存在且可用
@@ -66,7 +67,7 @@ namespace Bangumi.Api
         /// 检查用户授权文件。
         /// </summary>
         /// <returns></returns>
-        public static async Task<bool> CheckMyToken()
+        public static async Task<(bool, Task)> CheckMyToken()
         {
             if (MyToken == null)
             {
@@ -74,13 +75,14 @@ namespace Bangumi.Api
                 if (MyToken == null)
                 {
                     //DeleteTokens();
-                    return false;
+                    _isLogin = false;
+                }
+                else
+                {
+                    _isLogin = true;
                 }
             }
-            // 检查是否在有效期内，接近过期或过期则刷新token
-            _isLogin = true;
-            CheckToken();
-            return true;
+            return (_isLogin, CheckToken());
         }
 
         /// <summary>
@@ -102,7 +104,7 @@ namespace Bangumi.Api
         /// <summary>
         /// 查询授权信息，并在满足条件时刷新Token。
         /// </summary>
-        private static async void CheckToken()
+        private static async Task CheckToken()
         {
             try
             {
@@ -115,12 +117,13 @@ namespace Bangumi.Api
                         await WriteTokenAsync(token);
                 }
             }
+            catch (BgmUnauthorizedException)
+            {
+                _isLogin = false;
+                throw;
+            }
             catch (Exception e)
             {
-                if (e.Message.Contains("401"))
-                {
-                    _isLogin = false;
-                }
                 Debug.WriteLine(e.Message);
                 RecheckNetworkStatus();
             }

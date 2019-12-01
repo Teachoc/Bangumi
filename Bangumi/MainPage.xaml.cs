@@ -1,4 +1,5 @@
 ﻿using Bangumi.Api;
+using Bangumi.Api.Exceptions;
 using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.Views;
@@ -102,7 +103,7 @@ namespace Bangumi
             }
         }
 
-        private async void Page_Loaded(object s, RoutedEventArgs ev)
+        private void Page_Loaded(object s, RoutedEventArgs ev)
         {
             // 标题栏后退按钮
             SystemNavigationManager.GetForCurrentView().BackRequested += (sender, e) =>
@@ -133,7 +134,7 @@ namespace Bangumi
             SettingButton.Click += (sender, e) => RootFrame.Navigate(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
             OfflineAppBarButton.Click += (sender, e) => BangumiApi.RecheckNetworkStatus();
 
-            await UpdateUserStatusAsync();
+            _ = UpdateUserStatusAsync();
         }
 
         /// <summary>
@@ -191,18 +192,27 @@ namespace Bangumi
         /// <returns></returns>
         private async Task UpdateUserStatusAsync()
         {
-            bool result = await BangumiApi.CheckMyToken();
-            if (result)
+            try
             {
-                LoginButton.Label = "注销";
-                UserIcon.Glyph = "\uE7E8";
-                RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
+                var result = await BangumiApi.CheckMyToken();
+                if (result.Item1)
+                {
+                    LoginButton.Label = "注销";
+                    UserIcon.Glyph = "\uE7E8";
+                    RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
+                }
+                else
+                {
+                    LoginButton.Label = "登录";
+                    UserIcon.Glyph = "\uEE57";
+                    RootFrame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
+                }
+                await result.Item2;
             }
-            else
+            catch (BgmUnauthorizedException)
             {
-                LoginButton.Label = "登录";
-                UserIcon.Glyph = "\uEE57";
-                RootFrame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
+                // 授权过期，返回登录界面
+                MainPage.RootFrame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
             }
         }
 
