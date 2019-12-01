@@ -50,10 +50,10 @@ namespace Bangumi.Api
             for (int i = 0; i < 3; i++)
             {
                 Debug.WriteLine($"第{i + 1}次尝试获取Token。");
-                token = await _wrapper.GetTokenAsync(code);
+                token = await _wrapper.GetTokenWithCodeAsync(code);
                 if (token != null)
                 {
-                    await WriteTokenAsync(token);
+                    await SaveTokenAsync(token);
                     break;
                 }
                 else
@@ -89,7 +89,7 @@ namespace Bangumi.Api
         /// 删除用户相关文件。
         /// </summary>
         /// <returns></returns>
-        public static void DeleteToken()
+        public static void DeleteUserFiles()
         {
             // 删除用户认证文件
             MyToken = null;
@@ -109,12 +109,12 @@ namespace Bangumi.Api
             try
             {
                 Debug.WriteLine("尝试刷新Token。");
-                var token = await _wrapper.CheckTokenAsync(MyToken);
+                var token = await _wrapper.CheckAndRefreshTokenAsync(MyToken);
                 if (token != null)
                 {
                     // 将信息写入本地文件
                     if (!token.EqualsExT(MyToken))
-                        await WriteTokenAsync(token);
+                        await SaveTokenAsync(token);
                 }
             }
             catch (BgmUnauthorizedException)
@@ -134,7 +134,7 @@ namespace Bangumi.Api
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        private static async Task WriteTokenAsync(AccessToken token)
+        private static async Task SaveTokenAsync(AccessToken token)
         {
             // 存入内存
             MyToken = token;

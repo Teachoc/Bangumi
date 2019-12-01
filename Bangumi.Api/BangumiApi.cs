@@ -81,6 +81,10 @@ namespace Bangumi.Api
                                 throw new BgmUnauthorizedException();
                             }
                         }
+                        if (call.Exception is FlurlHttpTimeoutException)
+                        {
+                            throw new BgmTimeoutException();
+                        }
                     };
                 });
 

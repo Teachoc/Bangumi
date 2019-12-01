@@ -206,11 +206,7 @@ namespace Bangumi.Api.Services
                         privacy
                     })
                     .ReceiveString();
-                if (response.Contains($"\"type\":\"{collectionStatusEnum.GetValue()}\""))
-                {
-                    return true;
-                }
-                return false;
+                return response.Contains($"\"type\":\"{collectionStatusEnum.GetValue()}\"");
             }
             catch (Exception)
             {
@@ -237,11 +233,7 @@ namespace Bangumi.Api.Services
                     })
                     .GetAsync()
                     .ReceiveString();
-                if (response.Contains("\"error\":\"OK\""))
-                {
-                    return true;
-                }
-                return false;
+                return response.Contains("\"error\":\"OK\"");
             }
             catch (Exception)
             {
@@ -273,11 +265,7 @@ namespace Bangumi.Api.Services
                         ep_id
                     })
                     .ReceiveString();
-                if (response.Contains("\"error\":\"OK\""))
-                {
-                    return true;
-                }
-                return false;
+                return response.Contains("\"error\":\"OK\"");
             }
             catch (Exception)
             {
@@ -486,7 +474,7 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="code"></param>
         /// <returns>获取失败返回 null。</returns>
-        internal async Task<AccessToken> GetTokenAsync(string code)
+        internal async Task<AccessToken> GetTokenWithCodeAsync(string code)
         {
             try
             {
@@ -510,46 +498,15 @@ namespace Bangumi.Api.Services
         }
 
         /// <summary>
-        /// 刷新授权有效期。
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns>获取失败返回 null。</returns>
-        private async Task<AccessToken> RefreshTokenAsync(AccessToken token)
-        {
-            try
-            {
-                return await $"{OAuthBaseUrl}/access_token"
-                    .PostUrlEncodedAsync(new
-                    {
-                        grant_type = "refresh_token",
-                        client_id = ClientId,
-                        client_secret = ClientSecret,
-                        refresh_token = token.RefreshToken,
-                        redirect_uri = RedirectUrl
-                    })
-                    .ReceiveJson<AccessToken>();
-            }
-            catch (BgmUnauthorizedException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("RefreshAccessToken Error.");
-                Console.WriteLine(e);
-                return null;
-            }
-        }
-
-        /// <summary>
         /// 查询授权信息，并在满足条件时刷新Token。
         /// </summary>
         /// <param name="token"></param>
         /// <returns>获取失败返回 null，可能会抛出异常。</returns>
-        internal async Task<AccessToken> CheckTokenAsync(AccessToken token)
+        internal async Task<AccessToken> CheckAndRefreshTokenAsync(AccessToken token)
         {
             try
             {
+
                 var result = await $"{OAuthBaseUrl}/token_status"
                     .SetQueryParams(new
                     {
@@ -559,17 +516,31 @@ namespace Bangumi.Api.Services
                     .ReceiveJson<AccessToken>();
                 // 获取4天后的时间戳，离过期不足4天时或过期后更新 access_token
                 if (result.Expires < DateTime.Now.AddDays(4).ConvertDateTimeToJsTick())
-                    return await RefreshTokenAsync(token);
+                    return await RefreshTokenAsync();
                 return token;
             }
             catch (BgmUnauthorizedException)
             {
-                return await RefreshTokenAsync(token);
+                return await RefreshTokenAsync();
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
                 throw;
+            }
+
+            Task<AccessToken> RefreshTokenAsync()
+            {
+                return $"{OAuthBaseUrl}/access_token"
+                    .PostUrlEncodedAsync(new
+                    {
+                        grant_type = "refresh_token",
+                        client_id = ClientId,
+                        client_secret = ClientSecret,
+                        refresh_token = token.RefreshToken,
+                        redirect_uri = RedirectUrl
+                    })
+                    .ReceiveJson<AccessToken>();
             }
         }
 

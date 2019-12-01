@@ -179,7 +179,7 @@ namespace Bangumi
                 await msgDialog.ShowAsync();
                 if (choice == "确定")
                 {
-                    BangumiApi.DeleteToken();
+                    BangumiApi.DeleteUserFiles();
                     await UpdateUserStatusAsync();
                 }
             }
