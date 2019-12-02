@@ -1,5 +1,6 @@
 ﻿using Bangumi.Api.Exceptions;
 using Bangumi.Api.Models;
+using Flurl.Http;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -41,22 +42,20 @@ namespace Bangumi.Api
         /// <summary>
         /// 使用 code 换取 Access Token。
         /// </summary>
-        /// <param name="code"></param>
-        /// <returns></returns>
         public static async Task GetTokenAsync(string code)
         {
             AccessToken token;
             // 重试最多三次
             for (int i = 0; i < 3; i++)
             {
-                Debug.WriteLine($"第{i + 1}次尝试获取Token。");
-                token = await _wrapper.GetTokenWithCodeAsync(code);
-                if (token != null)
+                try
                 {
+                    Debug.WriteLine($"第{i + 1}次尝试获取Token。");
+                    token = await _wrapper.GetTokenWithCodeAsync(code);
                     await SaveTokenAsync(token);
                     break;
                 }
-                else
+                catch (FlurlHttpException)
                 {
                     await Task.Delay(1000);
                 }
@@ -66,7 +65,7 @@ namespace Bangumi.Api
         /// <summary>
         /// 检查用户授权文件。
         /// </summary>
-        /// <returns></returns>
+        /// <exception cref="BgmUnauthorizedException"></exception>
         public static async Task<(bool, Task)> CheckMyToken()
         {
             if (MyToken == null)
@@ -88,7 +87,6 @@ namespace Bangumi.Api
         /// <summary>
         /// 删除用户相关文件。
         /// </summary>
-        /// <returns></returns>
         public static void DeleteUserFiles()
         {
             // 删除用户认证文件
@@ -104,6 +102,7 @@ namespace Bangumi.Api
         /// <summary>
         /// 查询授权信息，并在满足条件时刷新Token。
         /// </summary>
+        /// <exception cref="BgmUnauthorizedException"></exception>
         private static async Task CheckToken()
         {
             try
@@ -132,8 +131,6 @@ namespace Bangumi.Api
         /// <summary>
         /// 将 Token 写入内存及文件。
         /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
         private static async Task SaveTokenAsync(AccessToken token)
         {
             // 存入内存

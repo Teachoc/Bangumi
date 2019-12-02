@@ -30,48 +30,40 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Collection2> GetSubjectCollectionAsync(string userIdString, SubjectTypeEnum subjectType)
         {
-            try
-            {
-                var result = (await $"{BaseUrl}/user/{userIdString}/collections/{subjectType.GetValue()}"
-                    .SetQueryParams(new
-                    {
-                        app_id = ClientId,
-                        max_results = 25
-                    })
-                    .GetAsync()
-                    .ReceiveJson<List<Collection2>>())
-                    ?.FirstOrDefault()
-                    ?? new Collection2 { Collects = new List<Collection>() };
-                foreach (var type in result.Collects)
+            var result = (await $"{BaseUrl}/user/{userIdString}/collections/{subjectType.GetValue()}"
+                .SetQueryParams(new
                 {
-                    foreach (var item in type.Items)
+                    app_id = ClientId,
+                    max_results = 25
+                })
+                .GetAsync()
+                .ReceiveJson<List<Collection2>>())
+                ?.FirstOrDefault()
+                ?? new Collection2 { Collects = new List<Collection>() };
+            foreach (var type in result.Collects)
+            {
+                foreach (var item in type.Items)
+                {
+                    item.Subject.Name = System.Net.WebUtility.HtmlDecode(item.Subject.Name);
+                    item.Subject.NameCn = item.Subject.NameCn.IsNullOrEmpty() ? item.Subject.Name : System.Net.WebUtility.HtmlDecode(item.Subject.NameCn);
+                    if (item.Subject.Images == null)
                     {
-                        item.Subject.Name = System.Net.WebUtility.HtmlDecode(item.Subject.Name);
-                        item.Subject.NameCn = item.Subject.NameCn.IsNullOrEmpty() ? item.Subject.Name : System.Net.WebUtility.HtmlDecode(item.Subject.NameCn);
-                        if (item.Subject.Images == null)
+                        item.Subject.Images = new Images
                         {
-                            item.Subject.Images = new Images
-                            {
-                                Grid = NoImageUri,
-                                Small = NoImageUri,
-                                Common = NoImageUri,
-                                Medium = NoImageUri,
-                                Large = NoImageUri,
-                            };
-                        }
-                        else
-                        {
-                            item.Subject.Images.ConvertImageHttpToHttps();
-                        }
+                            Grid = NoImageUri,
+                            Small = NoImageUri,
+                            Common = NoImageUri,
+                            Medium = NoImageUri,
+                            Large = NoImageUri,
+                        };
+                    }
+                    else
+                    {
+                        item.Subject.Images.ConvertImageHttpToHttps();
                     }
                 }
-                return result;
             }
-            catch (Exception)
-            {
-                Debug.WriteLine("GetSubjectCollectionAsync Error.");
-                throw;
-            }
+            return result;
         }
 
         /// <summary>
@@ -82,21 +74,13 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<SubjectStatus2> GetCollectionStatusAsync(string access_token, string subjectId)
         {
-            try
-            {
-                return await $"{BaseUrl}/collection/{subjectId}"
-                    .SetQueryParams(new
-                    {
-                        access_token
-                    })
-                    .GetAsync()
-                    .ReceiveJson<SubjectStatus2>();
-            }
-            catch (Exception)
-            {
-                Debug.WriteLine("GetCollectionStatusAsync Error.");
-                throw;
-            }
+            return await $"{BaseUrl}/collection/{subjectId}"
+                .SetQueryParams(new
+                {
+                    access_token
+                })
+                .GetAsync()
+                .ReceiveJson<SubjectStatus2>();
         }
 
         /// <summary>
@@ -108,22 +92,14 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Progress> GetProgressesAsync(string userIdString, string access_token, string subject_id)
         {
-            try
-            {
-                return await $"{BaseUrl}/user/{userIdString}/progress"
-                    .SetQueryParams(new
-                    {
-                        subject_id,
-                        access_token
-                    })
-                    .GetAsync()
-                    .ReceiveJson<Progress>();
-            }
-            catch (Exception)
-            {
-                Debug.WriteLine("GetProgressesAsync Error.");
-                throw;
-            }
+            return await $"{BaseUrl}/user/{userIdString}/progress"
+                .SetQueryParams(new
+                {
+                    subject_id,
+                    access_token
+                })
+                .GetAsync()
+                .ReceiveJson<Progress>();
         }
 
         /// <summary>
@@ -133,45 +109,37 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<List<Watching>> GetWatchingListAsync(string userIdString)
         {
-            try
-            {
-                var result = (await $"{BaseUrl}/user/{userIdString}/collection"
-                    .SetQueryParams(new
-                    {
-                        cat = "watching",
-                        responseGroup = "medium"
-                    })
-                    .GetAsync()
-                    .ReceiveJson<List<Watching>>())
-                    ?? new List<Watching>();
-                foreach (var watching in result)
+            var result = (await $"{BaseUrl}/user/{userIdString}/collection"
+                .SetQueryParams(new
                 {
-                    watching.Subject.Name = System.Net.WebUtility.HtmlDecode(watching.Subject.Name);
-                    watching.Subject.NameCn = watching.Subject.NameCn.IsNullOrEmpty() ?
-                        watching.Subject.Name : System.Net.WebUtility.HtmlDecode(watching.Subject.NameCn);
-                    if (watching.Subject.Images == null)
-                    {
-                        watching.Subject.Images = new Images
-                        {
-                            Grid = NoImageUri,
-                            Small = NoImageUri,
-                            Common = NoImageUri,
-                            Medium = NoImageUri,
-                            Large = NoImageUri,
-                        };
-                    }
-                    else
-                    {
-                        watching.Subject.Images.ConvertImageHttpToHttps();
-                    }
-                }
-                return result;
-            }
-            catch (Exception)
+                    cat = "watching",
+                    responseGroup = "medium"
+                })
+                .GetAsync()
+                .ReceiveJson<List<Watching>>())
+                ?? new List<Watching>();
+            foreach (var watching in result)
             {
-                Debug.WriteLine("GetWatchingListAsync Error.");
-                throw;
+                watching.Subject.Name = System.Net.WebUtility.HtmlDecode(watching.Subject.Name);
+                watching.Subject.NameCn = watching.Subject.NameCn.IsNullOrEmpty() ?
+                    watching.Subject.Name : System.Net.WebUtility.HtmlDecode(watching.Subject.NameCn);
+                if (watching.Subject.Images == null)
+                {
+                    watching.Subject.Images = new Images
+                    {
+                        Grid = NoImageUri,
+                        Small = NoImageUri,
+                        Common = NoImageUri,
+                        Medium = NoImageUri,
+                        Large = NoImageUri,
+                    };
+                }
+                else
+                {
+                    watching.Subject.Images.ConvertImageHttpToHttps();
+                }
             }
+            return result;
         }
 
         /// <summary>
@@ -191,28 +159,20 @@ namespace Bangumi.Api.Services
                                                                    string rating = "",
                                                                    string privacy = "0")
         {
-            try
-            {
-                var response = await $"{BaseUrl}/collection/{subjectId}/update"
-                    .SetQueryParams(new
-                    {
-                        access_token
-                    })
-                    .PostUrlEncodedAsync(new
-                    {
-                        status = collectionStatusEnum.GetValue(),
-                        comment,
-                        rating,
-                        privacy
-                    })
-                    .ReceiveString();
-                return response.Contains($"\"type\":\"{collectionStatusEnum.GetValue()}\"");
-            }
-            catch (Exception)
-            {
-                Debug.WriteLine("UpdateCollectionStatusAsync Error.");
-                throw;
-            }
+            var response = await $"{BaseUrl}/collection/{subjectId}/update"
+                .SetQueryParams(new
+                {
+                    access_token
+                })
+                .PostUrlEncodedAsync(new
+                {
+                    status = collectionStatusEnum.GetValue(),
+                    comment,
+                    rating,
+                    privacy
+                })
+                .ReceiveString();
+            return response.Contains($"\"type\":\"{collectionStatusEnum.GetValue()}\"");
         }
 
         /// <summary>
@@ -224,22 +184,14 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<bool> UpdateProgressAsync(string access_token, string ep, EpStatusEnum status)
         {
-            try
-            {
-                var response = await $"{BaseUrl}/ep/{ep}/status/{status}"
-                    .SetQueryParams(new
-                    {
-                        access_token
-                    })
-                    .GetAsync()
-                    .ReceiveString();
-                return response.Contains("\"error\":\"OK\"");
-            }
-            catch (Exception)
-            {
-                Debug.WriteLine("UpdateProgressAsync Error.");
-                throw;
-            }
+            var response = await $"{BaseUrl}/ep/{ep}/status/{status}"
+                .SetQueryParams(new
+                {
+                    access_token
+                })
+                .GetAsync()
+                .ReceiveString();
+            return response.Contains("\"error\":\"OK\"");
         }
 
         /// <summary>
@@ -253,25 +205,17 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<bool> UpdateProgressBatchAsync(string access_token, int ep, EpStatusEnum status, string ep_id)
         {
-            try
-            {
-                var response = await $"{BaseUrl}/ep/{ep}/status/{status}"
-                    .SetQueryParams(new
-                    {
-                        access_token
-                    })
-                    .PostUrlEncodedAsync(new
-                    {
-                        ep_id
-                    })
-                    .ReceiveString();
-                return response.Contains("\"error\":\"OK\"");
-            }
-            catch (Exception)
-            {
-                Debug.WriteLine("UpdateProgressBatchAsync Error.");
-                throw;
-            }
+            var response = await $"{BaseUrl}/ep/{ep}/status/{status}"
+                .SetQueryParams(new
+                {
+                    access_token
+                })
+                .PostUrlEncodedAsync(new
+                {
+                    ep_id
+                })
+                .ReceiveString();
+            return response.Contains("\"error\":\"OK\"");
         }
 
         /// <summary>
@@ -281,29 +225,21 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Subject> GetSubjectEpsAsync(string subjectId)
         {
-            try
+            var result = await $"{BaseUrl}/subject/{subjectId}/ep"
+                .GetAsync()
+                .ReceiveJson<Subject>();
+            if (result == null) return null;
+            result.Name = System.Net.WebUtility.HtmlDecode(result.Name);
+            result.NameCn = result.NameCn.IsNullOrEmpty() ? result.Name : System.Net.WebUtility.HtmlDecode(result.NameCn);
+            // 将章节按类别排序
+            result._eps = result.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
+            foreach (var ep in result.Eps)
             {
-                var result = await $"{BaseUrl}/subject/{subjectId}/ep"
-                    .GetAsync()
-                    .ReceiveJson<Subject>();
-                if (result == null) return null;
-                result.Name = System.Net.WebUtility.HtmlDecode(result.Name);
-                result.NameCn = result.NameCn.IsNullOrEmpty() ? result.Name : System.Net.WebUtility.HtmlDecode(result.NameCn);
-                // 将章节按类别排序
-                result._eps = result.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
-                foreach (var ep in result.Eps)
-                {
-                    ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
-                    ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
-                }
+                ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
+                ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
+            }
 
-                return result;
-            }
-            catch (Exception)
-            {
-                Debug.WriteLine("GetSubjectEpsAsync Error.");
-                throw;
-            }
+            return result;
         }
 
         /// <summary>
@@ -313,58 +249,50 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Subject> GetSubjectAsync(string subjectId)
         {
-            try
+            var result = await $"{BaseUrl}/subject/{subjectId}?responseGroup=large"
+                .GetAsync()
+                .ReceiveJson<Subject>();
+            if (result == null) return null;
+            result.Name = System.Net.WebUtility.HtmlDecode(result.Name);
+            result.NameCn = System.Net.WebUtility.HtmlDecode(result.NameCn);
+            if (result.Images == null)
             {
-                var result = await $"{BaseUrl}/subject/{subjectId}?responseGroup=large"
-                    .GetAsync()
-                    .ReceiveJson<Subject>();
-                if (result == null) return null;
-                result.Name = System.Net.WebUtility.HtmlDecode(result.Name);
-                result.NameCn = System.Net.WebUtility.HtmlDecode(result.NameCn);
-                if (result.Images == null)
+                result.Images = new Images
                 {
-                    result.Images = new Images
-                    {
-                        Grid = NoImageUri,
-                        Small = NoImageUri,
-                        Common = NoImageUri,
-                        Medium = NoImageUri,
-                        Large = NoImageUri,
-                    };
-                }
-                else
-                {
-                    result.Images.ConvertImageHttpToHttps();
-                }
-                // 将章节按类别排序
-                result._eps = result.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
-                foreach (var ep in result.Eps)
-                {
-                    ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
-                    ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
-                }
-                if (result.Blogs != null)
-                {
-                    foreach (var blog in result.Blogs)
-                    {
-                        blog.Title = System.Net.WebUtility.HtmlDecode(blog.Title);
-                        blog.Summary = System.Net.WebUtility.HtmlDecode(blog.Summary);
-                    }
-                }
-                if (result.Topics != null)
-                {
-                    foreach (var topic in result.Topics)
-                    {
-                        topic.Title = System.Net.WebUtility.HtmlDecode(topic.Title);
-                    }
-                }
-                return result;
+                    Grid = NoImageUri,
+                    Small = NoImageUri,
+                    Common = NoImageUri,
+                    Medium = NoImageUri,
+                    Large = NoImageUri,
+                };
             }
-            catch (Exception)
+            else
             {
-                Debug.WriteLine("GetSubjectAsync Error.");
-                throw;
+                result.Images.ConvertImageHttpToHttps();
             }
+            // 将章节按类别排序
+            result._eps = result.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
+            foreach (var ep in result.Eps)
+            {
+                ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
+                ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
+            }
+            if (result.Blogs != null)
+            {
+                foreach (var blog in result.Blogs)
+                {
+                    blog.Title = System.Net.WebUtility.HtmlDecode(blog.Title);
+                    blog.Summary = System.Net.WebUtility.HtmlDecode(blog.Summary);
+                }
+            }
+            if (result.Topics != null)
+            {
+                foreach (var topic in result.Topics)
+                {
+                    topic.Title = System.Net.WebUtility.HtmlDecode(topic.Title);
+                }
+            }
+            return result;
         }
 
         /// <summary>
@@ -373,74 +301,13 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<List<BangumiTimeLine>> GetBangumiCalendarAsync()
         {
-            try
+            var result = await $"{BaseUrl}/calendar"
+                .GetAsync()
+                .ReceiveJson<List<BangumiTimeLine>>();
+            if (result == null) return null;
+            foreach (var bangumiCalendar in result)
             {
-                var result = await $"{BaseUrl}/calendar"
-                    .GetAsync()
-                    .ReceiveJson<List<BangumiTimeLine>>();
-                if (result == null) return null;
-                foreach (var bangumiCalendar in result)
-                {
-                    foreach (var item in bangumiCalendar.Items)
-                    {
-                        item.Name = System.Net.WebUtility.HtmlDecode(item.Name);
-                        item.NameCn = item.NameCn.IsNullOrEmpty() ? item.Name : System.Net.WebUtility.HtmlDecode(item.NameCn);
-                        if (item.Images == null)
-                        {
-                            item.Images = new Images
-                            {
-                                Grid = NoImageUri,
-                                Small = NoImageUri,
-                                Common = NoImageUri,
-                                Medium = NoImageUri,
-                                Large = NoImageUri,
-                            };
-                        }
-                        else
-                        {
-                            item.Images.ConvertImageHttpToHttps();
-                        }
-                    }
-                }
-                return result;
-            }
-            catch (Exception)
-            {
-                Debug.WriteLine("GetBangumiCalendarAsync Error.");
-                throw;
-            }
-        }
-        /// <summary>
-        /// 获取搜索结果。
-        /// </summary>
-        /// <param name="keyWord"></param>
-        /// <param name="type"></param>
-        /// <param name="start"></param>
-        /// <param name="max_results"></param>
-        /// <returns></returns>
-        internal async Task<SearchResult> GetSearchResultAsync(string keyWord, string type, int start, int max_results)
-        {
-            try
-            {
-                var result = await $"{BaseUrl}/search/subject/{keyWord}"
-                    .SetQueryParams(new
-                    {
-                        type,
-                        responseGroup = "small",
-                        start,
-                        max_results
-                    })
-                    .GetAsync()
-                    .ReceiveJson<SearchResult>();
-                if (result?.Results == null)
-                {
-                    return new SearchResult
-                    {
-                        ResultCount = 0,
-                        Results = new List<Subject>()
-                    };
-                }
-                foreach (var item in result.Results)
+                foreach (var item in bangumiCalendar.Items)
                 {
                     item.Name = System.Net.WebUtility.HtmlDecode(item.Name);
                     item.NameCn = item.NameCn.IsNullOrEmpty() ? item.Name : System.Net.WebUtility.HtmlDecode(item.NameCn);
@@ -460,53 +327,88 @@ namespace Bangumi.Api.Services
                         item.Images.ConvertImageHttpToHttps();
                     }
                 }
-                return result;
             }
-            catch (Exception)
+            return result;
+        }
+        /// <summary>
+        /// 获取搜索结果。
+        /// </summary>
+        /// <param name="keyWord"></param>
+        /// <param name="type"></param>
+        /// <param name="start"></param>
+        /// <param name="max_results"></param>
+        /// <returns></returns>
+        internal async Task<SearchResult> GetSearchResultAsync(string keyWord, string type, int start, int max_results)
+        {
+            var result = await $"{BaseUrl}/search/subject/{keyWord}"
+                .SetQueryParams(new
+                {
+                    type,
+                    responseGroup = "small",
+                    start,
+                    max_results
+                })
+                .GetAsync()
+                .ReceiveJson<SearchResult>();
+            if (result?.Results == null)
             {
-                Debug.WriteLine("GetSearchResultAsync Error.");
-                throw;
+                return new SearchResult
+                {
+                    ResultCount = 0,
+                    Results = new List<Subject>()
+                };
             }
+            foreach (var item in result.Results)
+            {
+                item.Name = System.Net.WebUtility.HtmlDecode(item.Name);
+                item.NameCn = item.NameCn.IsNullOrEmpty() ? item.Name : System.Net.WebUtility.HtmlDecode(item.NameCn);
+                if (item.Images == null)
+                {
+                    item.Images = new Images
+                    {
+                        Grid = NoImageUri,
+                        Small = NoImageUri,
+                        Common = NoImageUri,
+                        Medium = NoImageUri,
+                        Large = NoImageUri,
+                    };
+                }
+                else
+                {
+                    item.Images.ConvertImageHttpToHttps();
+                }
+            }
+            return result;
         }
 
         /// <summary>
         /// 使用 code 换取 Access Token。
         /// </summary>
         /// <param name="code"></param>
-        /// <returns>获取失败返回 null。</returns>
+        /// <returns></returns>
         internal async Task<AccessToken> GetTokenWithCodeAsync(string code)
         {
-            try
-            {
-                return await $"{OAuthBaseUrl}/access_token"
-                    .PostUrlEncodedAsync(new
-                    {
-                        grant_type = "authorization_code",
-                        client_id = ClientId,
-                        client_secret = ClientSecret,
-                        code,
-                        redirect_uri = RedirectUrl
-                    })
-                    .ReceiveJson<AccessToken>();
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("GetAccessToken Error.");
-                Console.WriteLine(e);
-                return null;
-            }
+            return await $"{OAuthBaseUrl}/access_token"
+                .PostUrlEncodedAsync(new
+                {
+                    grant_type = "authorization_code",
+                    client_id = ClientId,
+                    client_secret = ClientSecret,
+                    code,
+                    redirect_uri = RedirectUrl
+                })
+                .ReceiveJson<AccessToken>();
         }
 
         /// <summary>
         /// 查询授权信息，并在满足条件时刷新Token。
         /// </summary>
         /// <param name="token"></param>
-        /// <returns>获取失败返回 null，可能会抛出异常。</returns>
+        /// <exception cref="BgmUnauthorizedException"></exception>
         internal async Task<AccessToken> CheckAndRefreshTokenAsync(AccessToken token)
         {
             try
             {
-
                 var result = await $"{OAuthBaseUrl}/token_status"
                     .SetQueryParams(new
                     {
@@ -514,19 +416,14 @@ namespace Bangumi.Api.Services
                     })
                     .PostStringAsync(string.Empty)
                     .ReceiveJson<AccessToken>();
-                // 获取4天后的时间戳，离过期不足4天时或过期后更新 access_token
-                if (result.Expires < DateTime.Now.AddDays(4).ConvertDateTimeToJsTick())
+                // 获取4天后的时间戳，离过期不足1天时或过期后更新 access_token
+                if (result.Expires < DateTime.Now.AddDays(1).ConvertDateTimeToJsTick())
                     return await RefreshTokenAsync();
                 return token;
             }
             catch (BgmUnauthorizedException)
             {
                 return await RefreshTokenAsync();
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                throw;
             }
 
             Task<AccessToken> RefreshTokenAsync()
