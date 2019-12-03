@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Bangumi.Api.Models
@@ -20,6 +21,7 @@ namespace Bangumi.Api.Models
         [JsonProperty("tag")]
         public List<string> Tags { get; set; }
 
+        [Obsolete]
         [JsonProperty("ep_status")]
         public int EpStatus { get; set; }
 
@@ -42,7 +44,6 @@ namespace Bangumi.Api.Models
 
             SubjectStatus2 s = (SubjectStatus2)obj;
             return Rating == s.Rating &&
-                   EpStatus == s.EpStatus &&
                    LastTouch == s.LastTouch &&
                    Comment.EqualsExT(s.Comment) &&
                    Private.EqualsExT(s.Private) &&

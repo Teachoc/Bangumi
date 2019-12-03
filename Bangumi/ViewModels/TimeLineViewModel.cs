@@ -4,6 +4,7 @@ using Bangumi.Common;
 using Bangumi.Facades;
 using Bangumi.Helper;
 using Bangumi.Views;
+using Microsoft.Toolkit.Uwp.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,7 +21,7 @@ namespace Bangumi.ViewModels
             IsLoading = false;
         }
 
-        public ObservableCollection<BangumiTimeLine> BangumiCollection { get; private set; } = new ObservableCollection<BangumiTimeLine>();
+        public ObservableCollection<BangumiTimeLine> TimeLineCollection { get; private set; } = new ObservableCollection<BangumiTimeLine>();
 
         private bool _isLoading;
         public bool IsLoading
@@ -52,7 +53,7 @@ namespace Bangumi.ViewModels
             try
             {
                 IsLoading = true;
-                await PopulateBangumiCalendarAsync(BangumiCollection);
+                await PopulateBangumiCalendarAsync();
             }
             catch (Exception e)
             {
@@ -85,43 +86,40 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="bangumiTimeLine"></param>
         /// <returns></returns>
-        private async Task PopulateBangumiCalendarAsync(ObservableCollection<BangumiTimeLine> bangumiTimeLine)
+        private async Task PopulateBangumiCalendarAsync()
         {
             try
             {
-                List<BangumiTimeLine> cache = BangumiApi.BangumiCache.TimeLine.ToList();
+                var timeLine = BangumiApi.GetBangumiCalendarAsync();
                 int day = GetDayOfWeek();
-                if (!cache.SequenceEqualExT(bangumiTimeLine.OrderBy(b => b.Weekday.Id).ToList()))
+                if (TimeLineCollection.Count == 0)
                 {
-                    bangumiTimeLine.Clear();
-                    foreach (var item in cache)
-                    {
-                        if (item.Weekday.Id < day)
-                        {
-                            bangumiTimeLine.Add(item);
-                        }
-                        else
-                        {
-                            bangumiTimeLine.Insert(bangumiTimeLine.Count + 1 - day, item);
-                        }
-                    }
+                    ProcessTimeLine(timeLine.Item1);
                 }
 
-                var response = await BangumiApi.GetBangumiCalendarAsync();
+                await timeLine.Item2
+                    .ContinueWith(t =>
+                    {
+                        if (!t.Result.SequenceEqualExT(TimeLineCollection.OrderBy(b => b.Weekday.Id).ToList()))
+                        {
+                            DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessTimeLine(t.Result));
+                        }
+                    });
 
-                if (!cache.SequenceEqualExT(response))
+                // 处理时间表顺序
+                void ProcessTimeLine(List<BangumiTimeLine> timeLines)
                 {
                     //清空原数据
-                    bangumiTimeLine.Clear();
-                    foreach (var item in response)
+                    TimeLineCollection.Clear();
+                    foreach (var item in timeLines)
                     {
                         if (item.Weekday.Id < day)
                         {
-                            bangumiTimeLine.Add(item);
+                            TimeLineCollection.Add(item);
                         }
                         else
                         {
-                            bangumiTimeLine.Insert(bangumiTimeLine.Count + 1 - day, item);
+                            TimeLineCollection.Insert(TimeLineCollection.Count + 1 - day, item);
                         }
                     }
                 }

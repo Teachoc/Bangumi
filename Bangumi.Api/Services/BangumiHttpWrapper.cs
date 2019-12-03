@@ -30,7 +30,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Collection2> GetSubjectCollectionAsync(string userIdString, SubjectTypeEnum subjectType)
         {
-            var result = (await $"{BaseUrl}/user/{userIdString}/collections/{subjectType.GetValue()}"
+            var response = (await $"{BaseUrl}/user/{userIdString}/collections/{subjectType.GetValue()}"
                 .SetQueryParams(new
                 {
                     app_id = ClientId,
@@ -40,12 +40,13 @@ namespace Bangumi.Api.Services
                 .ReceiveJson<List<Collection2>>())
                 ?.FirstOrDefault()
                 ?? new Collection2 { Collects = new List<Collection>() };
-            foreach (var type in result.Collects)
+            foreach (var type in response.Collects)
             {
                 foreach (var item in type.Items)
                 {
                     item.Subject.Name = System.Net.WebUtility.HtmlDecode(item.Subject.Name);
-                    item.Subject.NameCn = item.Subject.NameCn.IsNullOrEmpty() ? item.Subject.Name : System.Net.WebUtility.HtmlDecode(item.Subject.NameCn);
+                    item.Subject.NameCn = item.Subject.NameCn.IsNullOrEmpty() ?
+                        item.Subject.Name : System.Net.WebUtility.HtmlDecode(item.Subject.NameCn);
                     if (item.Subject.Images == null)
                     {
                         item.Subject.Images = new Images
@@ -63,7 +64,7 @@ namespace Bangumi.Api.Services
                     }
                 }
             }
-            return result;
+            return response;
         }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace Bangumi.Api.Services
         /// <param name="access_token"></param>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        internal async Task<SubjectStatus2> GetCollectionStatusAsync(string access_token, string subjectId)
+        internal async Task<SubjectStatus2> GetSubjectStatusAsync(string access_token, string subjectId)
         {
             return await $"{BaseUrl}/collection/{subjectId}"
                 .SetQueryParams(new
@@ -109,7 +110,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<List<Watching>> GetWatchingListAsync(string userIdString)
         {
-            var result = (await $"{BaseUrl}/user/{userIdString}/collection"
+            var response = (await $"{BaseUrl}/user/{userIdString}/collection"
                 .SetQueryParams(new
                 {
                     cat = "watching",
@@ -118,7 +119,7 @@ namespace Bangumi.Api.Services
                 .GetAsync()
                 .ReceiveJson<List<Watching>>())
                 ?? new List<Watching>();
-            foreach (var watching in result)
+            foreach (var watching in response)
             {
                 watching.Subject.Name = System.Net.WebUtility.HtmlDecode(watching.Subject.Name);
                 watching.Subject.NameCn = watching.Subject.NameCn.IsNullOrEmpty() ?
@@ -139,7 +140,7 @@ namespace Bangumi.Api.Services
                     watching.Subject.Images.ConvertImageHttpToHttps();
                 }
             }
-            return result;
+            return response;
         }
 
         /// <summary>
@@ -152,14 +153,11 @@ namespace Bangumi.Api.Services
         /// <param name="rating"></param>
         /// <param name="privacy"></param>
         /// <returns></returns>
-        internal async Task<bool> UpdateCollectionStatusAsync(string access_token,
-                                                                   string subjectId,
-                                                                   CollectionStatusEnum collectionStatusEnum,
-                                                                   string comment = "",
-                                                                   string rating = "",
-                                                                   string privacy = "0")
+        internal async Task<SubjectStatus2> UpdateCollectionStatusAsync(
+            string access_token, string subjectId, CollectionStatusEnum collectionStatusEnum,
+            string comment = "", string rating = "", string privacy = "0")
         {
-            var response = await $"{BaseUrl}/collection/{subjectId}/update"
+            return await $"{BaseUrl}/collection/{subjectId}/update"
                 .SetQueryParams(new
                 {
                     access_token
@@ -171,8 +169,7 @@ namespace Bangumi.Api.Services
                     rating,
                     privacy
                 })
-                .ReceiveString();
-            return response.Contains($"\"type\":\"{collectionStatusEnum.GetValue()}\"");
+                .ReceiveJson<SubjectStatus2>();
         }
 
         /// <summary>
@@ -225,21 +222,21 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Subject> GetSubjectEpsAsync(string subjectId)
         {
-            var result = await $"{BaseUrl}/subject/{subjectId}/ep"
+            var response = await $"{BaseUrl}/subject/{subjectId}/ep"
                 .GetAsync()
                 .ReceiveJson<Subject>();
-            if (result == null) return null;
-            result.Name = System.Net.WebUtility.HtmlDecode(result.Name);
-            result.NameCn = result.NameCn.IsNullOrEmpty() ? result.Name : System.Net.WebUtility.HtmlDecode(result.NameCn);
+            if (response == null) return null;
+            response.Name = System.Net.WebUtility.HtmlDecode(response.Name);
+            response.NameCn = response.NameCn.IsNullOrEmpty() ? response.Name : System.Net.WebUtility.HtmlDecode(response.NameCn);
             // 将章节按类别排序
-            result._eps = result.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
-            foreach (var ep in result.Eps)
+            response._eps = response.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
+            foreach (var ep in response.Eps)
             {
                 ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
                 ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
             }
 
-            return result;
+            return response;
         }
 
         /// <summary>
@@ -249,15 +246,15 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<Subject> GetSubjectAsync(string subjectId)
         {
-            var result = await $"{BaseUrl}/subject/{subjectId}?responseGroup=large"
+            var response = await $"{BaseUrl}/subject/{subjectId}?responseGroup=large"
                 .GetAsync()
                 .ReceiveJson<Subject>();
-            if (result == null) return null;
-            result.Name = System.Net.WebUtility.HtmlDecode(result.Name);
-            result.NameCn = System.Net.WebUtility.HtmlDecode(result.NameCn);
-            if (result.Images == null)
+            if (response == null) return null;
+            response.Name = System.Net.WebUtility.HtmlDecode(response.Name);
+            response.NameCn = System.Net.WebUtility.HtmlDecode(response.NameCn);
+            if (response.Images == null)
             {
-                result.Images = new Images
+                response.Images = new Images
                 {
                     Grid = NoImageUri,
                     Small = NoImageUri,
@@ -268,31 +265,31 @@ namespace Bangumi.Api.Services
             }
             else
             {
-                result.Images.ConvertImageHttpToHttps();
+                response.Images.ConvertImageHttpToHttps();
             }
             // 将章节按类别排序
-            result._eps = result.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
-            foreach (var ep in result.Eps)
+            response._eps = response.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
+            foreach (var ep in response.Eps)
             {
                 ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
                 ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
             }
-            if (result.Blogs != null)
+            if (response.Blogs != null)
             {
-                foreach (var blog in result.Blogs)
+                foreach (var blog in response.Blogs)
                 {
                     blog.Title = System.Net.WebUtility.HtmlDecode(blog.Title);
                     blog.Summary = System.Net.WebUtility.HtmlDecode(blog.Summary);
                 }
             }
-            if (result.Topics != null)
+            if (response.Topics != null)
             {
-                foreach (var topic in result.Topics)
+                foreach (var topic in response.Topics)
                 {
                     topic.Title = System.Net.WebUtility.HtmlDecode(topic.Title);
                 }
             }
-            return result;
+            return response;
         }
 
         /// <summary>
@@ -301,11 +298,11 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<List<BangumiTimeLine>> GetBangumiCalendarAsync()
         {
-            var result = await $"{BaseUrl}/calendar"
+            var response = await $"{BaseUrl}/calendar"
                 .GetAsync()
-                .ReceiveJson<List<BangumiTimeLine>>();
-            if (result == null) return null;
-            foreach (var bangumiCalendar in result)
+                .ReceiveJson<List<BangumiTimeLine>>()
+                ?? new List<BangumiTimeLine>();
+            foreach (var bangumiCalendar in response)
             {
                 foreach (var item in bangumiCalendar.Items)
                 {
@@ -328,7 +325,7 @@ namespace Bangumi.Api.Services
                     }
                 }
             }
-            return result;
+            return response;
         }
         /// <summary>
         /// 获取搜索结果。
@@ -340,7 +337,7 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         internal async Task<SearchResult> GetSearchResultAsync(string keyWord, string type, int start, int max_results)
         {
-            var result = await $"{BaseUrl}/search/subject/{keyWord}"
+            var response = await $"{BaseUrl}/search/subject/{keyWord}"
                 .SetQueryParams(new
                 {
                     type,
@@ -350,7 +347,7 @@ namespace Bangumi.Api.Services
                 })
                 .GetAsync()
                 .ReceiveJson<SearchResult>();
-            if (result?.Results == null)
+            if (response?.Results == null)
             {
                 return new SearchResult
                 {
@@ -358,7 +355,7 @@ namespace Bangumi.Api.Services
                     Results = new List<Subject>()
                 };
             }
-            foreach (var item in result.Results)
+            foreach (var item in response.Results)
             {
                 item.Name = System.Net.WebUtility.HtmlDecode(item.Name);
                 item.NameCn = item.NameCn.IsNullOrEmpty() ? item.Name : System.Net.WebUtility.HtmlDecode(item.NameCn);
@@ -378,7 +375,7 @@ namespace Bangumi.Api.Services
                     item.Images.ConvertImageHttpToHttps();
                 }
             }
-            return result;
+            return response;
         }
 
         /// <summary>
@@ -409,7 +406,7 @@ namespace Bangumi.Api.Services
         {
             try
             {
-                var result = await $"{OAuthBaseUrl}/token_status"
+                var response = await $"{OAuthBaseUrl}/token_status"
                     .SetQueryParams(new
                     {
                         access_token = token.Token
@@ -417,7 +414,7 @@ namespace Bangumi.Api.Services
                     .PostStringAsync(string.Empty)
                     .ReceiveJson<AccessToken>();
                 // 获取4天后的时间戳，离过期不足1天时或过期后更新 access_token
-                if (result.Expires < DateTime.Now.AddDays(1).ConvertDateTimeToJsTick())
+                if (response.Expires < DateTime.Now.AddDays(1).ConvertDateTimeToJsTick())
                     return await RefreshTokenAsync();
                 return token;
             }

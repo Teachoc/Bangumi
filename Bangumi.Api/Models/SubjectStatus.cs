@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace Bangumi.Api.Models
 {
@@ -13,6 +14,7 @@ namespace Bangumi.Api.Models
         [JsonProperty("type")]
         public string Type { get; set; }
 
+        [Obsolete("Use Type or Id instead.")]
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -26,8 +28,7 @@ namespace Bangumi.Api.Models
 
             SubjectStatus s = (SubjectStatus)obj;
             return Id == s.Id &&
-                   Type.EqualsExT(s.Type) &&
-                   Name.EqualsExT(s.Name);
+                   Type.EqualsExT(s.Type);
         }
 
         // override object.GetHashCode

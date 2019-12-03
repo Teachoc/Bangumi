@@ -1,6 +1,7 @@
 ﻿using Bangumi.Api.Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,7 +51,7 @@ namespace Bangumi.Api
         /// <summary>
         /// 存储缓存数据
         /// </summary>
-        public static BangumiCache BangumiCache { get; private set; }
+        internal static BangumiCache BangumiCache { get; private set; }
 
 
         #region 缓存操作公开方法
@@ -109,51 +110,26 @@ namespace Bangumi.Api
         /// <param name="comment"></param>
         /// <param name="rating"></param>
         /// <param name="privace"></param>
-        private static void UpdateSubjectStatusCache(string subjectId, CollectionStatusEnum collectionStatus,
-                                                     string comment, string rating, string privace)
+        private static SubjectStatus2 UpdateSubjectStatusCache(string subjectId, SubjectStatus2 subjectStatus)
         {
             _isCacheUpdated = false;
-            if (collectionStatus != CollectionStatusEnum.No)
+            if (subjectStatus != null)
             {
-                BangumiCache.SubjectStatus.TryGetValue(subjectId, out var status);
-                if (status != null)
-                {
-                    status.Status = new SubjectStatus()
-                    {
-                        Id = (int)collectionStatus,
-                        Type = collectionStatus.GetValue(),
-                    };
-                    status.Comment = comment;
-                    status.Rating = string.IsNullOrEmpty(rating) ? 0 : int.Parse(rating);
-                    status.Private = privace;
-                }
-                else
-                {
-                    BangumiCache.SubjectStatus.Add(subjectId,
-                        new SubjectStatus2()
-                        {
-                            Status = new SubjectStatus()
-                            {
-                                Id = (int)collectionStatus,
-                                Type = collectionStatus.GetValue(),
-                            },
-                            Comment = comment,
-                            Rating = string.IsNullOrEmpty(rating) ? 0 : int.Parse(rating),
-                            Private = privace,
-                        });
-                }
+                BangumiCache.SubjectStatus.AddOrUpdate(subjectId, subjectStatus, (key, value) => subjectStatus);
                 // 若状态不是在做，则从进度中删除
-                if (collectionStatus != CollectionStatusEnum.Do)
+                if (subjectStatus.Status.Id != (int)CollectionStatusEnum.Do)
                 {
                     BangumiCache.Watchings.RemoveAll(w => w.SubjectId.ToString() == subjectId);
                 }
             }
             else
             {
-                BangumiCache.SubjectStatus.Remove(subjectId);
+                // 若未收藏，则删除收藏状态，且从进度中删除
+                BangumiCache.SubjectStatus.TryRemove(subjectId, out _);
                 BangumiCache.Watchings.RemoveAll(w => w.SubjectId.ToString() == subjectId);
             }
             _isCacheUpdated = true;
+            return subjectStatus;
         }
 
         /// <summary>
@@ -207,8 +183,7 @@ namespace Bangumi.Api
                 }
                 else if (status != EpStatusEnum.remove)
                 {
-
-                    BangumiCache.Progresses.Add(sub.Id.ToString(), new Progress()
+                    var progress = new Progress()
                     {
                         SubjectId = sub.Id,
                         Eps = new List<EpStatus2>()
@@ -225,7 +200,8 @@ namespace Bangumi.Api
                                 }
                             }
                         }
-                    });
+                    };
+                    BangumiCache.Progresses.AddOrUpdate(sub.Id.ToString(), progress, (k, v) => progress);
                 }
                 // 找到收视列表中的条目，修改 LastTouch
                 var watch = BangumiCache.Watchings.FirstOrDefault(w => w.SubjectId == sub.Id);
@@ -244,25 +220,16 @@ namespace Bangumi.Api
         /// <param name="dic"></param>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        private static void UpdateCache<T>(Dictionary<string, T> dic, string key, T value)
+        private static T UpdateCache<T>(ConcurrentDictionary<string, T> dic, string key, T value)
         {
             if (dic == null) throw new ArgumentNullException(nameof(dic));
             if (key == null) throw new ArgumentNullException(nameof(key));
 
-            if (dic.ContainsKey(key))
+            return dic.AddOrUpdate(key, value, (k, v) =>
             {
-                if (dic[key].EqualsExT(value)) return;
-
-                _isCacheUpdated = false;
-                dic[key] = value;
                 _isCacheUpdated = true;
-            }
-            else
-            {
-                _isCacheUpdated = false;
-                dic.Add(key, value);
-                _isCacheUpdated = true;
-            }
+                return value;
+            });
         }
 
         /// <summary>
@@ -271,13 +238,21 @@ namespace Bangumi.Api
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <param name="dest"></param>
-        private static void UpdateCache<T>(ref List<T> source, List<T> dest)
+        private static List<T> UpdateCache<T>(List<T> source, List<T> dest)
         {
-            if (source.SequenceEqualExT(dest)) return;
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (dest == null) throw new ArgumentNullException(nameof(dest));
+
+            if (source.SequenceEqualExT(dest))
+            {
+                return dest;
+            }
 
             _isCacheUpdated = false;
-            source = dest;
+            source.Clear();
+            source.AddRange(dest);
             _isCacheUpdated = true;
+            return dest;
         }
         #endregion
 

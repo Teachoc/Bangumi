@@ -40,7 +40,7 @@
                                 Tag="Dropped"/>
             </MenuFlyout>
 
-            <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModel.BangumiCollection}" IsSourceGrouped="True" ItemsPath="Items"/>
+            <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModel.TimeLineCollection}" IsSourceGrouped="True" ItemsPath="Items"/>
 
             <DataTemplate x:Key="NarrowZoomedInTemplate" x:DataType="data:Subject">
                 <RelativePanel Padding="5"
@@ -196,7 +196,7 @@
         <Image Name="EmptyImage"
                Width="200"
                Height="326"
-               Visibility="{x:Bind common:Converters.CollapsedIfNotZero(ViewModel.BangumiCollection.Count),Mode=OneWay}"
+               Visibility="{x:Bind common:Converters.CollapsedIfNotZero(ViewModel.TimeLineCollection.Count),Mode=OneWay}"
                Source="ms-appx:///Assets/resource/empty.png"
                Stretch="Uniform"/>
 

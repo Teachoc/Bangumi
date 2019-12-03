@@ -31,9 +31,9 @@ namespace Bangumi.Views
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             MainPage.RootPage.RefreshButton.Click += ProgressPageRefresh;
-            if (!ViewModel.IsLoading)
+            if (ViewModel.WatchingCollection.Count == 0 && !ViewModel.IsLoading)
             {
-                await ViewModel.LoadWatchingListAsync(ViewModel.WatchingCollection.Count != 0);
+                await ViewModel.LoadWatchingListAsync();
             }
         }
 
@@ -49,14 +49,14 @@ namespace Bangumi.Views
                 var tag = button.Tag;
                 if (tag.Equals("进度"))
                 {
-                    await ViewModel.LoadWatchingListAsync(false);
+                    await ViewModel.LoadWatchingListAsync();
                 }
             }
         }
 
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var selectedItem = (WatchingStatus)e.ClickedItem;
+            var selectedItem = (WatchStatus)e.ClickedItem;
             MainPage.RootFrame.Navigate(typeof(DetailsPage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
         }
 
@@ -68,7 +68,7 @@ namespace Bangumi.Views
         private void NextEpButton_Click(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
-            var item = (WatchingStatus)button.DataContext;
+            var item = (WatchStatus)button.DataContext;
             ViewModel.UpdateNextEpStatus(item);
         }
 
@@ -80,7 +80,7 @@ namespace Bangumi.Views
         private void CollectionButton_Click(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
-            var item = (WatchingStatus)button.DataContext;
+            var item = (WatchStatus)button.DataContext;
             ViewModel.EditCollectionStatus(item);
         }
 
@@ -139,7 +139,7 @@ namespace Bangumi.Views
         {
             if (sender is RelativePanel panel)
             {
-                if (panel.DataContext is WatchingStatus watch)
+                if (panel.DataContext is WatchStatus watch)
                 {
                     await InitAirSites(watch.SubjectId.ToString());
                     SitesMenuFlyout.ShowAt(sender, point);

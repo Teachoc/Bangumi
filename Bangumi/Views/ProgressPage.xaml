@@ -23,7 +23,7 @@
             <!-- 右键放送站点菜单 -->
             <MenuFlyout x:Name="SitesMenuFlyout"/>
 
-            <DataTemplate x:Key="NarrowProgressSubjectTemplate" x:DataType="data:WatchingStatus">
+            <DataTemplate x:Key="NarrowProgressSubjectTemplate" x:DataType="data:WatchStatus">
                 <RelativePanel Padding="5"
                                RightTapped="RelativePanel_RightTapped"
                                Holding="RelativePanel_Holding"
@@ -136,7 +136,7 @@
                 </RelativePanel>
             </DataTemplate>
         
-            <DataTemplate x:Key="WideProgressSubjectTemplate" x:DataType="data:WatchingStatus">
+            <DataTemplate x:Key="WideProgressSubjectTemplate" x:DataType="data:WatchStatus">
                 <RelativePanel Padding="5"
                                RightTapped="RelativePanel_RightTapped"
                                Holding="RelativePanel_Holding"

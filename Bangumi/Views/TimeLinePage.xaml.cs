@@ -27,7 +27,7 @@ namespace Bangumi.Views
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             MainPage.RootPage.RefreshButton.Click += TimeLinePageRefresh;
-            if (ViewModel.BangumiCollection.Count == 0 && !ViewModel.IsLoading)
+            if (ViewModel.TimeLineCollection.Count == 0 && !ViewModel.IsLoading)
             {
                 ViewModel.LoadTimeLine();
             }

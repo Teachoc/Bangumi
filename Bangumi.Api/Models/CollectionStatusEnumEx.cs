@@ -27,22 +27,6 @@ namespace Bangumi.Api.Models
                         default:
                             return "收藏";
                     }
-                case SubjectTypeEnum.Anime:
-                    switch (status)
-                    {
-                        case CollectionStatusEnum.Wish:
-                            return "想看";
-                        case CollectionStatusEnum.Collect:
-                            return "看过";
-                        case CollectionStatusEnum.Do:
-                            return "在看";
-                        case CollectionStatusEnum.OnHold:
-                            return "搁置";
-                        case CollectionStatusEnum.Dropped:
-                            return "抛弃";
-                        default:
-                            return "收藏";
-                    }
                 case SubjectTypeEnum.Music:
                     switch (status)
                     {
@@ -75,22 +59,8 @@ namespace Bangumi.Api.Models
                         default:
                             return "收藏";
                     }
+                case SubjectTypeEnum.Anime:
                 case SubjectTypeEnum.Real:
-                    switch (status)
-                    {
-                        case CollectionStatusEnum.Wish:
-                            return "想看";
-                        case CollectionStatusEnum.Collect:
-                            return "看过";
-                        case CollectionStatusEnum.Do:
-                            return "在看";
-                        case CollectionStatusEnum.OnHold:
-                            return "搁置";
-                        case CollectionStatusEnum.Dropped:
-                            return "抛弃";
-                        default:
-                            return "收藏";
-                    }
                 default:
                     switch (status)
                     {

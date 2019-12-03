@@ -89,7 +89,6 @@ namespace Bangumi.Api
                 });
 
                 // 加载缓存
-                BangumiCache = new BangumiCache();
                 if (File.Exists(AppFile.BangumiCache.GetFilePath(_cacheFolderPath)))
                 {
                     try
@@ -101,6 +100,7 @@ namespace Bangumi.Api
                         FileHelper.DeleteFile(AppFile.BangumiCache.GetFilePath(_cacheFolderPath));
                     }
                 }
+                BangumiCache ??= new BangumiCache();
 
                 // 启动定时器，定时将缓存写入文件，30 秒
                 _timer = new Timer(TimerInterval);

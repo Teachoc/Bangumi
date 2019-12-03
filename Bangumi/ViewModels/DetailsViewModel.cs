@@ -4,10 +4,12 @@ using Bangumi.Common;
 using Bangumi.ContentDialogs;
 using Bangumi.Facades;
 using Bangumi.Helper;
+using Microsoft.Toolkit.Uwp.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 
@@ -201,14 +203,12 @@ namespace Bangumi.ViewModels
         {
             if (!BangumiApi.IsLogin)
                 return;
+            var subjectStatus = BangumiApi.GetSubjectStatusAsync(SubjectId);
             CollectionEditContentDialog collectionEditContentDialog = new CollectionEditContentDialog()
             {
-                Rate = _myRate,
-                Comment = _myComment,
-                Privacy = _myPrivacy,
-                CollectionStatus = _collectionStatus,
                 SubjectType = this.SubjectType,
                 Title = this.NameCn,
+                SubjectStatusTask = subjectStatus.Item2,
             };
             MainPage.RootPage.HasDialog = true;
             if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync())
@@ -227,16 +227,12 @@ namespace Bangumi.ViewModels
                     // 若状态修改为看过，且设置启用，则批量修改章节状态为看过
                     if (_collectionStatus == CollectionStatusEnum.Collect && SettingHelper.EpsBatch)
                     {
-                        int epId = 0;
-                        string epsId = string.Empty;
-                        foreach (var episode in Eps.Where(ep => ep.Status == "Air" || ep.Status == "Today" || ep.Status == "NA"))
-                        {
-                            epsId += episode.Id.ToString() + ",";
-                        }
-                        epsId = epsId.TrimEnd(',');
+                        var selectedEps = Eps.Where(ep => Regex.IsMatch(ep.Status, "(Air|Today|NA)"));
+                        int epId = selectedEps.LastOrDefault()?.Id ?? 0;
+                        string epsId = string.Join(',', selectedEps.Select(it => it.Id));
                         if (epsId != string.Empty && await BangumiFacade.UpdateProgressBatchAsync(epId, EpStatusEnum.watched, epsId))
                         {
-                            foreach (var episode in Eps.Where(ep => ep.Status == "Air" || ep.Status == "Today" || ep.Status == "NA"))
+                            foreach (var episode in selectedEps)
                             {
                                 episode.Status = "看过";
                             }
@@ -289,6 +285,7 @@ namespace Bangumi.ViewModels
             if (ep != null && status == EpStatusEnum.watched)
             {
                 IsUpdating = true;
+                var selectedEps = Eps.Where(it => Regex.IsMatch(it.Status, "(Air|Today|NA)")).TakeWhile(it => it.Id <= ep.Id);
                 string epsId = string.Empty;
                 foreach (var episode in Eps)
                 {
@@ -300,16 +297,12 @@ namespace Bangumi.ViewModels
                     }
                 }
                 epsId = epsId.TrimEnd(',');
+                epsId = string.Join(',', selectedEps.Select(it => it.Id));
                 if (epsId != string.Empty && await BangumiFacade.UpdateProgressBatchAsync(ep.Id, status, epsId))
                 {
-                    foreach (var episode in Eps)
+                    foreach (var episode in selectedEps)
                     {
-                        if (episode.Status == "Air" || episode.Status == "Today" || episode.Status == "NA")
-                            episode.Status = "看过";
-                        if (episode.Id == ep.Id)
-                        {
-                            break;
-                        }
+                        episode.Status = "看过";
                     }
                 }
                 else
@@ -355,59 +348,27 @@ namespace Bangumi.ViewModels
                 IsStatusLoaded = false;
                 MainPage.RootPage.RefreshButton.IsEnabled = false;
 
-                // 获取缓存
-                Progress progressCache = null;
-                SubjectStatus2 subjectStatusCache = null;
-                if (BangumiApi.BangumiCache.Subjects.TryGetValue(SubjectId, out var subjectCache))
-                {
-                    ProcessSubject(subjectCache);
-
-                    // 检查用户登录状态
-                    if (BangumiApi.IsLogin)
-                    {
-                        if (BangumiApi.BangumiCache.Progresses.TryGetValue(SubjectId, out progressCache))
-                        {
-                            ProcessProgress(subjectCache, progressCache);
-                        }
-                        if (BangumiApi.BangumiCache.SubjectStatus.TryGetValue(SubjectId, out subjectStatusCache))
-                        {
-                            ProcessCollectionStatus(subjectStatusCache);
-                        }
-                    }
-                }
-
+                var subject = BangumiApi.GetSubjectAsync(SubjectId);
+                ProcessSubject(subject.Item1);
                 // 检查用户登录状态
-                Task<Progress> progress = null;
-                Task<SubjectStatus2> subjectStatus = null;
                 if (BangumiApi.IsLogin)
                 {
-                    progress = BangumiApi.GetProgressesAsync(SubjectId);
-                    subjectStatus = BangumiApi.GetCollectionStatusAsync(SubjectId);
+                    var progress = BangumiApi.GetProgressesAsync(SubjectId);
+                    var subjectStatus = BangumiApi.GetSubjectStatusAsync(SubjectId);
+                    ProcessProgress(subject.Item1, progress.Item1);
+                    ProcessCollectionStatus(subjectStatus.Item1);
+                    await subject.Item2.ContinueWith(async t =>
+                    {
+                        await DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessSubject(t.Result));
+                        await progress.Item2.ContinueWith(t2 =>
+                            DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessProgress(t.Result, t2.Result)));
+                        await subjectStatus.Item2.ContinueWith(t3 =>
+                            DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessCollectionStatus(t3.Result)));
+                    });
                 }
-                // 获取最新数据
-                Subject subject = await BangumiApi.GetSubjectAsync(SubjectId);
-
-                if (subject != null && subject.Id.ToString() == SubjectId)
+                else
                 {
-                    bool subjectChanged = false;
-                    if (!subjectCache.EqualsExT(subject))
-                    {
-                        ProcessSubject(subject);
-                        subjectChanged = true;
-                    }
-
-                    // 检查用户登录状态
-                    if (BangumiApi.IsLogin)
-                    {
-                        if (progress != null && (subjectChanged || !progressCache.EqualsExT(await progress)))
-                        {
-                            ProcessProgress(subject, await progress);
-                        }
-                        if (subjectStatus != null && !subjectStatusCache.EqualsExT(await subjectStatus))
-                        {
-                            ProcessCollectionStatus(await subjectStatus);
-                        }
-                    }
+                    await subject.Item2.ContinueWith(t => ProcessSubject(t.Result));
                 }
             }
             catch (Exception e)
@@ -431,6 +392,8 @@ namespace Bangumi.ViewModels
         /// <param name="subject"></param>
         private void ProcessSubject(Subject subject)
         {
+            if (subject == null || subject.Id.ToString() != SubjectId) return;
+
             // 条目标题
             NameCn = string.IsNullOrEmpty(subject.NameCn) ? subject.Name : subject.NameCn;
             // 条目图片

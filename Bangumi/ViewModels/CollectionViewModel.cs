@@ -142,9 +142,9 @@ namespace Bangumi.ViewModels
         private async Task PopulateSubjectCollectionAsync(ObservableCollection<Collection> subjectCollection, SubjectTypeEnum subjectType)
         {
             try
-            {
-                // 获取缓存
-                BangumiApi.BangumiCache.Collections.TryGetValue(subjectType.GetValue(), out Collection2 cache);
+            {               
+                var respose = BangumiApi.GetSubjectCollectionAsync(subjectType);
+                Collection2 cache = respose.Item1;
                 if (cache != null && !cache.Collects.SequenceEqualExT(subjectCollection.ToList()))
                 {
                     //清空原数据
@@ -155,13 +155,12 @@ namespace Bangumi.ViewModels
                     }
                 }
 
-                var respose = await BangumiApi.GetSubjectCollectionAsync(subjectType);
-
-                if (!cache.EqualsExT(respose))
+                Collection2 current = await respose.Item2;
+                if (!cache.EqualsExT(current))
                 {
                     //清空原数据
                     subjectCollection.Clear();
-                    foreach (var status in respose.Collects)
+                    foreach (var status in current.Collects)
                     {
                         subjectCollection.Add(status);
                     }
