@@ -127,17 +127,13 @@ namespace Bangumi.ContentDialogs
         {
             var subjectStatus = await SubjectStatusTask;
             IsLoading = false;
-            if (subjectStatus == null)
-            {
-                return;
-            }
-
-            CollectionStatus = (CollectionStatusEnum)subjectStatus.Status.Id;
+            CollectionStatus = (CollectionStatusEnum)(subjectStatus.Status?.Id ?? (int)CollectionStatusEnum.No);
             Rate = subjectStatus.Rating;
             Comment = subjectStatus.Comment;
-            Privacy = subjectStatus.Private.Equals("1");
+            Privacy = subjectStatus.Private?.Equals("1") ?? false;
 
-            StatusPanel.Children.Cast<RadioButton>().FirstOrDefault(c => c?.Tag?.ToString() == CollectionStatus.GetValue()).IsChecked = true;
+            if (CollectionStatus != CollectionStatusEnum.No)
+                StatusPanel.Children.Cast<RadioButton>().FirstOrDefault(c => c?.Tag?.ToString() == CollectionStatus.GetValue()).IsChecked = true;
         }
     }
 }

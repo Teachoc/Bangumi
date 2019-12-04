@@ -122,7 +122,8 @@ namespace Bangumi.Api
                 if (requestType != RequestType.CacheOnly)
                 {
                     response = _wrapper.GetProgressesAsync(MyToken.UserId, MyToken.Token, subjectId)
-                        .ContinueWith(t => UpdateCache(BangumiCache.Progresses, subjectId, t.Result));
+                        .ContinueWith(t => UpdateCache(BangumiCache.Progresses, subjectId, t.Result),
+                        TaskContinuationOptions.OnlyOnRanToCompletion);
                 }
                 return (progressCache, response);
             }
@@ -153,7 +154,8 @@ namespace Bangumi.Api
                 if (requestType != RequestType.CacheOnly)
                 {
                     response = _wrapper.GetWatchingListAsync(MyToken.UserId)
-                        .ContinueWith(t => UpdateCache(BangumiCache.Watchings, t.Result));
+                        .ContinueWith(t => UpdateCache(BangumiCache.Watchings, t.Result),
+                        TaskContinuationOptions.OnlyOnRanToCompletion);
                 }
                 return (watchingCache, response);
             }
@@ -187,7 +189,8 @@ namespace Bangumi.Api
                 }
                 var response = _wrapper.UpdateCollectionStatusAsync(MyToken.Token,
                     subjectId, collectionStatusEnum, comment, rating, privace)
-                    .ContinueWith(t => UpdateSubjectStatusCache(subjectId, t.Result));
+                    .ContinueWith(t => UpdateSubjectStatusCache(subjectId, t.Result),
+                    TaskContinuationOptions.OnlyOnRanToCompletion);
                 return (await response)?.Status.Type == collectionStatusEnum.GetValue();
             }
             catch (Exception e)
@@ -221,7 +224,8 @@ namespace Bangumi.Api
                             UpdateProgressCache(int.Parse(epId), status);
                         }
                         return t.Result;
-                    });
+                    },
+                    TaskContinuationOptions.OnlyOnRanToCompletion);
             }
             catch (Exception e)
             {
@@ -264,7 +268,8 @@ namespace Bangumi.Api
                             }
                         }
                         return t.Result;
-                    });
+                    },
+                    TaskContinuationOptions.OnlyOnRanToCompletion);
 
                 return result;
             }
@@ -304,7 +309,8 @@ namespace Bangumi.Api
                             {
                                 UpdateCache(BangumiCache.Subjects[subjectId].Eps, t.Result.Eps);
                                 return t.Result;
-                            });
+                            },
+                            TaskContinuationOptions.OnlyOnRanToCompletion);
                     }
                     return (subjectCache, response);
                 }
@@ -341,7 +347,8 @@ namespace Bangumi.Api
                 if (requestType != RequestType.CacheOnly)
                 {
                     response = _wrapper.GetSubjectAsync(subjectId)
-                        .ContinueWith(t => UpdateCache(BangumiCache.Subjects, subjectId, t.Result));
+                        .ContinueWith(t => UpdateCache(BangumiCache.Subjects, subjectId, t.Result),
+                        TaskContinuationOptions.OnlyOnRanToCompletion);
                 }
                 return (subjectCache, response);
             }
@@ -372,7 +379,8 @@ namespace Bangumi.Api
                 if (requestType != RequestType.CacheOnly)
                 {
                     response = _wrapper.GetBangumiTimelineAsync()
-                       .ContinueWith(t => UpdateCache(BangumiCache.Timeline, t.Result));
+                       .ContinueWith(t => UpdateCache(BangumiCache.Timeline, t.Result),
+                        TaskContinuationOptions.OnlyOnRanToCompletion);
                 }
                 return (timelineCache, response);
             }
@@ -418,9 +426,9 @@ namespace Bangumi.Api
         /// </summary>
         public enum RequestType
         {
-            All,
-            CacheOnly,
-            TaskOnly
+            All = 0,
+            CacheOnly = 1,
+            TaskOnly = 2
         }
 
 

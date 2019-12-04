@@ -31,9 +31,16 @@ namespace Bangumi.Views
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             MainPage.RootPage.RefreshButton.Click += ProgressPageRefresh;
-            if (ViewModel.WatchingCollection.Count == 0 && !ViewModel.IsLoading)
+            if (!ViewModel.IsLoading)
             {
-                await ViewModel.LoadWatchingListAsync();
+                if (ViewModel.WatchingCollection.Count == 0)
+                {
+                    await ViewModel.LoadWatchingListAsync(Api.BangumiApi.RequestType.All);
+                }
+                else
+                {
+                    await ViewModel.LoadWatchingListAsync(Api.BangumiApi.RequestType.CacheOnly);
+                }
             }
         }
 
@@ -49,7 +56,7 @@ namespace Bangumi.Views
                 var tag = button.Tag;
                 if (tag.Equals("进度"))
                 {
-                    await ViewModel.LoadWatchingListAsync();
+                    await ViewModel.LoadWatchingListAsync(Api.BangumiApi.RequestType.TaskOnly);
                 }
             }
         }

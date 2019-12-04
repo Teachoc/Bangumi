@@ -81,14 +81,14 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="fromCache">只从缓存加载</param>
         /// <returns></returns>
-        public async Task LoadWatchingListAsync()
+        public async Task LoadWatchingListAsync(BangumiApi.RequestType requestType)
         {
             try
             {
                 if (BangumiApi.IsLogin)
                 {
                     IsLoading = true;
-                    await PopulateWatchingListAsync(WatchingCollection);
+                    await PopulateWatchingListAsync(WatchingCollection, requestType);
                 }
                 else
                 {
@@ -163,14 +163,14 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="watchingCollection"></param>
         /// <returns></returns>
-        private async Task PopulateWatchingListAsync(ObservableCollection<WatchStatus> watchingCollection)
+        private async Task PopulateWatchingListAsync(ObservableCollection<WatchStatus> watchingCollection,
+            BangumiApi.RequestType requestType = BangumiApi.RequestType.All)
         {
             var watchings = BangumiApi.GetWatchingListAsync();
             var cachedWatchings = watchings.Item1;
             var cachedWatchList = new List<WatchStatus>();
             var currentWatchList = new List<WatchStatus>();
-            var subjectTasks = new List<Task<Subject>>();
-            var progressTasks = new List<Task<Progress>>();
+            // 加载缓存，后面获取新数据后比较需要使用
             foreach (var watching in cachedWatchings)
             {
                 var subject = BangumiApi.GetSubjectEpsAsync(watching.SubjectId.ToString(), BangumiApi.RequestType.CacheOnly);
@@ -180,36 +180,65 @@ namespace Bangumi.ViewModels
                 ProcessSubject(item, subject.Item1);
                 ProcessProgress(item, progress.Item1);
                 cachedWatchList.Add(item);
+                if (subject.Item1 == null || progress.Item1 == null)
+                {
+                    watching.LastTouch = 0;
+                }
             }
-            DiffListToObservableCollection(watchingCollection, CollectionSorting(cachedWatchList));
-            await watchings.Item2.ContinueWith(async t =>
+            if (requestType != BangumiApi.RequestType.TaskOnly)
             {
-                var watchingsNotCached = t.Result.Where(it => cachedWatchings.All(it2 => !it2.EqualsExT(it)));
-                foreach (var item in watchingsNotCached)
+                DiffListToObservableCollection(watchingCollection, CollectionSorting(cachedWatchList));
+            }
+            if (requestType != BangumiApi.RequestType.CacheOnly)
+            {
+                // 内容有变更
+                await watchings.Item2.ContinueWith(async t =>
                 {
-                    subjectTasks.Add(BangumiApi.GetSubjectEpsAsync(item.SubjectId.ToString(), BangumiApi.RequestType.TaskOnly).Item2);
-                    progressTasks.Add(BangumiApi.GetProgressesAsync(item.SubjectId.ToString(), BangumiApi.RequestType.TaskOnly).Item2);
-                }
-                var newSubjects = await Task.WhenAll(subjectTasks);
-                var newProgresses = await Task.WhenAll(progressTasks);
-                foreach (var watching in t.Result)
-                {
-                    WatchStatus item;
-                    if (watchingsNotCached.Any(it => it.SubjectId == watching.SubjectId))
+                    var subjectTasks = new List<Task<Subject>>();
+                    var progressTasks = new List<Task<Progress>>();
+                    Subject[] newSubjects = null;
+                    Progress[] newProgresses = null;
+                    var watchingsNotCached = t.Result.Where(it => cachedWatchings.All(it2 => !it2.EqualsExT(it)));
+                    using (var semaphore = new SemaphoreSlim(10))
                     {
-                        item = ProcessWatching(watching);
-                        ProcessSubject(item, newSubjects.FirstOrDefault(it => it.Id == item.SubjectId));
-                        ProcessProgress(item, newProgresses.FirstOrDefault(it => it.SubjectId == item.SubjectId));
+                        foreach (var item in watchingsNotCached)
+                        {
+                            await semaphore.WaitAsync();
+                            subjectTasks.Add(BangumiApi.GetSubjectEpsAsync(item.SubjectId.ToString(), BangumiApi.RequestType.TaskOnly).Item2
+                                .ContinueWith(t =>
+                                {
+                                    semaphore.Release();
+                                    return t.Result;
+                                }));
+                            await semaphore.WaitAsync();
+                            progressTasks.Add(BangumiApi.GetProgressesAsync(item.SubjectId.ToString(), BangumiApi.RequestType.TaskOnly).Item2
+                                .ContinueWith(t =>
+                                {
+                                    semaphore.Release();
+                                    return t.Result;
+                                }));
+                        }
+                        newSubjects = await Task.WhenAll(subjectTasks);
+                        newProgresses = await Task.WhenAll(progressTasks);
                     }
-                    else
+                    foreach (var watching in t.Result)
                     {
-                        item = cachedWatchList.Find(it => it.SubjectId == watching.SubjectId);
+                        WatchStatus item;
+                        if (watchingsNotCached.Any(it => it.SubjectId == watching.SubjectId))
+                        {
+                            item = ProcessWatching(watching);
+                            ProcessSubject(item, newSubjects.FirstOrDefault(it => it.Id == item.SubjectId));
+                            ProcessProgress(item, newProgresses.FirstOrDefault(it => it.SubjectId == item.SubjectId));
+                        }
+                        else
+                        {
+                            item = cachedWatchList.Find(it => it.SubjectId == watching.SubjectId);
+                        }
+                        currentWatchList.Add(item);
                     }
-                    currentWatchList.Add(item);
-                }
-            }).Unwrap();
-            DiffListToObservableCollection(watchingCollection, CollectionSorting(currentWatchList));
-
+                }).Unwrap();
+                DiffListToObservableCollection(watchingCollection, CollectionSorting(currentWatchList));
+            }
             // 将 Watching 转换为界面显示用的 WatchStatus
             WatchStatus ProcessWatching(Watching w)
             {
@@ -466,7 +495,7 @@ namespace Bangumi.ViewModels
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return (int)(LastTouch % 1000000000) - UpdatedEps;
+            return (int)(SubjectId + LastTouch % 1000000000) - UpdatedEps;
         }
     }
 

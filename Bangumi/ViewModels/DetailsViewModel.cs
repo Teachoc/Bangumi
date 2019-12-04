@@ -360,10 +360,10 @@ namespace Bangumi.ViewModels
                     {
                         await DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessSubject(t.Result));
                         await progress.Item2.ContinueWith(t2 =>
-                            DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessProgress(t.Result, t2.Result)));
+                            DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessProgress(t.Result, t2.Result))).Unwrap();
                         await subjectStatus.Item2.ContinueWith(t3 =>
-                            DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessCollectionStatus(t3.Result)));
-                    });
+                            DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessCollectionStatus(t3.Result))).Unwrap();
+                    }).Unwrap();
                 }
                 else
                 {
