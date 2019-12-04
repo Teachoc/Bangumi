@@ -3,6 +3,7 @@ using Bangumi.Api.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Bangumi.Api
@@ -41,14 +42,23 @@ namespace Bangumi.Api
         /// </summary>
         /// <param name="subjectType"></param>
         /// <returns></returns>
-        public static (Collection2, Task<Collection2>) GetSubjectCollectionAsync(SubjectTypeEnum subjectType)
+        public static (Collection2, Task<Collection2>) GetSubjectCollectionAsync(
+            SubjectTypeEnum subjectType, RequestType requestType = RequestType.All)
         {
             try
             {
-                BangumiCache.Collections.TryGetValue(subjectType.GetValue(), out Collection2 cache);
-                var response = _wrapper.GetSubjectCollectionAsync(MyToken.UserId, subjectType)
-                    .ContinueWith(t => UpdateCache(BangumiCache.Collections, subjectType.GetValue(), t.Result),
-                    TaskContinuationOptions.OnlyOnRanToCompletion);
+                Collection2 cache = null;
+                Task<Collection2> response = null;
+                if (requestType != RequestType.TaskOnly)
+                {
+                    BangumiCache.Collections.TryGetValue(subjectType.GetValue(), out cache);
+                }
+                if (requestType != RequestType.CacheOnly)
+                {
+                    response = _wrapper.GetSubjectCollectionAsync(MyToken.UserId, subjectType)
+                        .ContinueWith(t => UpdateCache(BangumiCache.Collections, subjectType.GetValue(), t.Result),
+                        TaskContinuationOptions.OnlyOnRanToCompletion);
+                }
                 return (cache, response);
             }
             catch (Exception e)
@@ -65,14 +75,23 @@ namespace Bangumi.Api
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public static (SubjectStatus2, Task<SubjectStatus2>) GetSubjectStatusAsync(string subjectId)
+        public static (SubjectStatus2, Task<SubjectStatus2>) GetSubjectStatusAsync(
+            string subjectId, RequestType requestType = RequestType.All)
         {
             try
             {
-                BangumiCache.SubjectStatus.TryGetValue(subjectId, out SubjectStatus2 subjectStatusCache);
-                var response = _wrapper.GetSubjectStatusAsync(MyToken.Token, subjectId)
-                    .ContinueWith(t => UpdateCache(BangumiCache.SubjectStatus, subjectId, t.Result),
-                    TaskContinuationOptions.OnlyOnRanToCompletion);
+                SubjectStatus2 subjectStatusCache = null;
+                Task<SubjectStatus2> response = null;
+                if (requestType != RequestType.TaskOnly)
+                {
+                    BangumiCache.SubjectStatus.TryGetValue(subjectId, out subjectStatusCache);
+                }
+                if (requestType != RequestType.CacheOnly)
+                {
+                    response = _wrapper.GetSubjectStatusAsync(MyToken.Token, subjectId)
+                        .ContinueWith(t => UpdateCache(BangumiCache.SubjectStatus, subjectId, t.Result),
+                        TaskContinuationOptions.OnlyOnRanToCompletion);
+                }
                 return (subjectStatusCache, response);
             }
             catch (Exception e)
@@ -89,13 +108,22 @@ namespace Bangumi.Api
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public static (Progress, Task<Progress>) GetProgressesAsync(string subjectId)
+        public static (Progress, Task<Progress>) GetProgressesAsync(
+            string subjectId, RequestType requestType = RequestType.All)
         {
             try
             {
-                BangumiCache.Progresses.TryGetValue(subjectId, out Progress progressCache);
-                var response = _wrapper.GetProgressesAsync(MyToken.UserId, MyToken.Token, subjectId)
-                    .ContinueWith(t => UpdateCache(BangumiCache.Progresses, subjectId, t.Result));
+                Progress progressCache = null;
+                Task<Progress> response = null;
+                if (requestType != RequestType.TaskOnly)
+                {
+                    BangumiCache.Progresses.TryGetValue(subjectId, out progressCache);
+                }
+                if (requestType != RequestType.CacheOnly)
+                {
+                    response = _wrapper.GetProgressesAsync(MyToken.UserId, MyToken.Token, subjectId)
+                        .ContinueWith(t => UpdateCache(BangumiCache.Progresses, subjectId, t.Result));
+                }
                 return (progressCache, response);
             }
             catch (Exception e)
@@ -111,13 +139,23 @@ namespace Bangumi.Api
         /// 获取用户收视列表。
         /// </summary>
         /// <returns></returns>
-        public static (List<Watching>, Task<List<Watching>>) GetWatchingListAsync()
+        public static (List<Watching>, Task<List<Watching>>) GetWatchingListAsync(
+            RequestType requestType = RequestType.All)
         {
             try
             {
-                var response = _wrapper.GetWatchingListAsync(MyToken.UserId)
-                    .ContinueWith(t => UpdateCache(BangumiCache.Watchings, t.Result));
-                return (BangumiCache.Watchings, response);
+                List<Watching> watchingCache = null;
+                Task<List<Watching>> response = null;
+                if (requestType != RequestType.TaskOnly)
+                {
+                    watchingCache = BangumiCache.Watchings.ToList();
+                }
+                if (requestType != RequestType.CacheOnly)
+                {
+                    response = _wrapper.GetWatchingListAsync(MyToken.UserId)
+                        .ContinueWith(t => UpdateCache(BangumiCache.Watchings, t.Result));
+                }
+                return (watchingCache, response);
             }
             catch (Exception e)
             {
@@ -244,7 +282,8 @@ namespace Bangumi.Api
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public static (Subject, Task<Subject>) GetSubjectEpsAsync(string subjectId)
+        public static (Subject, Task<Subject>) GetSubjectEpsAsync(
+            string subjectId, RequestType requestType = RequestType.All)
         {
             try
             {
@@ -252,18 +291,26 @@ namespace Bangumi.Api
                 // 否则获取完整信息
                 if (BangumiCache.Subjects.ContainsKey(subjectId))
                 {
-                    BangumiCache.Subjects.TryGetValue(subjectId, out Subject subjectCache);
-                    var response = _wrapper.GetSubjectEpsAsync(subjectId)
-                        .ContinueWith(t =>
-                        {
-                            UpdateCache(BangumiCache.Subjects[subjectId].Eps, t.Result.Eps);
-                            return t.Result;
-                        });
+                    Subject subjectCache = null;
+                    Task<Subject> response = null;
+                    if (requestType != RequestType.TaskOnly)
+                    {
+                        BangumiCache.Subjects.TryGetValue(subjectId, out subjectCache);
+                    }
+                    if (requestType != RequestType.CacheOnly)
+                    {
+                        response = _wrapper.GetSubjectEpsAsync(subjectId)
+                            .ContinueWith(t =>
+                            {
+                                UpdateCache(BangumiCache.Subjects[subjectId].Eps, t.Result.Eps);
+                                return t.Result;
+                            });
+                    }
                     return (subjectCache, response);
                 }
                 else
                 {
-                    return GetSubjectAsync(subjectId);
+                    return GetSubjectAsync(subjectId, requestType);
                 }
             }
             catch (Exception e)
@@ -280,13 +327,22 @@ namespace Bangumi.Api
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public static (Subject, Task<Subject>) GetSubjectAsync(string subjectId)
+        public static (Subject, Task<Subject>) GetSubjectAsync(
+            string subjectId, RequestType requestType = RequestType.All)
         {
             try
             {
-                BangumiCache.Subjects.TryGetValue(subjectId, out Subject subjectCache);
-                var response = _wrapper.GetSubjectAsync(subjectId)
-                    .ContinueWith(t => UpdateCache(BangumiCache.Subjects, subjectId, t.Result));
+                Subject subjectCache = null;
+                Task<Subject> response = null;
+                if (requestType != RequestType.TaskOnly)
+                {
+                    BangumiCache.Subjects.TryGetValue(subjectId, out subjectCache);
+                }
+                if (requestType != RequestType.CacheOnly)
+                {
+                    response = _wrapper.GetSubjectAsync(subjectId)
+                        .ContinueWith(t => UpdateCache(BangumiCache.Subjects, subjectId, t.Result));
+                }
                 return (subjectCache, response);
             }
             catch (Exception e)
@@ -302,13 +358,23 @@ namespace Bangumi.Api
         /// 获取时间表。
         /// </summary>
         /// <returns></returns>
-        public static (List<BangumiTimeLine>, Task<List<BangumiTimeLine>>) GetBangumiCalendarAsync()
+        public static (List<BangumiTimeLine>, Task<List<BangumiTimeLine>>) GetBangumiTimelineAsync(
+            RequestType requestType = RequestType.All)
         {
             try
             {
-                var response = _wrapper.GetBangumiCalendarAsync()
-                    .ContinueWith(t => UpdateCache(BangumiCache.TimeLine, t.Result));
-                return (BangumiCache.TimeLine, response);
+                List<BangumiTimeLine> timelineCache = null;
+                Task<List<BangumiTimeLine>> response = null;
+                if (requestType != RequestType.TaskOnly)
+                {
+                    timelineCache = BangumiCache.Timeline.ToList();
+                }
+                if (requestType != RequestType.CacheOnly)
+                {
+                    response = _wrapper.GetBangumiTimelineAsync()
+                       .ContinueWith(t => UpdateCache(BangumiCache.Timeline, t.Result));
+                }
+                return (timelineCache, response);
             }
             catch (Exception e)
             {
@@ -345,6 +411,18 @@ namespace Bangumi.Api
                 throw;
             }
         }
+
+
+        /// <summary>
+        /// 请求返回种类
+        /// </summary>
+        public enum RequestType
+        {
+            All,
+            CacheOnly,
+            TaskOnly
+        }
+
 
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Bangumi.Api.Models;
+using Bangumi.ViewModels;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -8,35 +10,87 @@ using Windows.UI.Xaml.Controls;
 
 namespace Bangumi.ContentDialogs
 {
-    public sealed partial class CollectionEditContentDialog : ContentDialog
+    public sealed partial class CollectionEditContentDialog : ContentDialog, INotifyPropertyChanged
     {
-        public int Rate { get; private set; }
-        public string Comment { get; private set; }
-        public bool Privacy { get; private set; }
-        public CollectionStatusEnum CollectionStatus { get; private set; }
-        public SubjectTypeEnum SubjectType { get; set; }
-        public Task<SubjectStatus2> SubjectStatusTask { get; set; }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        /// 属性变更通知
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        private void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public CollectionEditContentDialog()
+        /// <summary>
+        /// 检查属性值是否相同。
+        /// 仅在不同时设置属性值。
+        /// </summary>
+        /// <typeparam name="T">属性类型。</typeparam>
+        /// <param name="storage">可读写的属性。</param>
+        /// <param name="value">属性值。</param>
+        /// <param name="propertyName">属性名。可被支持 CallerMemberName 的编译器自动提供。</param>
+        /// <returns>值改变则返回 true，未改变返回 false。</returns>
+        private bool Set<T>(ref T storage, T value,
+            [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+            {
+                return false;
+            }
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+        #endregion
+
+        private bool _isLoading = true;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                Set(ref _isLoading, value);
+            }
+        }
+
+        private int _rate;
+        public int Rate
+        {
+            get => _rate;
+            private set
+            {
+                Set(ref _rate, value);
+            }
+        }
+
+        private string _comment;
+        public string Comment
+        {
+            get => _comment;
+            private set
+            {
+                Set(ref _comment, value);
+            }
+        }
+
+        private bool _privacy;
+        public bool Privacy
+        {
+            get => _privacy;
+            private set
+            {
+                Set(ref _privacy, value);
+            }
+        }
+
+        public CollectionStatusEnum CollectionStatus { get; private set; }
+        private readonly Task<SubjectStatus2> SubjectStatusTask;
+
+        public CollectionEditContentDialog(SubjectTypeEnum subjectType, Task<SubjectStatus2> subjectStatusTask)
         {
             this.InitializeComponent();
-        }
-
-        private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-            Rate = (int)RateSlider.Value;
-            Comment = CommentTextBox.Text;
-            Privacy = PrivacyCheckBox.IsChecked == true;
-        }
-
-        private void StatusRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            CollectionStatus = CollectionStatusEnumEx.FromValue(((RadioButton)sender).Tag.ToString());
-        }
-
-        private async void ContentDialog_Loaded(object sender, RoutedEventArgs e)
-        {
-            switch (SubjectType)
+            switch (subjectType)
             {
                 case SubjectTypeEnum.Book:
                     WishRadio.Content = "想读";
@@ -61,7 +115,18 @@ namespace Bangumi.ContentDialogs
                     DoRadio.Content = "在看";
                     break;
             }
+            SubjectStatusTask = subjectStatusTask;
+        }
+
+        private void StatusRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            CollectionStatus = CollectionStatusEnumEx.FromValue(((RadioButton)sender).Tag.ToString());
+        }
+
+        private async void ContentDialog_Loaded(object sender, RoutedEventArgs e)
+        {
             var subjectStatus = await SubjectStatusTask;
+            IsLoading = false;
             if (subjectStatus == null)
             {
                 return;

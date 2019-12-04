@@ -90,7 +90,7 @@ namespace Bangumi.ViewModels
         {
             try
             {
-                var timeLine = BangumiApi.GetBangumiCalendarAsync();
+                var timeLine = BangumiApi.GetBangumiTimelineAsync();
                 int day = GetDayOfWeek();
                 if (TimeLineCollection.Count == 0)
                 {

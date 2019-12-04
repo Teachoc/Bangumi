@@ -204,11 +204,10 @@ namespace Bangumi.ViewModels
             if (!BangumiApi.IsLogin)
                 return;
             var subjectStatus = BangumiApi.GetSubjectStatusAsync(SubjectId);
-            CollectionEditContentDialog collectionEditContentDialog = new CollectionEditContentDialog()
+            CollectionEditContentDialog collectionEditContentDialog = new CollectionEditContentDialog(
+                this.SubjectType, subjectStatus.Item2)
             {
-                SubjectType = this.SubjectType,
                 Title = this.NameCn,
-                SubjectStatusTask = subjectStatus.Item2,
             };
             MainPage.RootPage.HasDialog = true;
             if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync())

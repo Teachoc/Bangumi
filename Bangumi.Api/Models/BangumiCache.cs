@@ -35,7 +35,7 @@ namespace Bangumi.Api.Models
         /// <summary>
         /// 时间表
         /// </summary>
-        public List<BangumiTimeLine> TimeLine { get; set; } = new List<BangumiTimeLine>();
+        public List<BangumiTimeLine> Timeline { get; set; } = new List<BangumiTimeLine>();
 
         /// <summary>
         /// 缓存更新时间

@@ -296,7 +296,7 @@ namespace Bangumi.Api.Services
         /// 获取时间表。
         /// </summary>
         /// <returns></returns>
-        internal async Task<List<BangumiTimeLine>> GetBangumiCalendarAsync()
+        internal async Task<List<BangumiTimeLine>> GetBangumiTimelineAsync()
         {
             var response = await $"{BaseUrl}/calendar"
                 .GetAsync()
@@ -437,7 +437,5 @@ namespace Bangumi.Api.Services
                     .ReceiveJson<AccessToken>();
             }
         }
-
-
     }
 }

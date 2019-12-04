@@ -4,14 +4,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Bangumi.ContentDialogs"
     xmlns:common="using:Bangumi.Common"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="评分和吐槽"
     Loaded="ContentDialog_Loaded"
     PrimaryButtonText="确认"
+    IsPrimaryButtonEnabled="{x:Bind common:Converters.Not(IsLoading), Mode=OneWay}"
     SecondaryButtonText="取消"
-    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     Background="{ThemeResource SystemChromeLowColor}">
 
     <ContentDialog.TitleTemplate>
@@ -84,84 +85,96 @@
         </ResourceDictionary>
     </ContentDialog.Resources>
 
-    <StackPanel MaxWidth="300">
-        <Grid Name="StatusPanel" CornerRadius="5" Background="{StaticResource SystemChromeMediumHighColor}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <RadioButton Name="WishRadio" 
-                         Grid.Column="0" 
-                         Background="#ff7e8b" 
-                         Style="{StaticResource CollectionStatusRadioButtonStyle}" 
-                         Content="想看" 
-                         Tag="wish" 
-                         GroupName="CollectionStatus" 
-                         Checked="StatusRadioButton_Checked" 
-                         AccessKey="A"/>
-            <RadioButton Name="CollectRadio" 
-                         Grid.Column="1" 
-                         Background="#ffc34d" 
-                         Style="{StaticResource CollectionStatusRadioButtonStyle}" 
-                         Content="看过" 
-                         Tag="collect" 
-                         GroupName="CollectionStatus" 
-                         Checked="StatusRadioButton_Checked" 
-                         AccessKey="S"/>
-            <RadioButton Name="DoRadio" 
-                         Grid.Column="2" 
-                         Background="#33c5f9" 
-                         Style="{StaticResource CollectionStatusRadioButtonStyle}" 
-                         Content="在看" 
-                         Tag="do" 
-                         GroupName="CollectionStatus" 
-                         Checked="StatusRadioButton_Checked"
-                         AccessKey="D"/>
-            <RadioButton Name="OnHoldRadio" 
-                         Grid.Column="3" 
-                         Background="#cccccc" 
-                         Style="{StaticResource CollectionStatusRadioButtonStyle}" 
-                         Content="搁置" 
-                         Tag="on_hold" 
-                         GroupName="CollectionStatus" 
-                         Checked="StatusRadioButton_Checked" 
-                         AccessKey="F"/>
-            <RadioButton Name="DroppedRadio" 
-                         Grid.Column="4" 
-                         Background="#9b9997" 
-                         Style="{StaticResource CollectionStatusRadioButtonStyle}" 
-                         Content="抛弃" 
-                         Tag="dropped" 
-                         GroupName="CollectionStatus" 
-                         Checked="StatusRadioButton_Checked"
-                         AccessKey="G"/>
-        </Grid>
-        <TextBlock Text="评分："
-                   Margin="0,5,0,0">
-            <Run Text="{x:Bind common:Converters.GetRateDesc(RateSlider.Value), Mode=OneWay}" />
-        </TextBlock>
-        <Slider Name="RateSlider" 
-                AutomationProperties.Name="Slider with ticks"
-                TickFrequency="1" 
-                TickPlacement="Outside"
-                Height="31"
-                Minimum="0"
-                Maximum="10"
-                Value="{x:Bind Rate}"
-                AccessKey="Z"/>
-        <TextBlock Text="吐槽：" 
-                   Margin="0,5,0,0"/>
-        <TextBox Name="CommentTextBox"
-                 Text="{x:Bind Comment}"
-                 TextWrapping="Wrap"
-                 AccessKey="X"/>
-        <CheckBox Name="PrivacyCheckBox" 
-                  Content="私密"
-                  IsChecked="{x:Bind Privacy}"
-                  Margin="0,5,0,0"
-                  AccessKey="C"/>
-    </StackPanel>
+    <Grid>
+        <StackPanel MaxWidth="300">
+            <Grid Name="StatusPanel" CornerRadius="5" Background="{StaticResource SystemChromeMediumHighColor}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <RadioButton Name="WishRadio" 
+                             Grid.Column="0" 
+                             Background="#ff7e8b" 
+                             Style="{StaticResource CollectionStatusRadioButtonStyle}" 
+                             Content="想看" 
+                             Tag="wish" 
+                             GroupName="CollectionStatus" 
+                             Checked="StatusRadioButton_Checked" 
+                             AccessKey="A"/>
+                <RadioButton Name="CollectRadio" 
+                             Grid.Column="1" 
+                             Background="#ffc34d" 
+                             Style="{StaticResource CollectionStatusRadioButtonStyle}" 
+                             Content="看过" 
+                             Tag="collect" 
+                             GroupName="CollectionStatus" 
+                             Checked="StatusRadioButton_Checked" 
+                             AccessKey="S"/>
+                <RadioButton Name="DoRadio" 
+                             Grid.Column="2" 
+                             Background="#33c5f9" 
+                             Style="{StaticResource CollectionStatusRadioButtonStyle}" 
+                             Content="在看" 
+                             Tag="do" 
+                             GroupName="CollectionStatus" 
+                             Checked="StatusRadioButton_Checked"
+                             AccessKey="D"/>
+                <RadioButton Name="OnHoldRadio" 
+                             Grid.Column="3" 
+                             Background="#cccccc" 
+                             Style="{StaticResource CollectionStatusRadioButtonStyle}" 
+                             Content="搁置" 
+                             Tag="on_hold" 
+                             GroupName="CollectionStatus" 
+                             Checked="StatusRadioButton_Checked" 
+                             AccessKey="F"/>
+                <RadioButton Name="DroppedRadio" 
+                             Grid.Column="4" 
+                             Background="#9b9997" 
+                             Style="{StaticResource CollectionStatusRadioButtonStyle}" 
+                             Content="抛弃" 
+                             Tag="dropped" 
+                             GroupName="CollectionStatus" 
+                             Checked="StatusRadioButton_Checked"
+                             AccessKey="G"/>
+            </Grid>
+            <TextBlock Text="评分："
+                       Margin="0,5,0,0">
+                <Run Text="{x:Bind common:Converters.GetRateDesc(RateSlider.Value), Mode=OneWay}" />
+            </TextBlock>
+            <Slider Name="RateSlider" 
+                    AutomationProperties.Name="Slider with ticks"
+                    TickFrequency="1" 
+                    TickPlacement="Outside"
+                    Height="31"
+                    Minimum="0"
+                    Maximum="10"
+                    Value="{x:Bind Rate, Mode=TwoWay}"
+                    AccessKey="Z"/>
+            <TextBlock Text="吐槽：" 
+                       Margin="0,5,0,0"/>
+            <TextBox Name="CommentTextBox"
+                     Text="{x:Bind Comment, Mode=TwoWay}"
+                     TextWrapping="Wrap"
+                     AccessKey="X"/>
+            <CheckBox Name="PrivacyCheckBox" 
+                      Content="私密"
+                      IsChecked="{x:Bind Privacy, Mode=TwoWay}"
+                      Margin="0,5,0,0"
+                      AccessKey="C"/>
+        </StackPanel>
+        <controls:Loading x:Name="LoadingControl" 
+                          IsLoading="{x:Bind IsLoading, Mode=OneWay}">
+            <controls:Loading.Background>
+                <SolidColorBrush Color="{ThemeResource SystemChromeLowColor}" 
+                                 Opacity="0.7" />
+            </controls:Loading.Background>
+            <ProgressRing IsActive="{x:Bind IsLoading, Mode=OneWay}"
+                          Height="40"
+                          Width="40"/>
+        </controls:Loading>
+    </Grid>
 </ContentDialog>
