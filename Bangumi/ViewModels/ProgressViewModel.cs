@@ -198,7 +198,9 @@ namespace Bangumi.ViewModels
                     var progressTasks = new List<Task<Progress>>();
                     Subject[] newSubjects = null;
                     Progress[] newProgresses = null;
-                    var watchingsNotCached = t.Result.Where(it => cachedWatchings.All(it2 => !it2.EqualsExT(it)));
+                    var watchingsNotCached = BangumiApi.IsCacheUpdatedToday ?
+                                             t.Result.Where(it => cachedWatchings.All(it2 => !it2.EqualsExT(it))).ToList() :
+                                             t.Result;
                     using (var semaphore = new SemaphoreSlim(10))
                     {
                         foreach (var item in watchingsNotCached)
@@ -236,6 +238,7 @@ namespace Bangumi.ViewModels
                         }
                         currentWatchList.Add(item);
                     }
+                    BangumiApi.IsCacheUpdatedToday = true;
                 }).Unwrap();
                 DiffListToObservableCollection(watchingCollection, CollectionSorting(currentWatchList));
             }

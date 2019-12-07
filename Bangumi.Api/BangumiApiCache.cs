@@ -42,9 +42,12 @@ namespace Bangumi.Api
             get => BangumiCache.UpdateDate == DateTime.Today.ConvertDateTimeToJsTick();
             set
             {
-                _isCacheUpdated = false;
-                BangumiCache.UpdateDate = (value ? DateTime.Today : DateTime.Today.AddDays(-1)).ConvertDateTimeToJsTick();
-                _isCacheUpdated = true;
+                if (IsCacheUpdatedToday != value)
+                {
+                    _isCacheUpdated = false;
+                    BangumiCache.UpdateDate = (value ? DateTime.Today : DateTime.Today.AddDays(-1)).ConvertDateTimeToJsTick();
+                    _isCacheUpdated = true;
+                }
             }
         }
 
