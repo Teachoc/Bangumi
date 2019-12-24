@@ -368,7 +368,8 @@ namespace Bangumi.ViewModels
                 }
                 else
                 {
-                    await subject.ContinueWith(t => DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessSubject(t.Result)));
+                    await subject.ContinueWith(t =>
+                        DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessSubject(t.Result))).Unwrap();
                 }
             }
             catch (Exception e)
@@ -542,7 +543,7 @@ namespace Bangumi.ViewModels
         /// <param name="progress"></param>
         private void ProcessProgress(Subject subject, Progress progress)
         {
-            if (progress == null || progress.SubjectId.ToString() != SubjectId) return;
+            if (progress?.Eps == null || progress.SubjectId.ToString() != SubjectId) return;
 
             foreach (var ep in Eps) //用户观看状态
             {

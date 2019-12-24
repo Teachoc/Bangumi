@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Bangumi.Api.Services
 {
@@ -137,10 +138,12 @@ namespace Bangumi.Api.Services
                     }
                     if (subject.Blogs != null)
                     {
+                        // 将多个换行符替换为一个，并清除多余的空格
+                        Regex regex = new Regex(@"(\r\n)+");
                         foreach (var blog in subject.Blogs)
                         {
                             blog.Title = System.Net.WebUtility.HtmlDecode(blog.Title);
-                            blog.Summary = System.Net.WebUtility.HtmlDecode(blog.Summary);
+                            blog.Summary = regex.Replace(System.Net.WebUtility.HtmlDecode(blog.Summary), Environment.NewLine).Trim();
                         }
                     }
                     if (subject.Topics != null)

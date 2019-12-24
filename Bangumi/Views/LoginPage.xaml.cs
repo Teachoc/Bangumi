@@ -45,6 +45,10 @@ namespace Bangumi.Views
             {
                 MainPage.RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
             }
+            else
+            {
+                NotificationHelper.Notify("登录失败，请重试！", NotificationHelper.NotifyType.Error);
+            }
         }
 
         private void EnterButton_Click(object sender, RoutedEventArgs e)

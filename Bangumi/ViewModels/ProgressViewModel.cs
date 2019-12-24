@@ -299,7 +299,7 @@ namespace Bangumi.ViewModels
         /// <param name="progress">进度</param>
         private void ProcessProgress(WatchStatus item, Progress progress)
         {
-            if (progress != null)
+            if (progress?.Eps != null)
             {
                 // 填充用户观看状态
                 foreach (var ep in item.Eps)
