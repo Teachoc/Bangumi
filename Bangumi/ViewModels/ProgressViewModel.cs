@@ -230,7 +230,7 @@ namespace Bangumi.ViewModels
                         {
                             item = ProcessWatching(watching);
                             ProcessSubject(item, newSubjects.FirstOrDefault(it => it.Id == item.SubjectId));
-                            ProcessProgress(item, newProgresses.FirstOrDefault(it => it.SubjectId == item.SubjectId));
+                            ProcessProgress(item, newProgresses.FirstOrDefault(it => it?.SubjectId == item.SubjectId));
                         }
                         else
                         {
