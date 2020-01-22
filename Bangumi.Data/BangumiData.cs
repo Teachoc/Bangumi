@@ -66,7 +66,7 @@ namespace Bangumi.Data
         {
             var siteList = _dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
                                           .Where(s => _dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
-            string[] airSites = { "bilibili", "acfun", "iqiyi" , "qq" };
+            string[] airSites = { "bilibili", "acfun", "iqiyi", "qq" };
             if (siteList == null) return null;
             foreach (var siteName in airSites)
             {

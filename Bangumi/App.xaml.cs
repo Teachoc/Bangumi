@@ -33,7 +33,7 @@ namespace Bangumi
         {
             e.Handled = true;
             // 马上将缓存写入文件
-            var task = BangumiApi.WriteCacheToFileRightNow();
+            var task = BangumiApi.BgmCache.WriteToFile();
             Windows.UI.Popups.MessageDialog dialog = new Windows.UI.Popups.MessageDialog($"发生未知错误，应用即将关闭！\n{e.Message}", "未知错误");
             await dialog.ShowAsync();
             await task;
@@ -102,7 +102,7 @@ namespace Bangumi
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             // 在应用挂起或退出时马上将缓存写入文件
-            await BangumiApi.WriteCacheToFileRightNow();
+            await BangumiApi.BgmCache.WriteToFile();
             //TODO: 保存应用程序状态并停止任何后台活动
             deferral.Complete();
         }

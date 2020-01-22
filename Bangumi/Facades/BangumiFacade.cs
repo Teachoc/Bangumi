@@ -20,7 +20,7 @@ namespace Bangumi.Facades
         {
             try
             {
-                if (await BangumiApi.UpdateProgressAsync(ep, status))
+                if (await BangumiApi.BgmApi.UpdateProgress(ep, status))
                 {
                     NotificationHelper.Notify($"标记章节{ep}{status.GetCnName()}成功");
                     return true;
@@ -49,7 +49,7 @@ namespace Bangumi.Facades
         {
             try
             {
-                if (await BangumiApi.UpdateProgressBatchAsync(ep, status, epsId))
+                if (await BangumiApi.BgmApi.UpdateProgressBatch(ep, status, epsId))
                 {
                     NotificationHelper.Notify($"批量标记章节{epsId}{status.GetCnName()}状态成功");
                     return true;
@@ -80,7 +80,8 @@ namespace Bangumi.Facades
         {
             try
             {
-                if (await BangumiApi.UpdateCollectionStatusAsync(subjectId, collectionStatus, comment, rating, privace))
+                if (await BangumiApi.BgmApi.UpdateStatus(subjectId, collectionStatus, comment, rating, privace)
+                    .ContinueWith(t => t.Result?.Status.Type == collectionStatus.GetValue()))
                 {
                     NotificationHelper.Notify($"更新条目{subjectId}状态成功");
                     return true;

@@ -68,7 +68,7 @@ namespace Bangumi.ViewModels
                 try
                 {
                     Debug.WriteLine("开始获取搜索建议");
-                    var result = await BangumiApi.GetSearchResultAsync(SearchText, "", 0, 10);
+                    var result = await BangumiApi.BgmApi.Search(SearchText, "", 0, 10);
                     if (SearchText == PreSearch[SelectedIndex])
                     {
                         return;
@@ -207,7 +207,7 @@ namespace Bangumi.ViewModels
                         {
                             this.OnLoadMoreStarted(index);
                         }
-                        SearchResult result = await BangumiApi.GetSearchResultAsync(keyword, type, offset, 20);
+                        SearchResult result = await BangumiApi.BgmApi.Search(keyword, type, offset, 20);
                         max = result.ResultCount;
                         foreach (Subject item in result.Results)
                         {

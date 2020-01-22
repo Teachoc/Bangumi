@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Bangumi.Api
+namespace Bangumi.Api.Common
 {
     public static class FileHelper
     {
@@ -25,10 +25,14 @@ namespace Bangumi.Api
         /// <returns></returns>
         internal static async Task<string> ReadTextAsync(string filePath)
         {
-            using (var reader = File.OpenText(filePath))
+            if (File.Exists(filePath))
             {
-                return await reader.ReadToEndAsync();
+                using (var reader = File.OpenText(filePath))
+                {
+                    return await reader.ReadToEndAsync();
+                }
             }
+            return string.Empty;
         }
 
         /// <summary>
@@ -89,12 +93,12 @@ namespace Bangumi.Api
                     }
                     return await DecryptionAsync(encryptedData);
                 }
-                return "";
+                return string.Empty;
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e);
-                return "";
+                return string.Empty;
             }
         }
 

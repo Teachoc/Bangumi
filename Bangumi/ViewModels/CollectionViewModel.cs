@@ -1,4 +1,5 @@
 ﻿using Bangumi.Api;
+using Bangumi.Api.Common;
 using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.Facades;
@@ -59,7 +60,7 @@ namespace Bangumi.ViewModels
             try
             {
                 var subjectType = GetSubjectType();
-                if (BangumiApi.IsLogin)
+                if (BangumiApi.BgmOAuth.IsLogin)
                 {
                     IsLoading = true;
                     await PopulateSubjectCollectionAsync(SubjectCollection, subjectType);
@@ -143,8 +144,7 @@ namespace Bangumi.ViewModels
         {
             try
             {               
-                var respose = BangumiApi.GetSubjectCollectionAsync(subjectType);
-                Collection2 cache = respose.Item1;
+                Collection2 cache = BangumiApi.BgmCache.Collections(subjectType);
                 if (cache != null && !cache.Collects.SequenceEqualExT(subjectCollection.ToList()))
                 {
                     //清空原数据
@@ -155,7 +155,7 @@ namespace Bangumi.ViewModels
                     }
                 }
 
-                Collection2 current = await respose.Item2;
+                Collection2 current = await BangumiApi.BgmApi.Collections(subjectType);
                 if (!cache.EqualsExT(current))
                 {
                     //清空原数据

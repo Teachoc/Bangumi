@@ -252,6 +252,12 @@
                                 Flurl(https://flurl.dev/)
                             </Hyperlink>
                         </TextBlock>
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,0,0,5">
+                            <Hyperlink NavigateUri="https://github.com/Tlaster/WeiPo">
+                                WeiPo(https://github.com/Tlaster/WeiPo)
+                            </Hyperlink>
+                        </TextBlock>
 
                     </StackPanel>
                 </ScrollViewer>

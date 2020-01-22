@@ -43,7 +43,7 @@ namespace Bangumi.Views
             UseBangumiDataAirTimeToggleSwitch.IsOn = SettingHelper.UseBangumiDataAirTime;
 
             // 获取缓存文件大小
-            JsonCacheSizeTextBlock.Text = ((double)BangumiApi.GetCacheFileLength() / 1024).ToString("F3");
+            JsonCacheSizeTextBlock.Text = ((double)BangumiApi.BgmCache.GetFileLength() / 1024).ToString("F3");
             DeleteUserCacheFileButton.IsEnabled = true;
 
             // 计算文件夹 ImageCache 中文件大小
@@ -166,7 +166,7 @@ namespace Bangumi.Views
         private void DeleteJsonCacheFileButton_Click(object sender, RoutedEventArgs e)
         {
             // 删除缓存文件
-            BangumiApi.DeleteCache();
+            BangumiApi.BgmCache.Delete();
             JsonCacheSizeTextBlock.Text = "0";
             DeleteUserCacheFileButton.IsEnabled = false;
         }

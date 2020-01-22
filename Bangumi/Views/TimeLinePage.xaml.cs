@@ -83,7 +83,7 @@ namespace Bangumi.Views
         // 鼠标右键弹出菜单
         private void ItemRelativePanel_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            if (BangumiApi.IsLogin && !ViewModel.IsLoading)
+            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsLoading)
             {
                 if (e.PointerDeviceType == PointerDeviceType.Mouse)
                 {
@@ -95,7 +95,7 @@ namespace Bangumi.Views
         // 触摸长按弹出菜单
         private void RelativePanel_Holding(object sender, HoldingRoutedEventArgs e)
         {
-            if (BangumiApi.IsLogin && !ViewModel.IsLoading)
+            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsLoading)
             {
                 if (e.HoldingState == HoldingState.Started)
                 {

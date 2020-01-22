@@ -201,11 +201,11 @@ namespace Bangumi.ViewModels
         /// </summary>
         public async void EditCollectionStatus()
         {
-            if (!BangumiApi.IsLogin)
+            if (!BangumiApi.BgmOAuth.IsLogin)
                 return;
-            var subjectStatus = BangumiApi.GetSubjectStatusAsync(SubjectId);
+            var subjectStatus = BangumiApi.BgmApi.Status(SubjectId);
             CollectionEditContentDialog collectionEditContentDialog = new CollectionEditContentDialog(
-                this.SubjectType, subjectStatus.Item2)
+                this.SubjectType, subjectStatus)
             {
                 Title = this.NameCn,
             };
@@ -347,27 +347,27 @@ namespace Bangumi.ViewModels
                 IsStatusLoaded = false;
                 MainPage.RootPage.RefreshButton.IsEnabled = false;
 
-                var subject = BangumiApi.GetSubjectAsync(SubjectId);
-                ProcessSubject(subject.Item1);
+                var subject = BangumiApi.BgmApi.Subject(SubjectId);
+                ProcessSubject(BangumiApi.BgmCache.Subject(SubjectId));
                 // 检查用户登录状态
-                if (BangumiApi.IsLogin)
+                if (BangumiApi.BgmOAuth.IsLogin)
                 {
-                    var progress = BangumiApi.GetProgressesAsync(SubjectId);
-                    var subjectStatus = BangumiApi.GetSubjectStatusAsync(SubjectId);
-                    ProcessProgress(subject.Item1, progress.Item1);
-                    ProcessCollectionStatus(subjectStatus.Item1);
-                    await subject.Item2.ContinueWith(async t =>
+                    var progress = BangumiApi.BgmApi.Progress(SubjectId);
+                    var status = BangumiApi.BgmApi.Status(SubjectId);
+                    ProcessProgress(BangumiApi.BgmCache.Subject(SubjectId), BangumiApi.BgmCache.Progress(SubjectId));
+                    ProcessCollectionStatus(BangumiApi.BgmCache.Status(SubjectId));
+                    await subject.ContinueWith(async t =>
                     {
                         await DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessSubject(t.Result));
-                        await progress.Item2.ContinueWith(t2 =>
+                        await progress.ContinueWith(t2 =>
                             DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessProgress(t.Result, t2.Result))).Unwrap();
-                        await subjectStatus.Item2.ContinueWith(t3 =>
+                        await status.ContinueWith(t3 =>
                             DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessCollectionStatus(t3.Result))).Unwrap();
                     }).Unwrap();
                 }
                 else
                 {
-                    await subject.Item2.ContinueWith(t => ProcessSubject(t.Result));
+                    await subject.ContinueWith(t => DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessSubject(t.Result)));
                 }
             }
             catch (Exception e)
@@ -396,7 +396,7 @@ namespace Bangumi.ViewModels
             // 条目标题
             NameCn = string.IsNullOrEmpty(subject.NameCn) ? subject.Name : subject.NameCn;
             // 条目图片
-            ImageSource = subject.Images.Common;
+            ImageSource = subject.Images?.Common;
             // 放送日期
             AirDate = subject.AirDate;
             AirTime = Converters.GetWeekday(subject.AirWeekday);

@@ -73,7 +73,7 @@ namespace Bangumi.Views
             MainPage.RootPage.WebPageAppBarButton.Click += LaunchWebPage_Click;
 
             // 设置收藏按钮可见以及属性绑定、事件绑定
-            if (BangumiApi.IsLogin)
+            if (BangumiApi.BgmOAuth.IsLogin)
             {
                 // 标签文本描述
                 Binding labelBinding = new Binding
@@ -148,7 +148,7 @@ namespace Bangumi.Views
         /// </summary>
         private void Eps_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if (BangumiApi.IsLogin && !ViewModel.IsProgressLoading && ((sender as RelativePanel)?.DataContext as Ep)?.Status != "NA")
+            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsProgressLoading && ((sender as RelativePanel)?.DataContext as Ep)?.Status != "NA")
             {
                 EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
@@ -159,7 +159,7 @@ namespace Bangumi.Views
         /// </summary>
         private void Eps_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            if (BangumiApi.IsLogin && !ViewModel.IsProgressLoading)
+            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsProgressLoading)
             {
                 if (e.PointerDeviceType == PointerDeviceType.Mouse)
                 {
@@ -173,7 +173,7 @@ namespace Bangumi.Views
         /// </summary>
         private void Eps_Holding(object sender, HoldingRoutedEventArgs e)
         {
-            if (BangumiApi.IsLogin && !ViewModel.IsProgressLoading)
+            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsProgressLoading)
             {
                 if (e.HoldingState == HoldingState.Started)
                 {

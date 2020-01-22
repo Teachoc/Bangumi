@@ -78,22 +78,9 @@ namespace Bangumi
 
             // 初始化 Api 对象
             BangumiApi.Init(ApplicationData.Current.LocalFolder.Path,
-                            ApplicationData.Current.LocalCacheFolder.Path,
-                            "https://api.bgm.tv",
-                            "https://bgm.tv/oauth",
-                            // 将自己申请的应用相关信息填入
-                            "bgm8905c514a1b94ec1", // ClientId
-                            "b678c34dd896203627da308b6b453775", // ClientSecret
-                            "BangumiGithubVersion", // RedirectUrl
-                            "ms-appx:///Assets/resource/err_404.png",
-                            EncryptionHelper.EncryptionAsync,
-                            EncryptionHelper.DecryptionAsync,
-                            new Func<bool>(() =>
-                            {
-                                // 检查网络状态
-                                IsOffline = Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile() == null;
-                                return IsOffline;
-                            }));
+                ApplicationData.Current.LocalCacheFolder.Path,
+                EncryptionHelper.EncryptionAsync,
+                EncryptionHelper.DecryptionAsync);
 
             if (SettingHelper.UseBangumiData)
             {
@@ -132,9 +119,13 @@ namespace Bangumi
 
             SearchButton.Click += (sender, e) => RootFrame.Navigate(typeof(SearchPage), null, new DrillInNavigationTransitionInfo());
             SettingButton.Click += (sender, e) => RootFrame.Navigate(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
-            OfflineAppBarButton.Click += (sender, e) => BangumiApi.RecheckNetworkStatus();
+            OfflineAppBarButton.Click += (sender, e) =>
+            {
+                // 检查网络状态
+                IsOffline = Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile() == null;
+            };
 
-            _ = UpdateUserStatusAsync();
+            UpdateUserStatus();
         }
 
         /// <summary>
@@ -168,7 +159,7 @@ namespace Bangumi
         {
             if (LoginButton.Label == "登录")
             {
-                await UpdateUserStatusAsync();
+                UpdateUserStatus();
             }
             else if (LoginButton.Label == "注销")
             {
@@ -179,8 +170,8 @@ namespace Bangumi
                 await msgDialog.ShowAsync();
                 if (choice == "确定")
                 {
-                    BangumiApi.DeleteUserFiles();
-                    await UpdateUserStatusAsync();
+                    BangumiApi.BgmOAuth.DeleteUserFiles();
+                    UpdateUserStatus();
                 }
             }
         }
@@ -190,29 +181,28 @@ namespace Bangumi
         /// 只检查 Token 是否存在。
         /// </summary>
         /// <returns></returns>
-        private async Task UpdateUserStatusAsync()
+        private void UpdateUserStatus()
         {
-            try
+            if (BangumiApi.BgmOAuth.IsLogin)
             {
-                var result = await BangumiApi.CheckMyToken();
-                if (result.Item1)
-                {
-                    LoginButton.Label = "注销";
-                    UserIcon.Glyph = "\uE7E8";
-                    RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
-                }
-                else
-                {
-                    LoginButton.Label = "登录";
-                    UserIcon.Glyph = "\uEE57";
-                    RootFrame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
-                }
-                await result.Item2;
+                LoginButton.Label = "注销";
+                UserIcon.Glyph = "\uE7E8";
+                RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
+                _ = BangumiApi.BgmOAuth.CheckToken()
+                    .ContinueWith(t =>
+                    {
+                        if (!t.Result)
+                        {
+                            // 授权过期，返回登录界面
+                            MainPage.RootFrame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
+                        }
+                    });
             }
-            catch (BgmUnauthorizedException)
+            else
             {
-                // 授权过期，返回登录界面
-                MainPage.RootFrame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
+                LoginButton.Label = "登录";
+                UserIcon.Glyph = "\uEE57";
+                RootFrame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
             }
         }
 

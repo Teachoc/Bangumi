@@ -1,4 +1,5 @@
-﻿using Bangumi.Data;
+﻿using Bangumi.Api;
+using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.ViewModels;
 using System;
@@ -31,15 +32,16 @@ namespace Bangumi.Views
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             MainPage.RootPage.RefreshButton.Click += ProgressPageRefresh;
-            if (!ViewModel.IsLoading)
+            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsLoading)
             {
                 if (ViewModel.WatchingCollection.Count == 0)
                 {
-                    await ViewModel.LoadWatchingListAsync(Api.BangumiApi.RequestType.All);
+                    ViewModel.PopulateWatchingListFromCache();
+                    await ViewModel.PopulateWatchingListAsync();
                 }
                 else
                 {
-                    await ViewModel.LoadWatchingListAsync(Api.BangumiApi.RequestType.CacheOnly);
+                    ViewModel.PopulateWatchingListFromCache();
                 }
             }
         }
@@ -56,7 +58,7 @@ namespace Bangumi.Views
                 var tag = button.Tag;
                 if (tag.Equals("进度"))
                 {
-                    await ViewModel.LoadWatchingListAsync(Api.BangumiApi.RequestType.TaskOnly);
+                    await ViewModel.PopulateWatchingListAsync();
                 }
             }
         }

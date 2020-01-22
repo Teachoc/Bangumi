@@ -50,7 +50,7 @@ namespace Bangumi.Views
             MainPage.RootPage.MyCommandBar.IsDynamicOverflowEnabled = false;
             MainPage.RootPage.MyCommandBar.IsDynamicOverflowEnabled = true;
 
-            if (BangumiApi.IsLogin)
+            if (BangumiApi.BgmOAuth.IsLogin)
             {
                 if (HomePagePivot.Items.Cast<PivotItem>().All(p => p.Name != "CollectionItem"))
                 {

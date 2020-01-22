@@ -41,13 +41,9 @@ namespace Bangumi.Views
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Wait, 10);
             await OAuthHelper.Authorize();
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 10);
-            if (BangumiApi.IsLogin)
+            if (BangumiApi.BgmOAuth.IsLogin)
             {
                 MainPage.RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
-            }
-            else
-            {
-                NotificationHelper.Notify("登录失败，请重试！", NotificationHelper.NotifyType.Error);
             }
         }
 

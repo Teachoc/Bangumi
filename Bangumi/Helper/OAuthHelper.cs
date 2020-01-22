@@ -1,4 +1,5 @@
 ﻿using Bangumi.Api;
+using Bangumi.Api.Services;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -16,18 +17,18 @@ namespace Bangumi.Helper
         {
             try
             {
-                string url = $"{BangumiApi.OAuthBaseUrl}/authorize?client_id={BangumiApi.ClientId}&response_type=code";
+                string url = $"{BgmOAuth.OAuthHOST}/authorize?client_id={BgmOAuth.ClientId}&response_type=code";
 
                 Uri startUri = new Uri(url);
                 // When using the desktop flow, the success code is displayed in the html title of this end uri
-                Uri endUri = new Uri($"{BangumiApi.OAuthBaseUrl}/{BangumiApi.RedirectUrl}");
+                Uri endUri = new Uri($"{BgmOAuth.OAuthHOST}/{BgmOAuth.RedirectUrl}");
 
                 //rootPage.NotifyUser("Navigating to: " + GoogleURL, NotifyType.StatusMessage);
 
                 WebAuthenticationResult webAuthenticationResult = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, startUri, endUri);
                 if (webAuthenticationResult.ResponseStatus == WebAuthenticationStatus.Success)
                 {
-                    await BangumiApi.GetTokenAsync(webAuthenticationResult.ResponseData.Replace($"{BangumiApi.OAuthBaseUrl}/{BangumiApi.RedirectUrl}?code=", ""));
+                    await BangumiApi.BgmOAuth.GetToken(webAuthenticationResult.ResponseData.Replace($"{BgmOAuth.OAuthHOST}/{BgmOAuth.RedirectUrl}?code=", ""));
                 }
                 else if (webAuthenticationResult.ResponseStatus == WebAuthenticationStatus.ErrorHttp)
                 {
@@ -40,7 +41,9 @@ namespace Bangumi.Helper
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.Message);
+                Debug.WriteLine("换取Token失败。");
+                Debug.WriteLine(e.StackTrace);
+                NotificationHelper.Notify(e.StackTrace, NotificationHelper.NotifyType.Error);
                 //var msgDialog = new Windows.UI.Popups.MessageDialog("登录失败，请重试！\n" + e.Message) { Title = "登录失败！" };
                 //msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("确定"));
                 //await msgDialog.ShowAsync();

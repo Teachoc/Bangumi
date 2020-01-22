@@ -1,4 +1,5 @@
 ﻿using Bangumi.Api;
+using Bangumi.Api.Common;
 using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.Facades;
@@ -90,14 +91,13 @@ namespace Bangumi.ViewModels
         {
             try
             {
-                var timeLine = BangumiApi.GetBangumiTimelineAsync();
                 int day = GetDayOfWeek();
                 if (TimeLineCollection.Count == 0)
                 {
-                    ProcessTimeLine(timeLine.Item1);
+                    ProcessTimeLine(BangumiApi.BgmCache.Calendar());
                 }
 
-                await timeLine.Item2
+                await BangumiApi.BgmApi.Calendar()
                     .ContinueWith(t =>
                     {
                         if (!t.Result.SequenceEqualExT(TimeLineCollection.OrderBy(b => b.Weekday.Id).ToList()))

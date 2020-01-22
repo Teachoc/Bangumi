@@ -176,7 +176,7 @@ namespace Bangumi.Common
                 return "尚未放送";
             if (eps != null)
             {
-                return eps.Count == updatedEps ? "全" + updatedEps + "话" : "更新到" + updatedEps + "话";
+                return eps.Count(ep => ep.Type == 0) == updatedEps ? "全" + updatedEps + "话" : "更新到" + updatedEps + "话";
             }
             return "共" + updatedEps + "话";
         }
