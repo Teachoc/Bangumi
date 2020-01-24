@@ -29,30 +29,27 @@ namespace Bangumi.Data
         /// </summary>
         /// <param name="dataFolderPath">文件夹路径</param>
         /// <param name="useBiliApp">是否将链接转换为使用 哔哩哔哩动画 启动协议</param>
-        public static async Task Init(string dataFolderPath, bool useBiliApp = false)
+        public static void Init(string dataFolderPath, bool useBiliApp = false)
         {
             _folderPath = dataFolderPath ?? throw new ArgumentNullException(nameof(dataFolderPath));
             UseBiliApp = useBiliApp;
             if (!Directory.Exists(_folderPath))
                 Directory.CreateDirectory(_folderPath);
-            if (_dataSet == null &&
-                File.Exists(AppFile.Data_json.GetFilePath(_folderPath)) &&
-                File.Exists(AppFile.Version.GetFilePath(_folderPath)))
+            Task.Run(async () =>
             {
-                _dataSet = JsonConvert.DeserializeObject<BangumiDataSet>(await FileHelper.ReadTextAsync(AppFile.Data_json.GetFilePath(_folderPath)));
-                Version = await FileHelper.ReadTextAsync(AppFile.Version.GetFilePath(_folderPath));
-            }
-            if (_seasonIdMap == null)
-            {
-                if (File.Exists(AppFile.Map_json.GetFilePath(_folderPath)))
+                if (_dataSet == null &&
+                    File.Exists(AppFile.Data_json.GetFilePath(_folderPath)) &&
+                    File.Exists(AppFile.Version.GetFilePath(_folderPath)))
                 {
-                    _seasonIdMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(await FileHelper.ReadTextAsync(AppFile.Map_json.GetFilePath(_folderPath)));
+                    _dataSet = JsonConvert.DeserializeObject<BangumiDataSet>(await FileHelper.ReadTextAsync(AppFile.Data_json.GetFilePath(_folderPath)));
+                    Version = await FileHelper.ReadTextAsync(AppFile.Version.GetFilePath(_folderPath));
+                    if (File.Exists(AppFile.Map_json.GetFilePath(_folderPath)))
+                    {
+                        _seasonIdMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(await FileHelper.ReadTextAsync(AppFile.Map_json.GetFilePath(_folderPath)));
+                    }
+                    _seasonIdMap ??= new Dictionary<string, string>();
                 }
-                else
-                {
-                    _seasonIdMap = new Dictionary<string, string>();
-                }
-            }
+            }).Wait();
         }
 
 
@@ -62,7 +59,7 @@ namespace Bangumi.Data
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static string GetAirTimeByBangumiId(string id)
+        public static DateTime? GetAirTimeByBangumiId(string id)
         {
             var siteList = _dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
                                           .Where(s => _dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
@@ -72,8 +69,7 @@ namespace Bangumi.Data
             {
                 if (!(siteList.FirstOrDefault(s => s.SiteName == siteName) is Site site)) continue;
                 if (!(site.Begin is DateTime d)) continue;
-                d = d.ToLocalTime();
-                return $"{System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetDayName(d.DayOfWeek)} {d.TimeOfDay:hh\\:mm}";
+                return d.ToLocalTime();
             }
 
             return null;

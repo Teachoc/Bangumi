@@ -121,6 +121,24 @@ namespace Bangumi.Common
         }
 
         /// <summary>
+        /// 获取日期为星期几
+        /// </summary>
+        /// <param name="day"></param>
+        /// <returns></returns>
+        public static string GetWeekday(string dateTime)
+        {
+            if (DateTime.TryParse(dateTime, out var d))
+            {
+                if (dateTime.Length > 10)
+                {
+                    return $"{System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetDayName(d.DayOfWeek)} {d.TimeOfDay:hh\\:mm}";
+                }
+                return System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetDayName(d.DayOfWeek);
+            }
+            return string.Empty;
+        }
+
+        /// <summary>
         /// 获取星期的中文
         /// </summary>
         /// <param name="day"></param>

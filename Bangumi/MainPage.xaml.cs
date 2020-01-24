@@ -85,8 +85,8 @@ namespace Bangumi
             if (SettingHelper.UseBangumiData)
             {
                 // 初始化 BangumiData 对象
-                _ = BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
-                                     SettingHelper.UseBiliApp);
+                BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
+                                 SettingHelper.UseBiliApp);
             }
         }
 

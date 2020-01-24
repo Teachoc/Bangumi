@@ -164,7 +164,7 @@ namespace Bangumi.Api.Services
             {
                 _cache.Status.AddOrUpdate(subjectId, subjectStatus, (key, value) => subjectStatus);
                 // 若状态不是在做，则从进度中删除
-                if (subjectStatus.Status.Id != (int)CollectionStatusEnum.Do)
+                if (subjectStatus.Status?.Id != (int)CollectionStatusEnum.Do)
                 {
                     _cache.Watching.RemoveAll(w => w.SubjectId.ToString() == subjectId);
                 }

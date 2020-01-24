@@ -50,7 +50,7 @@
                                Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
                     <TextBlock Name="AirWeekdayTextBlock"
-                               Text="{x:Bind AirTime}" 
+                               Text="{x:Bind common:Converters.GetWeekday(AirTime)}" 
                                x:Phase="1"
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="TitleTextBlock"
@@ -172,7 +172,7 @@
                              FontSize="16"/>
                     </TextBlock>
                     <TextBlock Name="AirWeekdayTextBlock"
-                               Text="{x:Bind AirTime}" 
+                               Text="{x:Bind common:Converters.GetWeekday(AirTime)}" 
                                x:Phase="1"
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="TitleTextBlock"

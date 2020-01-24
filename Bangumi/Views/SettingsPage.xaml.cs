@@ -90,8 +90,8 @@ namespace Bangumi.Views
                         if(SettingHelper.UseBangumiData)
                         {
                             // 获取数据版本
-                            await BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
-                                                   SettingHelper.UseBiliApp);
+                            BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
+                                             SettingHelper.UseBiliApp);
                             BangumiDataTextBlock.Text = "数据版本：" +
                                 (string.IsNullOrEmpty(BangumiData.Version) ?
                                 "无数据" :

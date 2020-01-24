@@ -247,9 +247,9 @@ namespace Bangumi.ViewModels
                 WatchedEps = w.EpStatus,
                 UpdatedEps = w.Subject.EpsCount,
                 AirTime = SettingHelper.UseBangumiDataAirTime
-                    ? BangumiData.GetAirTimeByBangumiId(w.SubjectId.ToString())
-                    ?? Converters.GetWeekday(w.Subject.AirWeekday)
-                    : Converters.GetWeekday(w.Subject.AirWeekday),
+                    ? BangumiData.GetAirTimeByBangumiId(w.SubjectId.ToString())?.ToString("yyyy-MM-dd HH:mm")
+                    ?? w.Subject.AirDate
+                    : w.Subject.AirDate,
                 Type = w.Subject.Type,
                 IsUpdating = false,
             };
@@ -276,7 +276,8 @@ namespace Bangumi.ViewModels
                         Sort = ep.Sort,
                         Status = ep.Status,
                         Type = ep.Type,
-                        Name = ep.NameCn == "" ? ep.Name : ep.NameCn
+                        Name = ep.NameCn == "" ? ep.Name : ep.NameCn,
+                        AirDate = DateTime.TryParse(ep.AirDate, out var d) ? d : d
                     };
                     item.Eps.Add(simpleEp);
                 }
@@ -402,14 +403,26 @@ namespace Bangumi.ViewModels
             return watchingStatuses.OrderBy(p => p.EpColor)
                                    .ThenBy(p => p.WatchedEps == 0)
                                    .ThenBy(p => p.UpdatedEps - p.WatchedEps)
-                                   .ThenBy(p => p.LastTouch)
+                                   .ThenBy(p => p.Eps?.LastOrDefault(ep => ep.Type == 0 && !Regex.IsMatch(ep.Status, "(NA)")).AirDate)
+                                   .ThenBy(p =>
+                                   {
+                                       if (DateTime.TryParse(p.AirTime, out var airTime))
+                                       {
+                                           var first = p.Eps?.FirstOrDefault(ep => ep.Type == 0).AirDate;
+                                           var last = p.Eps?.LastOrDefault(ep => ep.Type == 0 && !Regex.IsMatch(ep.Status, "(NA)")).AirDate;
+                                           if (first != null && last != null)
+                                           {
+                                               return airTime.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks);
+                                           }
+                                       }
+                                       return airTime;
+                                   })
                                    .ToList();
         }
 
         #endregion
 
     }
-
 
 
     public class WatchStatus : ViewModelBase
@@ -498,6 +511,7 @@ namespace Bangumi.ViewModels
         public double Sort { get; set; }
         public string Status { get; set; }
         public string Name { get; set; }
+        public DateTime AirDate { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -512,7 +526,8 @@ namespace Bangumi.ViewModels
                    Type == s.Type &&
                    Sort == s.Sort &&
                    Status.EqualsExT(s.Status) &&
-                   Name.EqualsExT(s.Name);
+                   Name.EqualsExT(s.Name) &&
+                   AirDate.EqualsExT(s.AirDate);
         }
 
         // override object.GetHashCode
