@@ -10,12 +10,11 @@ namespace Bangumi.Api.Models
     public class SubjectStatus
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public CollectionStatusEnum Id { get; set; }
 
         [JsonProperty("type")]
         public string Type { get; set; }
 
-        [Obsolete("Use Type or Id instead.")]
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -35,7 +34,7 @@ namespace Bangumi.Api.Models
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return Id;
+            return (int)Id;
         }
     }
 }

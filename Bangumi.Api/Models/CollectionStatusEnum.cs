@@ -10,7 +10,6 @@ namespace Bangumi.Api.Models
         Collect = 2,
         Do = 3,
         OnHold = 4,
-        Dropped = 5,
-        No,
+        Dropped = 5
     }
 }

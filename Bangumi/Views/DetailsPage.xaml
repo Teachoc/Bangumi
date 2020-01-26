@@ -19,10 +19,6 @@
 
     <Page.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Dictionary1.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-            
             <MenuFlyout x:Name="EpMenuFlyout">
                 <MenuFlyoutItem Click="UpdateEpStatusMenuFlyoutItem_Click" 
                                 Text="看过"

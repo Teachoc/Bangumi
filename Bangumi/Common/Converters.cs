@@ -1,6 +1,7 @@
 ﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 using Bangumi.Api.Models;
+using Bangumi.Api.Common;
 using System.Collections.Generic;
 using System.Linq;
 using System;
@@ -85,8 +86,7 @@ namespace Bangumi.Common
         /// <returns></returns>
         public static string ConvertJsTickToDateTime(long dateTime)
         {
-            // 默认 DateTime 使用 UTC 时间
-            return new DateTime(1970, 1, 1).Add(new TimeSpan(long.Parse(dateTime + "0000000"))).ToLocalTime().ToString();
+            return dateTime.ToDateTime().ToString("yyyy-MM-dd HH:mm"); ;
         }
 
         /// <summary>
@@ -94,36 +94,15 @@ namespace Bangumi.Common
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static string GetSubjectTypeName(int type)
+        public static string GetSubjectTypeName(SubjectTypeEnum type)
         {
-            string cn = string.Empty;
-            switch (type)
-            {
-                case 1:
-                    cn = "书籍";
-                    break;
-                case 2:
-                    cn = "动画";
-                    break;
-                case 3:
-                    cn = "音乐";
-                    break;
-                case 4:
-                    cn = "游戏";
-                    break;
-                case 6:
-                    cn = "三次元";
-                    break;
-                default:
-                    break;
-            }
-            return cn;
+            return type.GetDescCn();
         }
 
         /// <summary>
         /// 获取日期为星期几
         /// </summary>
-        /// <param name="day"></param>
+        /// <param name="dateTime"></param>
         /// <returns></returns>
         public static string GetWeekday(string dateTime)
         {
@@ -136,6 +115,41 @@ namespace Bangumi.Common
                 return System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetDayName(d.DayOfWeek);
             }
             return string.Empty;
+        }
+
+        /// <summary>
+        /// 根据收藏状态返回不同颜色
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        public static SolidColorBrush GetSolidColorBrush(CollectionStatusEnum? status)
+        {
+            switch (status)
+            {
+                case CollectionStatusEnum.Wish:
+                    return (SolidColorBrush)Application.Current.Resources["WishBackground"];
+                case CollectionStatusEnum.Collect:
+                    return (SolidColorBrush)Application.Current.Resources["CollectBackground"];
+                case CollectionStatusEnum.Do:
+                    return (SolidColorBrush)Application.Current.Resources["DoBackground"];
+                case CollectionStatusEnum.OnHold:
+                    return (SolidColorBrush)Application.Current.Resources["OnHoldBackground"];
+                case CollectionStatusEnum.Dropped:
+                    return (SolidColorBrush)Application.Current.Resources["DroppedBackground"];
+                default:
+                    return (SolidColorBrush)Application.Current.Resources["DoBackground"];
+            }
+        }
+
+        /// <summary>
+        /// 根据收藏状态返回描述
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="subjectType"></param>
+        /// <returns></returns>
+        public static string GetDesc(CollectionStatusEnum? status, SubjectTypeEnum subjectType = SubjectTypeEnum.Anime)
+        {
+            return status?.GetDescCn(subjectType) ?? string.Empty;
         }
 
         /// <summary>
@@ -249,14 +263,15 @@ namespace Bangumi.Common
         }
 
         /// <summary>
-        /// 返回 a / b 的形式字符串
+        /// 返回 a{splitter}b 的形式字符串
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
+        /// <param name="splitter">分隔符</param>
         /// <returns></returns>
-        public static string GetProgress(int a, int b)
+        public static string Split(object a, object b, string splitter)
         {
-            return $"{a} / {b}";
+            return $"{a}{splitter}{b}";
         }
 
         /// <summary>

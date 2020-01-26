@@ -16,10 +16,6 @@
 
     <Page.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Dictionary1.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-
             <!-- 右键放送站点菜单 -->
             <MenuFlyout x:Name="SitesMenuFlyout"/>
 
@@ -45,6 +41,7 @@
                     <TextBlock Name="TitleTextBlock"
                                Text="{x:Bind NameCn}" 
                                FontSize="14" 
+                               ToolTipService.ToolTip="{x:Bind common:Converters.Split(NameCn, Name, '\\n'), Mode=OneWay}"
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.AlignTopWithPanel="True"
                                Foreground="{StaticResource BangumiPinkBrush}"
@@ -108,13 +105,13 @@
                                    Text="{x:Bind common:Converters.GetEpNextSortDesc(NextEp,Eps), Mode=OneWay}">
                         </TextBlock>
                     </Button>
-                
-                    <ProgressBar Maximum="{x:Bind Eps.Count, Mode=OneWay}"
+
+                    <ProgressBar Maximum="{x:Bind EpsCount, Mode=OneWay}"
                                  Value="{x:Bind WatchedEps, Mode=OneWay}"
                                  Width="{Binding ElementName=BangumiImage, Path=Width}"
                                  RelativePanel.Below="BangumiImage"
                                  RelativePanel.AlignLeftWithPanel="True"
-                                 ToolTipService.ToolTip="{x:Bind common:Converters.GetProgress(WatchedEps, Eps.Count), Mode=OneWay}"
+                                 ToolTipService.ToolTip="{x:Bind common:Converters.Split(WatchedEps, EpsCount, ' / '), Mode=OneWay}"
                                  Margin="0,1,0,0"
                                  Background="{ThemeResource SystemChromeHighColor}"
                                  Foreground="{StaticResource BangumiPinkBrush}" />
@@ -161,6 +158,7 @@
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.AlignTopWithPanel="True"
                                MaxLines="2"
+                               ToolTipService.ToolTip="{x:Bind common:Converters.Split(NameCn, Name, '\\n'), Mode=OneWay}"
                                TextTrimming="CharacterEllipsis"
                                TextWrapping="Wrap">
                         <Run Text="{x:Bind NameCn}"
@@ -231,12 +229,12 @@
                         </TextBlock>
                     </Button>
 
-                    <ProgressBar Maximum="{x:Bind Eps.Count, Mode=OneWay}"
+                    <ProgressBar Maximum="{x:Bind EpsCount, Mode=OneWay}"
                                  Value="{x:Bind WatchedEps, Mode=OneWay}"
                                  Width="{Binding ElementName=BangumiImage, Path=Width}"
                                  RelativePanel.Below="BangumiImage"
                                  RelativePanel.AlignLeftWithPanel="True"
-                                 ToolTipService.ToolTip="{x:Bind common:Converters.GetProgress(WatchedEps, Eps.Count), Mode=OneWay}"
+                                 ToolTipService.ToolTip="{x:Bind common:Converters.Split(WatchedEps, EpsCount, ' / '), Mode=OneWay}"
                                  Margin="0,1,0,0"
                                  Background="{ThemeResource SystemChromeHighColor}"
                                  Foreground="{StaticResource BangumiPinkBrush}" />

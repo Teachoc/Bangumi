@@ -194,6 +194,36 @@ namespace Bangumi.Api.Services
         }
 
         /// <summary>
+        /// 获取指定条目收藏信息，批量。
+        /// </summary>
+        /// <param name="subjectId"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, SubjectStatus>> Status(IEnumerable<string> subjectIds)
+        {
+            Dictionary<string, SubjectStatus> status = new Dictionary<string, SubjectStatus>();
+            for (int i = 0; i < subjectIds.Count(); i += 20)
+            {
+                await $"{HOST}/user/{_bgmOAuth.MyToken.UserId}/collection"
+                    .SetQueryParams(new
+                    {
+                        ids = string.Join(",", subjectIds.Skip(i).Take(20))
+                    })
+                    .GetAsync()
+                    .ReceiveJson<Dictionary<string, SubjectStatus>>()
+                    .ContinueWith(t =>
+                    {
+                        if (t.Result == null) return;
+                        foreach (var item in t.Result)
+                        {
+                            status.Add(item.Key, item.Value);
+                            _bgmCache.UpdateStatus(item.Key, item.Value);
+                        }
+                    }, TaskContinuationOptions.OnlyOnRanToCompletion);
+            }
+            return status;
+        }
+
+        /// <summary>
         /// 获取用户指定条目收视进度。
         /// </summary>
         /// <param name="subject_id"></param>

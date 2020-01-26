@@ -15,7 +15,7 @@ namespace Bangumi.Api.Models
         public string Url { get; set; }
 
         [JsonProperty("type")]
-        public int Type { get; set; }
+        public SubjectTypeEnum Type { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }

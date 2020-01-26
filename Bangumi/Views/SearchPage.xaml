@@ -16,10 +16,6 @@
 
     <Page.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Dictionary1.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-
             <MenuFlyout x:Name="CollectionMenuFlyout">
                 <MenuFlyoutItem Name="WishMenuFlyoutItem"
                                 Click="UpdateCollectionStatusMenuFlyoutItem_Click" 
@@ -68,20 +64,34 @@
                                FontSize="14" 
                                Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="SubTitleTextBlock" Text="{x:Bind Name}" 
+                    <TextBlock Name="SubTitleTextBlock"
+                               Text="{x:Bind Name}" 
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="TitleTextBlock"
                                x:Phase="1"
                                FontSize="12"
                                Foreground="Gray"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
+                    <TextBlock Name="TypeTextBlock"
+                               Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="SubTitleTextBlock"
                                x:Phase="1"
                                FontSize="12" 
                                Foreground="Gray"
                                TextTrimming="CharacterEllipsis"/>
+                    <Border Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
+                            Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
+                            RelativePanel.RightOf="BangumiImage"
+                            RelativePanel.Below="TypeTextBlock"
+                            CornerRadius="8">
+                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
+                                   x:Phase="1"
+                                   Margin="5,0"
+                                   FontSize="12"
+                                   Foreground="White"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
                 </RelativePanel>
             </DataTemplate>
 
@@ -110,20 +120,34 @@
                                FontSize="20" 
                                Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="SubTitleTextBlock" Text="{x:Bind Name}" 
+                    <TextBlock Name="SubTitleTextBlock"
+                               Text="{x:Bind Name}" 
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="TitleTextBlock"
                                x:Phase="1"
                                FontSize="16"
                                Foreground="Gray"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
+                    <TextBlock Name="TypeTextBlock"
+                               Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="SubTitleTextBlock"
                                x:Phase="1"
                                FontSize="16" 
                                Foreground="Gray"
                                TextTrimming="CharacterEllipsis"/>
+                    <Border Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
+                            Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
+                            RelativePanel.RightOf="BangumiImage"
+                            RelativePanel.Below="TypeTextBlock"
+                            CornerRadius="10">
+                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
+                                   x:Phase="1"
+                                   Margin="6,0"
+                                   FontSize="16"
+                                   Foreground="White"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
                 </RelativePanel>
             </DataTemplate>
 
@@ -152,13 +176,26 @@
                                FontSize="14" 
                                Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{x:Bind Name}" 
+                    <TextBlock Name="SubTitleTextBlock"
+                               Text="{x:Bind Name}" 
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="TitleTextBlock"
                                x:Phase="1"
                                FontSize="12"
                                Foreground="Gray"
                                TextTrimming="CharacterEllipsis"/>
+                    <Border Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
+                            Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
+                            RelativePanel.RightOf="BangumiImage"
+                            RelativePanel.Below="SubTitleTextBlock"
+                            CornerRadius="8">
+                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
+                                   x:Phase="1"
+                                   Margin="5,0"
+                                   FontSize="12"
+                                   Foreground="White"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
                 </RelativePanel>
             </DataTemplate>
 
@@ -187,13 +224,26 @@
                                FontSize="20" 
                                Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{x:Bind Name}" 
+                    <TextBlock Name="SubTitleTextBlock"
+                               Text="{x:Bind Name}" 
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="TitleTextBlock"
                                x:Phase="1"
                                FontSize="16"
                                Foreground="Gray"
                                TextTrimming="CharacterEllipsis"/>
+                    <Border Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
+                            Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
+                            RelativePanel.RightOf="BangumiImage"
+                            RelativePanel.Below="SubTitleTextBlock"
+                            CornerRadius="10">
+                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
+                                   x:Phase="1"
+                                   Margin="6,0"
+                                   FontSize="16"
+                                   Foreground="White"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
                 </RelativePanel>
             </DataTemplate>
         </ResourceDictionary>

@@ -92,9 +92,9 @@ namespace Bangumi.ViewModels
 
             // 由于服务器原因，导致条目在多个类别下出现，则有不属于同一类别的存在，则进行更新
             var cols = SubjectCollection.Where(sub => sub.Items.FirstOrDefault(it => it.SubjectId == subject.SubjectId) != null).ToList();
-            if (cols.All(c => c.Status.Name == collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type)))
+            if (cols.All(c => c.Status.Id == collectionStatus))
                 return;
-            var col = cols.FirstOrDefault(c => c.Status.Name != collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type));
+            var col = cols.FirstOrDefault(c => c.Status.Id != collectionStatus);
             IsUpdating = true;
             if (await BangumiFacade.UpdateCollectionStatusAsync(subject.SubjectId.ToString(), collectionStatus))
             {
@@ -109,7 +109,7 @@ namespace Bangumi.ViewModels
                         SubjectCollection.Insert(index, col);
                     // 找到新所属类别，有则加入，无则新增
                     var newCol = SubjectCollection.FirstOrDefault(sub =>
-                        sub.Status.Name == collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type));
+                        sub.Status.Id == collectionStatus);
                     if (newCol != null)
                     {
                         newCol.Items.Insert(0, subject);
@@ -124,7 +124,11 @@ namespace Bangumi.ViewModels
                         {
                             Items = new List<Subject2>() { subject },
                             Status = new SubjectStatus()
-                            { Name = collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type) },
+                            {
+                                Id = collectionStatus,
+                                Type = collectionStatus.GetValue(),
+                                Name = collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type)
+                            },
                             Count = 1
                         };
                         SubjectCollection.Add(newCol);
@@ -143,7 +147,7 @@ namespace Bangumi.ViewModels
         private async Task PopulateSubjectCollectionAsync(ObservableCollection<Collection> subjectCollection, SubjectTypeEnum subjectType)
         {
             try
-            {               
+            {
                 Collection2 cache = BangumiApi.BgmCache.Collections(subjectType);
                 if (cache != null && !cache.Collects.SequenceEqualExT(subjectCollection.ToList()))
                 {

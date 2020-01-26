@@ -16,6 +16,7 @@ namespace Bangumi.Api.Services
         internal Subject UpdateSubject(string key, Subject value);
         internal Subject UpdateSubjectEp(string key, Subject value);
         internal SubjectStatus2 UpdateStatus(string key, SubjectStatus2 value);
+        internal SubjectStatus UpdateStatus(string key, SubjectStatus value);
         internal Progress UpdateProgress(string key, Progress value);
         internal void UpdateProgress(int key, EpStatusEnum value);
         internal List<BangumiTimeLine> UpdateCalendar(List<BangumiTimeLine> value);

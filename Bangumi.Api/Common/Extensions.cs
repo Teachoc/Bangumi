@@ -21,6 +21,18 @@ namespace Bangumi.Api.Common
         }
 
         /// <summary>
+        /// 将js时间戳转换为C#时间戳
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static DateTime ToDateTime(this long dateTime)
+        {
+            // C# 时间戳为 1/10000000 秒，从0001年1月1日开始；Bangumi 使用的时间戳为秒，从1970年1月1日开始
+            // 默认 DateTime 使用 UTC 时间
+            return new DateTime(1970, 1, 1).Add(new TimeSpan(long.Parse(dateTime + "0000000"))).ToLocalTime();
+        }
+
+        /// <summary>
         /// 若网址是https的则直接返回，否则将http替换为https后返回
         /// </summary>
         /// <param name="http"></param>

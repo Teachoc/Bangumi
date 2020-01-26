@@ -69,61 +69,62 @@ namespace Bangumi.ViewModels
                 }
             }
             // 内容有变更
-            await BangumiApi.BgmApi.Watching().ContinueWith(async t =>
-            {
-                var subjectTasks = new List<Task<Subject>>();
-                var progressTasks = new List<Task<Progress>>();
-                Subject[] newSubjects = null;
-                Progress[] newProgresses = null;
-                var watchingsNotCached = BangumiApi.BgmCache.IsUpdatedToday ?
-                                         t.Result.Where(it => cachedWatchings.All(it2 => !it2.EqualsExT(it))).ToList() :
-                                         t.Result;
-                using (var semaphore = new SemaphoreSlim(10))
+            await BangumiApi.BgmApi.Watching()
+                .ContinueWith(async t =>
                 {
-                    foreach (var item in watchingsNotCached)
+                    var subjectTasks = new List<Task<Subject>>();
+                    var progressTasks = new List<Task<Progress>>();
+                    Subject[] newSubjects = null;
+                    Progress[] newProgresses = null;
+                    var watchingsNotCached = BangumiApi.BgmCache.IsUpdatedToday ?
+                                             t.Result.Where(it => cachedWatchings.All(it2 => !it2.EqualsExT(it))).ToList() :
+                                             t.Result;
+                    using (var semaphore = new SemaphoreSlim(10))
                     {
-                        await semaphore.WaitAsync();
-                        subjectTasks.Add(BangumiApi.BgmApi.SubjectEp(item.SubjectId.ToString())
-                            .ContinueWith(t =>
-                            {
-                                semaphore.Release();
-                                return t.Result;
-                            }));
-                        await semaphore.WaitAsync();
-                        progressTasks.Add(BangumiApi.BgmApi.Progress(item.SubjectId.ToString())
-                            .ContinueWith(t =>
-                            {
-                                semaphore.Release();
-                                return t.Result;
-                            }));
+                        foreach (var item in watchingsNotCached)
+                        {
+                            await semaphore.WaitAsync();
+                            subjectTasks.Add(BangumiApi.BgmApi.SubjectEp(item.SubjectId.ToString())
+                                .ContinueWith(t =>
+                                {
+                                    semaphore.Release();
+                                    return t.Result;
+                                }));
+                            await semaphore.WaitAsync();
+                            progressTasks.Add(BangumiApi.BgmApi.Progress(item.SubjectId.ToString())
+                                .ContinueWith(t =>
+                                {
+                                    semaphore.Release();
+                                    return t.Result;
+                                }));
+                        }
+                        newSubjects = await Task.WhenAll(subjectTasks);
+                        newProgresses = await Task.WhenAll(progressTasks);
                     }
-                    newSubjects = await Task.WhenAll(subjectTasks);
-                    newProgresses = await Task.WhenAll(progressTasks);
-                }
-                foreach (var watching in t.Result)
-                {
-                    WatchStatus item;
-                    if (watchingsNotCached.Any(it => it.SubjectId == watching.SubjectId))
+                    foreach (var watching in t.Result)
                     {
-                        item = ProcessWatching(watching);
-                        ProcessSubject(item, newSubjects.FirstOrDefault(it => it.Id == item.SubjectId));
-                        ProcessProgress(item, newProgresses.FirstOrDefault(it => it?.SubjectId == item.SubjectId));
+                        WatchStatus item;
+                        if (watchingsNotCached.Any(it => it.SubjectId == watching.SubjectId))
+                        {
+                            item = ProcessWatching(watching);
+                            ProcessSubject(item, newSubjects.FirstOrDefault(it => it.Id == item.SubjectId));
+                            ProcessProgress(item, newProgresses.FirstOrDefault(it => it?.SubjectId == item.SubjectId));
+                        }
+                        else
+                        {
+                            item = cachedWatchList.Find(it => it.SubjectId == watching.SubjectId);
+                        }
+                        currentWatchList.Add(item);
                     }
-                    else
-                    {
-                        item = cachedWatchList.Find(it => it.SubjectId == watching.SubjectId);
-                    }
-                    currentWatchList.Add(item);
-                }
-                BangumiApi.BgmCache.IsUpdatedToday = true;
-            }).Unwrap();
+                    BangumiApi.BgmCache.IsUpdatedToday = true;
+                }, TaskContinuationOptions.OnlyOnRanToCompletion)
+                .Unwrap();
             DiffListToObservableCollection(WatchingCollection, CollectionSorting(currentWatchList));
             IsLoading = false;
         }
 
         public void PopulateWatchingListFromCache()
         {
-            IsLoading = true;
             var cachedWatchings = BangumiApi.BgmCache.Watching();
             var cachedWatchList = new List<WatchStatus>();
             // 加载缓存，后面获取新数据后比较需要使用
@@ -142,7 +143,6 @@ namespace Bangumi.ViewModels
                 }
             }
             DiffListToObservableCollection(WatchingCollection, CollectionSorting(cachedWatchList));
-            IsLoading = false;
         }
 
         /// <summary>
@@ -159,11 +159,12 @@ namespace Bangumi.ViewModels
                 Title = status.NameCn,
             };
             MainPage.RootPage.HasDialog = true;
-            if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync())
+            if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync() &&
+                collectionEditContentDialog.CollectionStatus != null)
             {
                 status.IsUpdating = true;
                 if (await BangumiFacade.UpdateCollectionStatusAsync(status.SubjectId.ToString(),
-                                                                    collectionEditContentDialog.CollectionStatus,
+                                                                    collectionEditContentDialog.CollectionStatus.Value,
                                                                     collectionEditContentDialog.Comment,
                                                                     collectionEditContentDialog.Rate.ToString(),
                                                                     collectionEditContentDialog.Privacy ? "1" : "0"))
@@ -403,13 +404,13 @@ namespace Bangumi.ViewModels
             return watchingStatuses.OrderBy(p => p.EpColor)
                                    .ThenBy(p => p.WatchedEps == 0)
                                    .ThenBy(p => p.UpdatedEps - p.WatchedEps)
-                                   .ThenBy(p => p.Eps?.LastOrDefault(ep => ep.Type == 0 && !Regex.IsMatch(ep.Status, "(NA)")).AirDate)
+                                   .ThenBy(p => p.Eps?.LastOrDefault(ep => ep.Type == 0 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate)
                                    .ThenBy(p =>
                                    {
                                        if (DateTime.TryParse(p.AirTime, out var airTime))
                                        {
-                                           var first = p.Eps?.FirstOrDefault(ep => ep.Type == 0).AirDate;
-                                           var last = p.Eps?.LastOrDefault(ep => ep.Type == 0 && !Regex.IsMatch(ep.Status, "(NA)")).AirDate;
+                                           var first = p.Eps?.FirstOrDefault(ep => ep.Type == 0)?.AirDate;
+                                           var last = p.Eps?.LastOrDefault(ep => ep.Type == 0 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate;
                                            if (first != null && last != null)
                                            {
                                                return airTime.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks);
@@ -433,8 +434,12 @@ namespace Bangumi.ViewModels
         public long LastTouch { get; set; }
         public string Url { get; set; }
         public string Image { get; set; }
-        public int Type { get; set; }
+        public SubjectTypeEnum Type { get; set; }
         public string AirTime { get; set; }
+        /// <summary>
+        /// 正片数量
+        /// </summary>
+        public int EpsCount { get => Eps.Count(ep => ep.Type == 0); }
         public List<SimpleEp> Eps { get; set; }
 
         private bool _isUpdating;

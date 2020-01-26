@@ -99,7 +99,7 @@ namespace Bangumi.Api.Models
             }
         }
 
-        public static CollectionStatusEnum FromValue(string status)
+        public static CollectionStatusEnum? FromValue(string status)
         {
             switch (status)
             {
@@ -114,7 +114,7 @@ namespace Bangumi.Api.Models
                 case "dropped":
                     return CollectionStatusEnum.Dropped;
                 default:
-                    return CollectionStatusEnum.No;
+                    return null;
             }
         }
     }

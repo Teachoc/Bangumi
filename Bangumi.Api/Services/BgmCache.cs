@@ -53,10 +53,7 @@ namespace Bangumi.Api.Services
                     _cache = new Cache();
                 }
             }
-            else
-            {
-                _cache = new Cache();
-            }
+            _cache ??= new Cache();
             // 启动定时器，定时将缓存写入文件，30 秒
             _timer = new Timer(TimerInterval);
             _timer.Elapsed += WriteCacheToFileTimer_Elapsed;
@@ -164,9 +161,33 @@ namespace Bangumi.Api.Services
             {
                 _cache.Status.AddOrUpdate(subjectId, subjectStatus, (key, value) => subjectStatus);
                 // 若状态不是在做，则从进度中删除
-                if (subjectStatus.Status?.Id != (int)CollectionStatusEnum.Do)
+                if (subjectStatus.Status?.Id != CollectionStatusEnum.Do)
                 {
                     _cache.Watching.RemoveAll(w => w.SubjectId.ToString() == subjectId);
+                }
+                else if (subjectStatus.Status?.Id == CollectionStatusEnum.Do &&
+                         _cache.Watching.All(w => w.SubjectId.ToString() != subjectId) &&
+                         _cache.Subject.TryGetValue(subjectId, out var subject) &&
+                         subject.Type == SubjectTypeEnum.Anime)
+                {
+                    _cache.Watching.Add(new Watching
+                    {
+                        SubjectId = subject.Id,
+                        LastTouch = DateTime.Now.ToJsTick(),
+                        Name = subject.Name,
+                        Subject = new Subject3
+                        {
+                            Id = subject.Id,
+                            Name = subject.Name,
+                            NameCn = subject.NameCn,
+                            Type = subject.Type,
+                            AirDate = subject.AirDate,
+                            AirWeekday = subject.AirWeekday,
+                            EpsCount = subject.EpsCount,
+                            Images = subject.Images,
+                            Url = subject.Url
+                        }
+                    });
                 }
             }
             else
@@ -176,6 +197,20 @@ namespace Bangumi.Api.Services
                 _cache.Watching.RemoveAll(w => w.SubjectId.ToString() == subjectId);
             }
             _isCacheUpdated = true;
+            return subjectStatus;
+        }
+
+        SubjectStatus IBgmCache.UpdateStatus(string subjectId, SubjectStatus subjectStatus)
+        {
+            if (subjectStatus != null)
+            {
+                _cache.Status.AddOrUpdate(subjectId, new SubjectStatus2 { Status = subjectStatus }, (key, value) =>
+                {
+                    value.Status = subjectStatus;
+                    return value;
+                });
+                _isCacheUpdated = true;
+            }
             return subjectStatus;
         }
 

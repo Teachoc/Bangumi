@@ -16,7 +16,7 @@ namespace Bangumi.Api.Models
         public string Url { get; set; }
 
         [JsonProperty("type")]
-        public int Type { get; set; }
+        public SubjectTypeEnum Type { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -38,6 +38,10 @@ namespace Bangumi.Api.Models
 
         [JsonProperty("rank")]
         public int Rank { get; set; }
+        /// <summary>
+        /// 用来保存当前用户的收藏状态
+        /// </summary>
+        public CollectionStatusEnum? Status { get; set; }
 
         [JsonProperty("rating")]
         public Rating Rating { get; set; }
@@ -93,6 +97,7 @@ namespace Bangumi.Api.Models
                    NameCn.EqualsExT(s.NameCn) &&
                    Summary.EqualsExT(s.Summary) &&
                    AirDate.EqualsExT(s.AirDate) &&
+                   Status.EqualsExT(s.Status) &&
                    Rating.EqualsExT(s.Rating) &&
                    Images.EqualsExT(s.Images) &&
                    Collection.EqualsExT(s.Collection) &&

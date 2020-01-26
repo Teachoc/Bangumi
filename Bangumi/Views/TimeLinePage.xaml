@@ -8,6 +8,7 @@
     xmlns:data="using:Bangumi.Api.Models"
     xmlns:wuxdata="using:Windows.UI.Xaml.Data"
     xmlns:common="using:Bangumi.Common"
+    xmlns:model="using:Bangumi.Api.Models"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     Loaded="Page_Loaded"
@@ -18,10 +19,6 @@
 
     <Page.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Dictionary1.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-
             <MenuFlyout x:Name="CollectionMenuFlyout">
                 <MenuFlyoutItem Click="UpdateCollectionStatusMenuFlyoutItem_Click" 
                                 Text="想看"
@@ -67,13 +64,26 @@
                                FontSize="14"
                                Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{x:Bind Name}"
+                    <TextBlock Name="SubTitleTextBlock"
+                               Text="{x:Bind Name}"
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="TitleTextBlock"
                                x:Phase="1"
                                FontSize="12"
                                Foreground="Gray"
                                TextTrimming="CharacterEllipsis"/>
+                    <Border Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
+                            Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
+                            RelativePanel.RightOf="BangumiImage"
+                            RelativePanel.Below="SubTitleTextBlock"
+                            CornerRadius="8">
+                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, model:SubjectTypeEnum.Anime)}"
+                                   x:Phase="1"
+                                   Margin="5,0"
+                                   FontSize="12"
+                                   Foreground="White"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
                 </RelativePanel>
             </DataTemplate>
 
@@ -96,19 +106,33 @@
                                       Width="85"
                                       Margin="0,0,10,0"
                                       Stretch="UniformToFill" />
-                    <TextBlock Name="TitleTextBlock" Text="{x:Bind NameCn}"
+                    <TextBlock Name="TitleTextBlock" 
+                               Text="{x:Bind NameCn}"
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.AlignTopWithPanel="True"
                                FontSize="20"
                                Foreground="{StaticResource BangumiPinkBrush}"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{x:Bind Name}"
+                    <TextBlock Name="SubTitleTextBlock"
+                               Text="{x:Bind Name}"
                                RelativePanel.RightOf="BangumiImage"
                                RelativePanel.Below="TitleTextBlock"
                                x:Phase="1"
                                FontSize="16"
                                Foreground="Gray"
                                TextTrimming="CharacterEllipsis"/>
+                    <Border Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
+                            Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
+                            RelativePanel.RightOf="BangumiImage"
+                            RelativePanel.Below="SubTitleTextBlock"
+                            CornerRadius="10">
+                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, model:SubjectTypeEnum.Anime)}"
+                                   x:Phase="1"
+                                   Margin="6,0"
+                                   FontSize="16"
+                                   Foreground="White"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
                 </RelativePanel>
             </DataTemplate>
 

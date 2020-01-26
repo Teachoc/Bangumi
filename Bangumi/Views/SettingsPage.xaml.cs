@@ -73,7 +73,7 @@ namespace Bangumi.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void SettingToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        private void SettingToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
             if (sender is ToggleSwitch toggleSwitch)
             {

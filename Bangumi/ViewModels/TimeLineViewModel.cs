@@ -98,13 +98,25 @@ namespace Bangumi.ViewModels
                 }
 
                 await BangumiApi.BgmApi.Calendar()
-                    .ContinueWith(t =>
+                    .ContinueWith(async t =>
                     {
+                        if (BangumiApi.BgmOAuth.IsLogin)
+                        {
+                            await BangumiApi.BgmApi.Status(t.Result.SelectMany(t => t.Items.Select(s => s.Id.ToString())));
+                            foreach (var item in t.Result)
+                            {
+                                foreach (var subject in item.Items)
+                                {
+                                    subject.Status = BangumiApi.BgmCache.Status(subject.Id.ToString())?.Status?.Id;
+                                }
+                            }
+                        }
                         if (!t.Result.SequenceEqualExT(TimeLineCollection.OrderBy(b => b.Weekday.Id).ToList()))
                         {
-                            DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessTimeLine(t.Result));
+                            await DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessTimeLine(t.Result));
                         }
-                    });
+                    }, TaskContinuationOptions.OnlyOnRanToCompletion).Unwrap();
+
 
                 // 处理时间表顺序
                 void ProcessTimeLine(List<BangumiTimeLine> timeLines)

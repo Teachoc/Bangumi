@@ -147,10 +147,10 @@ namespace Bangumi.ViewModels
         private int _myRate;
         private string _myComment;
         private bool _myPrivacy;
-        private CollectionStatusEnum _collectionStatus;
+        private CollectionStatusEnum? _collectionStatus;
         public string CollectionStatusText
         {
-            get => _collectionStatus.GetDescCn(SubjectType);
+            get => _collectionStatus?.GetDescCn(SubjectType);
             set => Set(ref _collectionStatus, CollectionStatusEnumEx.FromValue(value));
         }
 
@@ -210,18 +210,19 @@ namespace Bangumi.ViewModels
                 Title = this.NameCn,
             };
             MainPage.RootPage.HasDialog = true;
-            if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync())
+            if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync() &&
+                collectionEditContentDialog.CollectionStatus != null)
             {
                 IsUpdating = true;
                 IsStatusLoaded = false;
                 if (await BangumiFacade.UpdateCollectionStatusAsync(SubjectId,
-                    collectionEditContentDialog.CollectionStatus, collectionEditContentDialog.Comment,
+                    collectionEditContentDialog.CollectionStatus.Value, collectionEditContentDialog.Comment,
                     collectionEditContentDialog.Rate.ToString(), collectionEditContentDialog.Privacy ? "1" : "0"))
                 {
                     _myRate = collectionEditContentDialog.Rate;
                     _myComment = collectionEditContentDialog.Comment;
                     _myPrivacy = collectionEditContentDialog.Privacy;
-                    CollectionStatusText = collectionEditContentDialog.CollectionStatus.GetValue();
+                    CollectionStatusText = collectionEditContentDialog.CollectionStatus?.GetValue();
                     SetCollectionIcon();
                     // 若状态修改为看过，且设置启用，则批量修改章节状态为看过
                     if (_collectionStatus == CollectionStatusEnum.Collect && SettingHelper.EpsBatch)
@@ -317,7 +318,7 @@ namespace Bangumi.ViewModels
         /// </summary>
         private void SetCollectionIcon()
         {
-            if (CollectionStatusText == CollectionStatusEnum.No.GetValue())
+            if (CollectionStatusText == null)
             {
                 CollectionStatusIcon = "\uE006";
             }

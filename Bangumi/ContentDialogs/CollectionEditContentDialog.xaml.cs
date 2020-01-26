@@ -84,7 +84,7 @@ namespace Bangumi.ContentDialogs
             }
         }
 
-        public CollectionStatusEnum CollectionStatus { get; private set; }
+        public CollectionStatusEnum? CollectionStatus { get; private set; }
         private readonly Task<SubjectStatus2> SubjectStatusTask;
 
         public CollectionEditContentDialog(SubjectTypeEnum subjectType, Task<SubjectStatus2> subjectStatusTask)
@@ -127,13 +127,13 @@ namespace Bangumi.ContentDialogs
         {
             var subjectStatus = await SubjectStatusTask;
             IsLoading = false;
-            CollectionStatus = (CollectionStatusEnum)(subjectStatus.Status?.Id ?? (int)CollectionStatusEnum.No);
+            CollectionStatus = subjectStatus.Status?.Id;
             Rate = subjectStatus.Rating;
             Comment = subjectStatus.Comment;
             Privacy = subjectStatus.Private?.Equals("1") ?? false;
 
-            if (CollectionStatus != CollectionStatusEnum.No)
-                StatusPanel.Children.Cast<RadioButton>().FirstOrDefault(c => c?.Tag?.ToString() == CollectionStatus.GetValue()).IsChecked = true;
+            if (CollectionStatus != null)
+                StatusPanel.Children.Cast<RadioButton>().FirstOrDefault(c => c?.Tag?.ToString() == CollectionStatus?.GetValue()).IsChecked = true;
         }
     }
 }

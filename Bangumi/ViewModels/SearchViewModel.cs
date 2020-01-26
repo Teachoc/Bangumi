@@ -3,9 +3,11 @@ using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.Facades;
 using Bangumi.Helper;
+using Microsoft.Toolkit.Uwp.Helpers;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -207,19 +209,30 @@ namespace Bangumi.ViewModels
                         {
                             this.OnLoadMoreStarted(index);
                         }
-                        SearchResult result = await BangumiApi.BgmApi.Search(keyword, type, offset, 20);
-                        max = result.ResultCount;
-                        foreach (Subject item in result.Results)
-                        {
-                            Add(item);
-                        }
+                        await BangumiApi.BgmApi.Search(keyword, type, offset, 20)
+                            .ContinueWith(async t =>
+                            {
+                                if (BangumiApi.BgmOAuth.IsLogin)
+                                {
+                                    await BangumiApi.BgmApi.Status(t.Result.Results.Select(s => s.Id.ToString()));
+                                    foreach (var subject in t.Result.Results)
+                                    {
+                                        subject.Status = BangumiApi.BgmCache.Status(subject.Id.ToString())?.Status?.Id;
+                                    }
+                                }
+                                max = t.Result.ResultCount;
+                                foreach (Subject item in t.Result.Results)
+                                {
+                                    await DispatcherHelper.ExecuteOnUIThreadAsync(() => Add(item));
+                                }
+                                itemsCount += t.Result.Results.Count;
+                                offset += 20;
+                            }, TaskContinuationOptions.OnlyOnRanToCompletion)
+                            .Unwrap();
                         if (!HasMoreItems)
                         {
                             System.Diagnostics.Debug.WriteLine("Loading complete.");
                         }
-                        itemsCount += result.Results.Count;
-                        offset += 20;
-
                     }
                     catch (Exception e)
                     {

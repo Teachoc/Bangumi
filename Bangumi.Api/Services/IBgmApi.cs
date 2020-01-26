@@ -11,6 +11,7 @@ namespace Bangumi.Api.Services
         Task<Subject> Subject(string subjectId);
         Task<Subject> SubjectEp(string subjectId);
         Task<SubjectStatus2> Status(string subjectId);
+        Task<Dictionary<string, SubjectStatus>> Status(IEnumerable<string> subjectIds);
         Task<Progress> Progress(string subject_id);
         Task<List<BangumiTimeLine>> Calendar();
         Task<SubjectStatus2> UpdateStatus(string subjectId, 

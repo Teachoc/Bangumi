@@ -23,10 +23,6 @@
     <ContentDialog.Resources>
 
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="ms-appx:///Views/Dictionary1.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-
             <Style x:Key="CollectionStatusRadioButtonStyle" TargetType="RadioButton">
                 <Setter Property="Background" Value="{ThemeResource RadioButtonBackground}"/>
                 <Setter Property="Foreground" Value="{ThemeResource RadioButtonForeground}"/>
@@ -97,7 +93,7 @@
                 </Grid.ColumnDefinitions>
                 <RadioButton Name="WishRadio" 
                              Grid.Column="0" 
-                             Background="#ff7e8b" 
+                             Background="{StaticResource WishBackground}" 
                              Style="{StaticResource CollectionStatusRadioButtonStyle}" 
                              Content="想看" 
                              Tag="wish" 
@@ -106,7 +102,7 @@
                              AccessKey="A"/>
                 <RadioButton Name="CollectRadio" 
                              Grid.Column="1" 
-                             Background="#ffc34d" 
+                             Background="{StaticResource CollectBackground}" 
                              Style="{StaticResource CollectionStatusRadioButtonStyle}" 
                              Content="看过" 
                              Tag="collect" 
@@ -115,7 +111,7 @@
                              AccessKey="S"/>
                 <RadioButton Name="DoRadio" 
                              Grid.Column="2" 
-                             Background="#33c5f9" 
+                             Background="{StaticResource DoBackground}" 
                              Style="{StaticResource CollectionStatusRadioButtonStyle}" 
                              Content="在看" 
                              Tag="do" 
@@ -124,7 +120,7 @@
                              AccessKey="D"/>
                 <RadioButton Name="OnHoldRadio" 
                              Grid.Column="3" 
-                             Background="#cccccc" 
+                             Background="{StaticResource OnHoldBackground}" 
                              Style="{StaticResource CollectionStatusRadioButtonStyle}" 
                              Content="搁置" 
                              Tag="on_hold" 
@@ -133,7 +129,7 @@
                              AccessKey="F"/>
                 <RadioButton Name="DroppedRadio" 
                              Grid.Column="4" 
-                             Background="#9b9997" 
+                             Background="{StaticResource DroppedBackground}" 
                              Style="{StaticResource CollectionStatusRadioButtonStyle}" 
                              Content="抛弃" 
                              Tag="dropped" 
