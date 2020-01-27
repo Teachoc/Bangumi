@@ -359,34 +359,50 @@ namespace Bangumi.ViewModels
         {
             if (!origin.SequenceEqualExT(dest))
             {
-                // 检查原有列表中的项目是否还在，否则删除
-                for (int i = 0; i < origin.Count; i++)
-                {
-                    if (dest.Find(d => d.GetHashCode() == origin[i].GetHashCode()) == null)
-                    {
-                        origin.Remove(origin[i--]);
-                    }
-                }
-                // 添加新增的
+                int compareCount = 0;
                 for (int i = 0; i < dest.Count; i++)
                 {
-                    if (origin.Where(o => o.GetHashCode() == dest[i].GetHashCode()).FirstOrDefault() == null)
+                    bool insert = true;
+                    for (int j = i; j < origin.Count; j++)
+                    {
+                        compareCount++;
+                        if (dest[i].EqualsExT(origin[j]))
+                        {
+                            if (j != i)
+                            {
+                                origin.Move(j, i);
+                            }
+                            insert = false;
+                            break;
+                        }
+                        else
+                        {
+                            bool removed = true;
+                            for (int k = j; k < dest.Count; k++)
+                            {
+                                compareCount++;
+                                if (origin[j].EqualsExT(dest[k]))
+                                {
+                                    removed = false;
+                                    break;
+                                }
+                            }
+                            if (removed)
+                            {
+                                origin.RemoveAt(j--);
+                            }
+                        }
+                    }
+                    if (insert)
                     {
                         origin.Insert(i, dest[i]);
                     }
                 }
-                // 调整顺序
-                for (int i = 0; i < origin.Count; i++)
-                {
-                    int index = origin.IndexOf(dest[i]);
-                    if (index != i && index >= 0)
-                    {
-                        origin.Move(index, i);
-                    }
-                }
-                // 若通过以上步骤任无法排好序，则重置列表
+                NotificationHelper.Notify($"{nameof(compareCount)}: {compareCount}", NotificationHelper.NotifyType.Debug);
+                // 若通过以上步骤无法排好序，则重置列表
                 if (!origin.SequenceEqualExT(dest))
                 {
+                    NotificationHelper.Notify($"{nameof(compareCount)}: {compareCount}\n比较失败，重置列表！", NotificationHelper.NotifyType.Debug);
                     origin.Clear();
                     foreach (var item in dest)
                     {

@@ -1,4 +1,6 @@
-﻿namespace Bangumi.Helper
+﻿using System;
+
+namespace Bangumi.Helper
 {
     public static class NotificationHelper
     {
@@ -24,6 +26,17 @@
                     duration = 3000;
                     dismissButton = false;
                     break;
+                case NotifyType.Debug:
+#if DEBUG
+                    MainPage.RootPage.ToastInAppNotification.Dismiss();
+                    notification = MainPage.RootPage.ToastInAppNotification;
+                    msg = DateTime.Now.ToLongTimeString() + ": " + msg;
+                    duration = 0;
+                    dismissButton = true;
+#else
+                    return;
+#endif
+                    break;
                 default:
                     notification = MainPage.RootPage.ToastInAppNotification;
                     duration = 1500;
@@ -39,6 +52,7 @@
             Message,
             Warn,
             Error,
+            Debug,
         }
     }
 }
