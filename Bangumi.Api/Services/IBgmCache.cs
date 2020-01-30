@@ -12,21 +12,21 @@ namespace Bangumi.Api.Services
         long GetFileLength();
 
         internal List<Watching> UpdateWatching(List<Watching> value);
-        internal Collection2 UpdateCollections(SubjectTypeEnum key, Collection2 value);
-        internal Subject UpdateSubject(string key, Subject value);
-        internal Subject UpdateSubjectEp(string key, Subject value);
-        internal SubjectStatus2 UpdateStatus(string key, SubjectStatus2 value);
-        internal SubjectStatus UpdateStatus(string key, SubjectStatus value);
+        internal CollectionE UpdateCollections(SubjectType key, CollectionE value);
+        internal SubjectLarge UpdateSubject(string key, SubjectLarge value);
+        internal SubjectLarge UpdateSubjectEp(string key, SubjectLarge value);
+        internal CollectionStatusE UpdateStatus(string key, CollectionStatusE value);
+        internal CollectionStatus UpdateStatus(string key, CollectionStatus value);
         internal Progress UpdateProgress(string key, Progress value);
-        internal void UpdateProgress(int key, EpStatusEnum value);
-        internal List<BangumiTimeLine> UpdateCalendar(List<BangumiTimeLine> value);
+        internal void UpdateProgress(int key, EpStatusType value);
+        internal List<Calendar> UpdateCalendar(List<Calendar> value);
 
         List<Watching> Watching();
-        Collection2 Collections(SubjectTypeEnum key);
-        Subject Subject(string key);
-        SubjectStatus2 Status(string key);
+        CollectionE Collections(SubjectType key);
+        SubjectLarge Subject(string key);
+        CollectionStatusE Status(string key);
         Progress Progress(string key);
-        List<BangumiTimeLine> Calendar();
+        List<Calendar> Calendar();
 
     }
 }

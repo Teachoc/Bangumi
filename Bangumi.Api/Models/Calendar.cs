@@ -1,15 +1,16 @@
 ﻿using Bangumi.Api.Common;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Bangumi.Api.Models
 {
-    public class Subject2
+    public class Calendar
     {
-        [JsonProperty("subject_id")]
-        public int SubjectId { get; set; }
+        [JsonProperty("weekday")]
+        public Weekday Weekday { get; set; }
 
-        [JsonProperty("subject")]
-        public Subject Subject { get; set; }
+        [JsonProperty("items")]
+        public List<SubjectForCalendar> Items { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -19,15 +20,15 @@ namespace Bangumi.Api.Models
                 return false;
             }
 
-            Subject2 s = (Subject2)obj;
-            return SubjectId == s.SubjectId &&
-                   Subject.EqualsExT(s.Subject);
+            Calendar b = (Calendar)obj;
+            return Weekday.EqualsExT(b.Weekday) &&
+                   Items.SequenceEqualExT(b.Items);
         }
 
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return SubjectId;
+            return Items.Count;
         }
     }
 }

@@ -59,7 +59,7 @@ namespace Bangumi.Api.Services
                             throw new BgmUnauthorizedException();
                         }
                     }
-                    if (call.Exception is FlurlHttpTimeoutException)
+                    if (call.Exception is TaskCanceledException)
                     {
                         throw new BgmTimeoutException();
                     }

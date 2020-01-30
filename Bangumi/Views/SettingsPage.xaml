@@ -36,7 +36,7 @@
                                       Toggled="SettingToggleSwitch_Toggled">
                             <ToggleSwitch.Header>
                                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                                           Text="收藏状态修改为看过时，将所有章节状态修改为看过（仅在详情页有效）"
+                                           Text="收藏状态修改为看过时，将所有章节状态修改为看过（仅修改正片且仅在详情页有效）"
                                            Margin="0,4,0,0"
                                            FontWeight="Normal"
                                            TextWrapping="Wrap" />

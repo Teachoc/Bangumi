@@ -8,23 +8,38 @@ namespace Bangumi.Api.Models
     /// </summary>
     public class Watching
     {
+        /// <summary>
+        /// 条目名称
+        /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// 条目 ID
+        /// </summary>
         [JsonProperty("subject_id")]
         public int SubjectId { get; set; }
 
+        /// <summary>
+        /// 章节观看状态
+        /// </summary>
         [JsonProperty("ep_status")]
         public int EpStatus { get; set; }
 
+        /// <summary>
+        /// 书籍章节状态
+        /// </summary>
         [JsonProperty("vol_status")]
         public int VolStatus { get; set; }
 
+        /// <summary>
+        /// 最后修改时间
+        /// </summary>
         [JsonProperty("lasttouch")]
-        public long LastTouch { get; set; }
+        public int LastTouch { get; set; }
 
         [JsonProperty("subject")]
-        public Subject3 Subject { get; set; }
+        public SubjectForWatching Subject { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)

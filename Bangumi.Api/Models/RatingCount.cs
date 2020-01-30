@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Bangumi.Api.Models
 {
+    /// <summary>
+    /// 各分值评分人数
+    /// </summary>
     public class RatingCount
     {
         [JsonProperty("10")]

@@ -44,7 +44,7 @@ namespace Bangumi.Api.Services
                             throw new BgmUnauthorizedException();
                         }
                     }
-                    if (call.Exception is FlurlHttpTimeoutException)
+                    if (call.Exception is TaskCanceledException)
                     {
                         throw new BgmTimeoutException();
                     }
@@ -85,7 +85,7 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="subjectType"></param>
         /// <returns></returns>
-        public async Task<Collection2> Collections(SubjectTypeEnum subjectType)
+        public async Task<CollectionE> Collections(SubjectType subjectType)
         {
             return await $"{HOST}/user/{_bgmOAuth.MyToken.UserId}/collections/{subjectType.GetValue()}"
                 .SetQueryParams(new
@@ -94,10 +94,10 @@ namespace Bangumi.Api.Services
                     max_results = 25
                 })
                 .GetAsync()
-                .ReceiveJson<List<Collection2>>()
+                .ReceiveJson<List<CollectionE>>()
                 .ContinueWith(t =>
                 {
-                    Collection2 collection = t.Result?.FirstOrDefault() ?? new Collection2 { Collects = new List<Collection>() };
+                    CollectionE collection = t.Result?.FirstOrDefault() ?? new CollectionE { Collects = new List<Collection>() };
                     foreach (var type in collection.Collects)
                     {
                         foreach (var item in type.Items)
@@ -117,24 +117,27 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public async Task<Subject> Subject(string subjectId)
+        public async Task<SubjectLarge> Subject(string subjectId)
         {
             return await $"{HOST}/subject/{subjectId}?responseGroup=large"
                 .GetAsync()
-                .ReceiveJson<Subject>()
+                .ReceiveJson<SubjectLarge>()
                 .ContinueWith(t =>
                 {
-                    Subject subject = t.Result;
+                    SubjectLarge subject = t.Result;
                     if (subject == null) return null;
                     subject.Name = System.Net.WebUtility.HtmlDecode(subject.Name);
                     subject.NameCn = System.Net.WebUtility.HtmlDecode(subject.NameCn);
                     subject.Images?.ConvertImageHttpToHttps();
                     // 将章节按类别排序
-                    subject._eps = subject.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
-                    foreach (var ep in subject.Eps)
+                    if (subject.Eps != null)
                     {
-                        ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
-                        ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
+                        subject.Eps = subject.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
+                        foreach (var ep in subject.Eps)
+                        {
+                            ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
+                            ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
+                        }
                     }
                     if (subject.Blogs != null)
                     {
@@ -162,21 +165,24 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public async Task<Subject> SubjectEp(string subjectId)
+        public async Task<SubjectLarge> SubjectEp(string subjectId)
         {
             return await $"{HOST}/subject/{subjectId}/ep"
                 .GetAsync()
-                .ReceiveJson<Subject>()
+                .ReceiveJson<SubjectLarge>()
                 .ContinueWith(t =>
                 {
-                    Subject subject = t.Result;
+                    SubjectLarge subject = t.Result;
                     if (subject == null) return null;
                     // 将章节按类别排序
-                    subject._eps = subject.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
-                    foreach (var ep in subject.Eps)
+                    if (subject.Eps != null)
                     {
-                        ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
-                        ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
+                        subject.Eps = subject.Eps.OrderBy(c => c.Type).ThenBy(c => c.Sort).ToList();
+                        foreach (var ep in subject.Eps)
+                        {
+                            ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
+                            ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
+                        }
                     }
                     return _bgmCache.UpdateSubjectEp(subjectId, t.Result);
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -187,11 +193,11 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public async Task<SubjectStatus2> Status(string subjectId)
+        public async Task<CollectionStatusE> Status(string subjectId)
         {
             return await $"{HOST}/collection/{subjectId}"
                 .GetAsync()
-                .ReceiveJson<SubjectStatus2>()
+                .ReceiveJson<CollectionStatusE>()
                 .ContinueWith(t => _bgmCache.UpdateStatus(subjectId, t.Result),
                     TaskContinuationOptions.OnlyOnRanToCompletion);
         }
@@ -201,9 +207,9 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, SubjectStatus>> Status(IEnumerable<string> subjectIds)
+        public async Task<Dictionary<string, CollectionStatus>> Status(IEnumerable<string> subjectIds)
         {
-            Dictionary<string, SubjectStatus> status = new Dictionary<string, SubjectStatus>();
+            Dictionary<string, CollectionStatus> status = new Dictionary<string, CollectionStatus>();
             for (int i = 0; i < subjectIds.Count(); i += 20)
             {
                 await $"{HOST}/user/{_bgmOAuth.MyToken.UserId}/collection"
@@ -212,7 +218,7 @@ namespace Bangumi.Api.Services
                         ids = string.Join(",", subjectIds.Skip(i).Take(20))
                     })
                     .GetAsync()
-                    .ReceiveJson<Dictionary<string, SubjectStatus>>()
+                    .ReceiveJson<Dictionary<string, CollectionStatus>>()
                     .ContinueWith(t =>
                     {
                         if (t.Result == null) return;
@@ -253,8 +259,8 @@ namespace Bangumi.Api.Services
         /// <param name="rating"></param>
         /// <param name="privacy"></param>
         /// <returns></returns>
-        public async Task<SubjectStatus2> UpdateStatus(
-            string subjectId, CollectionStatusEnum collectionStatusEnum,
+        public async Task<CollectionStatusE> UpdateStatus(
+            string subjectId, CollectionStatusType collectionStatusEnum,
             string comment = "", string rating = "", string privacy = "0")
         {
             return await $"{HOST}/collection/{subjectId}/update"
@@ -265,7 +271,7 @@ namespace Bangumi.Api.Services
                     rating,
                     privacy
                 })
-                .ReceiveJson<SubjectStatus2>()
+                .ReceiveJson<CollectionStatusE>()
                 .ContinueWith(t => _bgmCache.UpdateStatus(subjectId, t.Result),
                     TaskContinuationOptions.OnlyOnRanToCompletion);
         }
@@ -276,7 +282,7 @@ namespace Bangumi.Api.Services
         /// <param name="ep"></param>
         /// <param name="status"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateProgress(string ep, EpStatusEnum status)
+        public async Task<bool> UpdateProgress(string ep, EpStatusType status)
         {
             return await $"{HOST}/ep/{ep}/status/{status}"
                 .GetAsync()
@@ -300,7 +306,7 @@ namespace Bangumi.Api.Services
         /// <param name="status"></param>
         /// <param name="ep_id">章节id，逗号分隔</param>
         /// <returns></returns>
-        public async Task<bool> UpdateProgressBatch(int ep, EpStatusEnum status, string ep_id)
+        public async Task<bool> UpdateProgressBatch(int ep, EpStatusType status, string ep_id)
         {
             return await $"{HOST}/ep/{ep}/status/{status}"
                 .PostUrlEncodedAsync(new
@@ -326,14 +332,14 @@ namespace Bangumi.Api.Services
         /// 获取时间表。
         /// </summary>
         /// <returns></returns>
-        public async Task<List<BangumiTimeLine>> Calendar()
+        public async Task<List<Calendar>> Calendar()
         {
             return await $"{HOST}/calendar"
                 .GetAsync()
-                .ReceiveJson<List<BangumiTimeLine>>()
+                .ReceiveJson<List<Calendar>>()
                 .ContinueWith(t =>
                 {
-                    List<BangumiTimeLine> calendar = t.Result ?? new List<BangumiTimeLine>();
+                    List<Calendar> calendar = t.Result ?? new List<Calendar>();
                     foreach (var bangumiCalendar in calendar)
                     {
                         foreach (var item in bangumiCalendar.Items)
@@ -371,7 +377,7 @@ namespace Bangumi.Api.Services
                 return new SearchResult
                 {
                     ResultCount = 0,
-                    Results = new List<Subject>()
+                    Results = new List<SubjectForSearch>()
                 };
             }
             foreach (var item in response.Results)

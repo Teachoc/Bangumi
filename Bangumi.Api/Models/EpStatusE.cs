@@ -1,16 +1,18 @@
 ﻿using Bangumi.Api.Common;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Bangumi.Api.Models
 {
-    public class BangumiTimeLine
+    /// <summary>
+    /// 章节状态2
+    /// </summary>
+    public class EpStatusE
     {
-        [JsonProperty("weekday")]
-        public Weekday Weekday { get; set; }
+        [JsonProperty("id")]
+        public int Id { get; set; }
 
-        [JsonProperty("items")]
-        public List<Subject> Items { get; set; }
+        [JsonProperty("status")]
+        public EpStatus Status { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -20,15 +22,15 @@ namespace Bangumi.Api.Models
                 return false;
             }
 
-            BangumiTimeLine b = (BangumiTimeLine)obj;
-            return Weekday.EqualsExT(b.Weekday) &&
-                   Items.SequenceEqualExT(b.Items);
+            EpStatusE e = (EpStatusE)obj;
+            return Id == e.Id &&
+                   Status.EqualsExT(e.Status);
         }
 
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return Items.Count;
+            return Id;
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Bangumi.ViewModels
             IsLoading = false;
         }
 
-        public ObservableCollection<BangumiTimeLine> TimeLineCollection { get; private set; } = new ObservableCollection<BangumiTimeLine>();
+        public ObservableCollection<Calendar> TimeLineCollection { get; private set; } = new ObservableCollection<Calendar>();
 
         private bool _isLoading;
         public bool IsLoading
@@ -72,7 +72,7 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="collectionStatus"></param>
-        public async void UpdateCollectionStatus(Subject subject, CollectionStatusEnum collectionStatus)
+        public async void UpdateCollectionStatus(SubjectBase subject, CollectionStatusType collectionStatus)
         {
             if (subject != null)
             {
@@ -119,7 +119,7 @@ namespace Bangumi.ViewModels
 
 
                 // 处理时间表顺序
-                void ProcessTimeLine(List<BangumiTimeLine> timeLines)
+                void ProcessTimeLine(List<Calendar> timeLines)
                 {
                     //清空原数据
                     TimeLineCollection.Clear();

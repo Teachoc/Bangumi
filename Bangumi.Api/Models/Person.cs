@@ -1,27 +1,26 @@
 ﻿using Bangumi.Api.Common;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Bangumi.Api.Models
 {
     /// <summary>
-    /// 评分
+    /// 现实人物
     /// </summary>
-    public class Rating
+    public class Person : Mono
     {
         /// <summary>
-        /// 总评分人数
+        /// 人物类型
+        /// <br/>example: 主角
         /// </summary>
-        [JsonProperty("total")]
-        public int Total { get; set; }
-
-        [JsonProperty("count")]
-        public RatingCount Count { get; set; }
+        [JsonProperty("role_name")]
+        public string RoleName { get; set; }
 
         /// <summary>
-        /// 评分
+        /// 职位
         /// </summary>
-        [JsonProperty("score")]
-        public double Score { get; set; }
+        [JsonProperty("jobs")]
+        public List<string> Jobs { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -30,17 +29,17 @@ namespace Bangumi.Api.Models
             {
                 return false;
             }
+            base.Equals(obj);
 
-            Rating r = (Rating)obj;
-            return Total == r.Total &&
-                   Score == r.Score &&
-                   Count.EqualsExT(r.Count);
+            Person s = (Person)obj;
+            return RoleName.EqualsExT(s.RoleName) &&
+                   Jobs.SequenceEqualExT(s.Jobs);
         }
 
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return Total;
+            return Id;
         }
     }
 }

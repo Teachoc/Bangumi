@@ -16,7 +16,7 @@ namespace Bangumi.Facades
         /// <param name="ep"></param>
         /// <param name="status"></param>
         /// <returns>更新是否成功</returns>
-        public static async Task<bool> UpdateProgressAsync(string ep, EpStatusEnum status)
+        public static async Task<bool> UpdateProgressAsync(string ep, EpStatusType status)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace Bangumi.Facades
         /// <param name="status"></param>
         /// <param name="epsId"></param>
         /// <returns></returns>
-        public static async Task<bool> UpdateProgressBatchAsync(int ep, EpStatusEnum status, string epsId)
+        public static async Task<bool> UpdateProgressBatchAsync(int ep, EpStatusType status, string epsId)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace Bangumi.Facades
         /// <param name="privace"></param>
         /// <returns>更新是否成功</returns>
         public static async Task<bool> UpdateCollectionStatusAsync(string subjectId,
-            CollectionStatusEnum collectionStatus, string comment = "", string rating = "", string privace = "0")
+            CollectionStatusType collectionStatus, string comment = "", string rating = "", string privace = "0")
         {
             try
             {

@@ -10,13 +10,16 @@ namespace Bangumi.Api.Models
     public class Collection
     {
         [JsonProperty("status")]
-        public SubjectStatus Status { get; set; }
+        public CollectionStatus Status { get; set; }
 
+        /// <summary>
+        /// 收藏数
+        /// </summary>
         [JsonProperty("count")]
         public int Count { get; set; }
 
         [JsonProperty("list")]
-        public List<Subject2> Items { get; set; }
+        public List<SubjectBaseE> Items { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)

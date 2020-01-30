@@ -3,26 +3,50 @@ using Newtonsoft.Json;
 
 namespace Bangumi.Api.Models
 {
+    /// <summary>
+    /// 讨论版
+    /// </summary>
     public class Topic
     {
+        /// <summary>
+        /// ID
+        /// </summary>
         [JsonProperty("id")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// 地址
+        /// </summary>
         [JsonProperty("url")]
         public string Url { get; set; }
 
+        /// <summary>
+        /// 标题
+        /// </summary>
         [JsonProperty("title")]
         public string Title { get; set; }
 
+        /// <summary>
+        /// 所属对象（条目） ID
+        /// </summary>
         [JsonProperty("main_id")]
         public int MainId { get; set; }
 
+        /// <summary>
+        /// 发布时间
+        /// </summary>
         [JsonProperty("timestamp")]
-        public long Timestamp { get; set; }
+        public int Timestamp { get; set; }
 
+        /// <summary>
+        /// 最后回复时间
+        /// </summary>
         [JsonProperty("lastpost")]
-        public long LastPost { get; set; }
+        public int LastPost { get; set; }
 
+        /// <summary>
+        /// 回复数
+        /// </summary>
         [JsonProperty("replies")]
         public int Replies { get; set; }
 

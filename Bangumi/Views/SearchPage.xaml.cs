@@ -31,7 +31,7 @@ namespace Bangumi.Views
 
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var selectedItem = (Subject)e.ClickedItem;
+            var selectedItem = (SubjectForSearch)e.ClickedItem;
             MainPage.RootFrame.Navigate(typeof(DetailsPage), selectedItem.Id, new DrillInNavigationTransitionInfo());
         }
 
@@ -187,19 +187,19 @@ namespace Bangumi.Views
                 switch (item.Tag)
                 {
                     case "Wish":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Wish);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Wish);
                         break;
                     case "Collect":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Collect);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Collect);
                         break;
                     case "Doing":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Do);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Do);
                         break;
                     case "OnHold":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.OnHold);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.OnHold);
                         break;
                     case "Dropped":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject, CollectionStatusEnum.Dropped);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Dropped);
                         break;
                 }
             }

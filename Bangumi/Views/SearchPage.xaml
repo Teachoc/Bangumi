@@ -39,7 +39,7 @@
                                 Tag="Dropped"/>
             </MenuFlyout>
 
-            <DataTemplate x:Key="NarrowSubjectWithTypeTemplate" x:DataType="data:Subject">
+            <DataTemplate x:Key="NarrowSubjectWithTypeTemplate" x:DataType="data:SubjectForSearch">
                 <RelativePanel Padding="5"
                                RightTapped="ItemRelativePanel_RightTapped"
                                Holding="ItemRelativePanel_Holding"
@@ -95,7 +95,7 @@
                 </RelativePanel>
             </DataTemplate>
 
-            <DataTemplate x:Key="WideSubjectWithTypeTemplate" x:DataType="data:Subject">
+            <DataTemplate x:Key="WideSubjectWithTypeTemplate" x:DataType="data:SubjectForSearch">
                 <RelativePanel Padding="5"
                                RightTapped="ItemRelativePanel_RightTapped"
                                Holding="ItemRelativePanel_Holding"
@@ -151,7 +151,7 @@
                 </RelativePanel>
             </DataTemplate>
 
-            <DataTemplate x:Key="NarrowSubjectTemplate" x:DataType="data:Subject">
+            <DataTemplate x:Key="NarrowSubjectTemplate" x:DataType="data:SubjectForSearch">
                 <RelativePanel Padding="5"
                                RightTapped="ItemRelativePanel_RightTapped"
                                Holding="ItemRelativePanel_Holding"
@@ -199,7 +199,7 @@
                 </RelativePanel>
             </DataTemplate>
 
-            <DataTemplate x:Key="WideSubjectTemplate" x:DataType="data:Subject">
+            <DataTemplate x:Key="WideSubjectTemplate" x:DataType="data:SubjectForSearch">
                 <RelativePanel Padding="5"
                                RightTapped="ItemRelativePanel_RightTapped"
                                Holding="ItemRelativePanel_Holding"

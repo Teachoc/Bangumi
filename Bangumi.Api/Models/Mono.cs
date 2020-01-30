@@ -6,28 +6,25 @@ namespace Bangumi.Api.Models
     /// <summary>
     /// 人物
     /// </summary>
-    public class Actor
+    public class Mono : MonoBase
     {
-        [JsonProperty("id")]
-        public int Id { get; set; }
+        /// <summary>
+        /// 简体中文名
+        /// </summary>
+        [JsonProperty("name_cn")]
+        public string NameCn { get; set; }
 
         /// <summary>
-        /// 人物主页
+        /// 回复数量
         /// </summary>
-        [JsonProperty("url")]
-        public string Url { get; set; }
+        [JsonProperty("comment")]
+        public int Comment { get; set; }
 
         /// <summary>
-        /// 人物姓名
+        /// 收藏人数
         /// </summary>
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// large, medium, small, grid
-        /// </summary>
-        [JsonProperty("images")]
-        public Images Images { get; set; }
+        [JsonProperty("collects")]
+        public int Collects { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -36,12 +33,12 @@ namespace Bangumi.Api.Models
             {
                 return false;
             }
+            base.Equals(obj);
 
-            Actor a = (Actor)obj;
-            return Id == a.Id &&
-                   Url.EqualsExT(a.Url) &&
-                   Name.EqualsExT(a.Name) &&
-                   Images.EqualsExT(a.Images);
+            Mono c = (Mono)obj;
+            return NameCn.EqualsExT(c.NameCn) &&
+                   Comment == c.Comment &&
+                   Collects == c.Collects;
         }
 
         // override object.GetHashCode

@@ -11,6 +11,6 @@ namespace Bangumi.Api.Models
         public int ResultCount { get; set; }
 
         [JsonProperty("list")]
-        public List<Subject> Results { get; set; }
+        public List<SubjectForSearch> Results { get; set; }
     }
 }

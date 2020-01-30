@@ -84,31 +84,31 @@ namespace Bangumi.ContentDialogs
             }
         }
 
-        public CollectionStatusEnum? CollectionStatus { get; private set; }
-        private readonly Task<SubjectStatus2> SubjectStatusTask;
+        public CollectionStatusType? CollectionStatus { get; private set; }
+        private readonly Task<CollectionStatusE> SubjectStatusTask;
 
-        public CollectionEditContentDialog(SubjectTypeEnum subjectType, Task<SubjectStatus2> subjectStatusTask)
+        public CollectionEditContentDialog(SubjectType subjectType, Task<CollectionStatusE> subjectStatusTask)
         {
             this.InitializeComponent();
             switch (subjectType)
             {
-                case SubjectTypeEnum.Book:
+                case SubjectType.Book:
                     WishRadio.Content = "想读";
                     CollectRadio.Content = "读过";
                     DoRadio.Content = "在读";
                     break;
-                case SubjectTypeEnum.Music:
+                case SubjectType.Music:
                     WishRadio.Content = "想听";
                     CollectRadio.Content = "听过";
                     DoRadio.Content = "在听";
                     break;
-                case SubjectTypeEnum.Game:
+                case SubjectType.Game:
                     WishRadio.Content = "想玩";
                     CollectRadio.Content = "玩过";
                     DoRadio.Content = "在玩";
                     break;
-                case SubjectTypeEnum.Anime:
-                case SubjectTypeEnum.Real:
+                case SubjectType.Anime:
+                case SubjectType.Real:
                 default:
                     WishRadio.Content = "想看";
                     CollectRadio.Content = "看过";
@@ -120,7 +120,7 @@ namespace Bangumi.ContentDialogs
 
         private void StatusRadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            CollectionStatus = CollectionStatusEnumEx.FromValue(((RadioButton)sender).Tag.ToString());
+            CollectionStatus = CollectionStatusTypeExtension.FromValue(((RadioButton)sender).Tag.ToString());
         }
 
         private async void ContentDialog_Loaded(object sender, RoutedEventArgs e)

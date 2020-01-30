@@ -86,7 +86,7 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="collectionStatus"></param>
-        public async void UpdateCollectionStatus(Subject2 subject, CollectionStatusEnum collectionStatus)
+        public async void UpdateCollectionStatus(SubjectBaseE subject, CollectionStatusType collectionStatus)
         {
             if (subject == null) return;
 
@@ -122,12 +122,12 @@ namespace Bangumi.ViewModels
                     {
                         newCol = new Collection()
                         {
-                            Items = new List<Subject2>() { subject },
-                            Status = new SubjectStatus()
+                            Items = new List<SubjectBaseE>() { subject },
+                            Status = new CollectionStatus()
                             {
                                 Id = collectionStatus,
                                 Type = collectionStatus.GetValue(),
-                                Name = collectionStatus.GetDescCn((SubjectTypeEnum)subject.Subject.Type)
+                                Name = collectionStatus.GetDesc(subject.Subject.Type)
                             },
                             Count = 1
                         };
@@ -144,11 +144,11 @@ namespace Bangumi.ViewModels
         /// <param name="subjectCollection"></param>
         /// <param name="subjectType"></param>
         /// <returns></returns>
-        private async Task PopulateSubjectCollectionAsync(ObservableCollection<Collection> subjectCollection, SubjectTypeEnum subjectType)
+        private async Task PopulateSubjectCollectionAsync(ObservableCollection<Collection> subjectCollection, SubjectType subjectType)
         {
             try
             {
-                Collection2 cache = BangumiApi.BgmCache.Collections(subjectType);
+                CollectionE cache = BangumiApi.BgmCache.Collections(subjectType);
                 if (cache != null && !cache.Collects.SequenceEqualExT(subjectCollection.ToList()))
                 {
                     //清空原数据
@@ -159,7 +159,7 @@ namespace Bangumi.ViewModels
                     }
                 }
 
-                Collection2 current = await BangumiApi.BgmApi.Collections(subjectType);
+                CollectionE current = await BangumiApi.BgmApi.Collections(subjectType);
                 if (!cache.EqualsExT(current))
                 {
                     //清空原数据
@@ -182,22 +182,22 @@ namespace Bangumi.ViewModels
         /// 根据下拉框返回所选择的收藏类型
         /// </summary>
         /// <returns></returns>
-        private SubjectTypeEnum GetSubjectType()
+        private SubjectType GetSubjectType()
         {
             switch (SelectedIndex)
             {
                 case 0:
-                    return SubjectTypeEnum.Anime;
+                    return SubjectType.Anime;
                 case 1:
-                    return SubjectTypeEnum.Book;
+                    return SubjectType.Book;
                 case 2:
-                    return SubjectTypeEnum.Music;
+                    return SubjectType.Music;
                 case 3:
-                    return SubjectTypeEnum.Game;
+                    return SubjectType.Game;
                 case 4:
-                    return SubjectTypeEnum.Real;
+                    return SubjectType.Real;
                 default:
-                    return SubjectTypeEnum.Anime;
+                    return SubjectType.Anime;
             }
         }
 

@@ -4,7 +4,10 @@ using System.Text;
 
 namespace Bangumi.Api.Models
 {
-    public enum SubjectTypeEnum : int
+    /// <summary>
+    /// 条目类型
+    /// </summary>
+    public enum SubjectType
     {
         Book = 1,
         Anime = 2,

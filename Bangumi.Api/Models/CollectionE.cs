@@ -4,28 +4,31 @@ using System.Collections.Generic;
 
 namespace Bangumi.Api.Models
 {
-    public class Crt
+    /// <summary>
+    /// 某一类别的收藏
+    /// </summary>
+    public class CollectionE
     {
-        [JsonProperty("id")]
-        public int Id { get; set; }
+        /// <summary>
+        /// 收藏类别
+        /// </summary>
+        [JsonProperty("type")]
+        public int Type { get; set; }
 
-        [JsonProperty("url")]
-        public string Url { get; set; }
-
+        /// <summary>
+        /// 类别名
+        /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// 类别中文名
+        /// </summary>
         [JsonProperty("name_cn")]
         public string NameCn { get; set; }
 
-        [JsonProperty("role_name")]
-        public string RoleName { get; set; }
-
-        [JsonProperty("images")]
-        public Images Images { get; set; }
-
-        [JsonProperty("actors")]
-        public List<Actor> Actors { get; set; }
+        [JsonProperty("collects")]
+        public List<Collection> Collects { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -35,20 +38,17 @@ namespace Bangumi.Api.Models
                 return false;
             }
 
-            Crt c = (Crt)obj;
-            return Id == c.Id &&
-                   Url.EqualsExT(c.Url) &&
+            CollectionE c = (CollectionE)obj;
+            return Type == c.Type &&
                    Name.EqualsExT(c.Name) &&
                    NameCn.EqualsExT(c.NameCn) &&
-                   RoleName.EqualsExT(c.RoleName) &&
-                   Images.EqualsExT(c.Images) &&
-                   Actors.SequenceEqualExT(c.Actors);
+                   Collects.SequenceEqualExT(c.Collects);
         }
 
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return Id;
+            return Type;
         }
     }
 }

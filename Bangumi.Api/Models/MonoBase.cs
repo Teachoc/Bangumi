@@ -1,31 +1,36 @@
 ﻿using Bangumi.Api.Common;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Bangumi.Api.Models
 {
-    public class Staff
+    /// <summary>
+    /// 人物（基础模型）
+    /// </summary>
+    public class MonoBase
     {
+        /// <summary>
+        /// 人物 ID
+        /// </summary>
         [JsonProperty("id")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// 人物地址
+        /// </summary>
         [JsonProperty("url")]
         public string Url { get; set; }
 
+        /// <summary>
+        /// 姓名
+        /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("name_cn")]
-        public string NameCn { get; set; }
-
-        [JsonProperty("role_name")]
-        public string RoleName { get; set; }
-
+        /// <summary>
+        /// large, medium, small, grid
+        /// </summary>
         [JsonProperty("images")]
         public Images Images { get; set; }
-
-        [JsonProperty("jobs")]
-        public List<string> Jobs { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -35,14 +40,11 @@ namespace Bangumi.Api.Models
                 return false;
             }
 
-            Staff s = (Staff)obj;
-            return Id == s.Id &&
-                   Url.EqualsExT(s.Url) &&
-                   Name.EqualsExT(s.Name) &&
-                   NameCn.EqualsExT(s.NameCn) &&
-                   RoleName.EqualsExT(s.RoleName) &&
-                   Images.EqualsExT(s.Images) &&
-                   Jobs.SequenceEqualExT(s.Jobs);
+            MonoBase c = (MonoBase)obj;
+            return Id == c.Id &&
+                   Url.EqualsExT(c.Url) &&
+                   Name.EqualsExT(c.Name) &&
+                   Images.EqualsExT(c.Images);
         }
 
         // override object.GetHashCode

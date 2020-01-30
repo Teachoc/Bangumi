@@ -3,6 +3,9 @@ using Newtonsoft.Json;
 
 namespace Bangumi.Api.Models
 {
+    /// <summary>
+    /// 封面、肖像
+    /// </summary>
     public class Images
     {
         [JsonProperty("large")]

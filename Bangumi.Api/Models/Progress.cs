@@ -13,7 +13,7 @@ namespace Bangumi.Api.Models
         public int SubjectId { get; set; }
 
         [JsonProperty("eps")]
-        public List<EpStatus2> Eps { get; set; }
+        public List<EpStatusE> Eps { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -24,7 +24,8 @@ namespace Bangumi.Api.Models
             }
 
             Progress p = (Progress)obj;
-            return Eps.SequenceEqualExT(p.Eps);
+            return SubjectId == p.SubjectId &&
+                   Eps.SequenceEqualExT(p.Eps);
         }
 
         // override object.GetHashCode

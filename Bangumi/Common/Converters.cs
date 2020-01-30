@@ -84,7 +84,7 @@ namespace Bangumi.Common
         /// </summary>
         /// <param name="dateTime"></param>
         /// <returns></returns>
-        public static string ConvertJsTickToDateTime(long dateTime)
+        public static string ConvertJsTickToDateTime(int dateTime)
         {
             return dateTime.ToDateTime().ToString("yyyy-MM-dd HH:mm"); ;
         }
@@ -94,9 +94,9 @@ namespace Bangumi.Common
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static string GetSubjectTypeName(SubjectTypeEnum type)
+        public static string GetSubjectTypeName(SubjectType type)
         {
-            return type.GetDescCn();
+            return type.GetDesc();
         }
 
         /// <summary>
@@ -122,19 +122,19 @@ namespace Bangumi.Common
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
-        public static SolidColorBrush GetSolidColorBrush(CollectionStatusEnum? status)
+        public static SolidColorBrush GetSolidColorBrush(CollectionStatusType? status)
         {
             switch (status)
             {
-                case CollectionStatusEnum.Wish:
+                case CollectionStatusType.Wish:
                     return (SolidColorBrush)Application.Current.Resources["WishBackground"];
-                case CollectionStatusEnum.Collect:
+                case CollectionStatusType.Collect:
                     return (SolidColorBrush)Application.Current.Resources["CollectBackground"];
-                case CollectionStatusEnum.Do:
+                case CollectionStatusType.Do:
                     return (SolidColorBrush)Application.Current.Resources["DoBackground"];
-                case CollectionStatusEnum.OnHold:
+                case CollectionStatusType.OnHold:
                     return (SolidColorBrush)Application.Current.Resources["OnHoldBackground"];
-                case CollectionStatusEnum.Dropped:
+                case CollectionStatusType.Dropped:
                     return (SolidColorBrush)Application.Current.Resources["DroppedBackground"];
                 default:
                     return (SolidColorBrush)Application.Current.Resources["DoBackground"];
@@ -147,9 +147,9 @@ namespace Bangumi.Common
         /// <param name="status"></param>
         /// <param name="subjectType"></param>
         /// <returns></returns>
-        public static string GetDesc(CollectionStatusEnum? status, SubjectTypeEnum subjectType = SubjectTypeEnum.Anime)
+        public static string GetDesc(CollectionStatusType? status, SubjectType subjectType = SubjectType.Anime)
         {
-            return status?.GetDescCn(subjectType) ?? string.Empty;
+            return status?.GetDesc(subjectType) ?? string.Empty;
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Bangumi.Common
         /// <param name="sort"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static string GetEpSortDesc(double sort, int type)
+        public static string GetEpSortDesc(double sort, EpisodeType type)
         {
             if (type == 0)
             {
@@ -227,7 +227,7 @@ namespace Bangumi.Common
             }
             else
             {
-                return type.GetEpisodeType() + " " + sort;
+                return type.GetDesc() + " " + sort;
             }
         }
 
@@ -257,7 +257,7 @@ namespace Bangumi.Common
             else
             {
                 return "EP." +
-                       ep.Type.GetEpisodeType() + " " + nextEp +
+                       ep.Type.GetDesc() + " " + nextEp +
                        (string.IsNullOrEmpty(ep.Name) ? string.Empty : " " + ep.Name);
             }
         }

@@ -1,26 +1,36 @@
-﻿using Newtonsoft.Json;
+﻿using Bangumi.Api.Common;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Bangumi.Api.Models
 {
+    /// <summary>
+    /// 收藏状态
+    /// <br/> 1 = wish = 想做
+    /// <br/> 2 = collect = 做过
+    /// <br/> 3 = do = 在做
+    /// <br/> 4 = on_hold = 搁置
+    /// <br/> 5 = dropped = 抛弃
+    /// </summary>
     public class CollectionStatus
     {
-        [JsonProperty("wish")]
-        public int Wish { get; set; }
+        /// <summary>
+        /// 收藏状态 ID
+        /// </summary>
+        [JsonProperty("id")]
+        public CollectionStatusType Id { get; set; }
 
-        [JsonProperty("collect")]
-        public int Collect { get; set; }
+        /// <summary>
+        /// 收藏状态类型
+        /// </summary>
+        [JsonProperty("type")]
+        public string Type { get; set; }
 
-        [JsonProperty("doing")]
-        public int Doing { get; set; }
-
-        [JsonProperty("on_hold")]
-        public int OnHold { get; set; }
-
-        [JsonProperty("dropped")]
-        public int Dropped { get; set; }
+        /// <summary>
+        /// 收藏状态名称
+        /// </summary>
+        [JsonProperty("name")]
+        public string Name { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -30,18 +40,16 @@ namespace Bangumi.Api.Models
                 return false;
             }
 
-            CollectionStatus c = (CollectionStatus)obj;
-            return Wish == c.Wish &&
-                   Collect == c.Collect &&
-                   Doing == c.Doing &&
-                   OnHold == c.OnHold &&
-                   Dropped == c.Dropped;
+            CollectionStatus s = (CollectionStatus)obj;
+            return Id == s.Id &&
+                   Type.EqualsExT(s.Type) &&
+                   Name.EqualsExT(s.Name);
         }
 
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return Wish + Collect + Doing + OnHold + Dropped;
+            return (int)Id;
         }
     }
 }

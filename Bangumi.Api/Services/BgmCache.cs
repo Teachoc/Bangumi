@@ -118,7 +118,7 @@ namespace Bangumi.Api.Services
             return _cache.Watching;
         }
 
-        Collection2 IBgmCache.UpdateCollections(SubjectTypeEnum key, Collection2 value)
+        CollectionE IBgmCache.UpdateCollections(SubjectType key, CollectionE value)
         {
             return _cache.Collections.AddOrUpdate(key.GetValue(), value, (k, v) =>
             {
@@ -128,7 +128,7 @@ namespace Bangumi.Api.Services
             });
         }
 
-        Subject IBgmCache.UpdateSubject(string key, Subject value)
+        SubjectLarge IBgmCache.UpdateSubject(string key, SubjectLarge value)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 
@@ -140,42 +140,42 @@ namespace Bangumi.Api.Services
             });
         }
 
-        Subject IBgmCache.UpdateSubjectEp(string subjectId, Subject subject)
+        SubjectLarge IBgmCache.UpdateSubjectEp(string subjectId, SubjectLarge subject)
         {
             var sub = _cache.Subject.GetOrAdd(subjectId, subject);
             if (sub == null)
             {
                 return subject;
             }
-            if (!sub._eps.SequenceEqualExT(subject._eps))
+            if (!sub.Eps.SequenceEqualExT(subject.Eps))
             {
-                sub._eps = subject._eps;
+                sub.Eps = subject.Eps;
                 _isCacheUpdated = true;
             }
             return sub;
         }
 
-        SubjectStatus2 IBgmCache.UpdateStatus(string subjectId, SubjectStatus2 subjectStatus)
+        CollectionStatusE IBgmCache.UpdateStatus(string subjectId, CollectionStatusE subjectStatus)
         {
             if (subjectStatus != null)
             {
                 _cache.Status.AddOrUpdate(subjectId, subjectStatus, (key, value) => subjectStatus);
                 // 若状态不是在做，则从进度中删除
-                if (subjectStatus.Status?.Id != CollectionStatusEnum.Do)
+                if (subjectStatus.Status?.Id != CollectionStatusType.Do)
                 {
                     _cache.Watching.RemoveAll(w => w.SubjectId.ToString() == subjectId);
                 }
-                else if (subjectStatus.Status?.Id == CollectionStatusEnum.Do &&
+                else if (subjectStatus.Status?.Id == CollectionStatusType.Do &&
                          _cache.Watching.All(w => w.SubjectId.ToString() != subjectId) &&
                          _cache.Subject.TryGetValue(subjectId, out var subject) &&
-                         subject.Type == SubjectTypeEnum.Anime)
+                         subject.Type == SubjectType.Anime)
                 {
                     _cache.Watching.Add(new Watching
                     {
                         SubjectId = subject.Id,
                         LastTouch = DateTime.Now.ToJsTick(),
                         Name = subject.Name,
-                        Subject = new Subject3
+                        Subject = new SubjectForWatching
                         {
                             Id = subject.Id,
                             Name = subject.Name,
@@ -200,11 +200,11 @@ namespace Bangumi.Api.Services
             return subjectStatus;
         }
 
-        SubjectStatus IBgmCache.UpdateStatus(string subjectId, SubjectStatus subjectStatus)
+        CollectionStatus IBgmCache.UpdateStatus(string subjectId, CollectionStatus subjectStatus)
         {
             if (subjectStatus != null)
             {
-                _cache.Status.AddOrUpdate(subjectId, new SubjectStatus2 { Status = subjectStatus }, (key, value) =>
+                _cache.Status.AddOrUpdate(subjectId, new CollectionStatusE { Status = subjectStatus }, (key, value) =>
                 {
                     value.Status = subjectStatus;
                     return value;
@@ -226,10 +226,10 @@ namespace Bangumi.Api.Services
             });
         }
 
-        void IBgmCache.UpdateProgress(int epId, EpStatusEnum status)
+        void IBgmCache.UpdateProgress(int epId, EpStatusType status)
         {
             // 找到该章节所属的条目
-            var sub = _cache.Subject.Values.FirstOrDefault(s => s.Eps.FirstOrDefault(p => p.Id == epId) != null);
+            var sub = _cache.Subject.Values.FirstOrDefault(s => s.Eps?.FirstOrDefault(p => p.Id == epId) != null);
             if (sub != null)
             {
                 // 找到已有进度，否则新建
@@ -237,23 +237,23 @@ namespace Bangumi.Api.Services
                 if (pro != null)
                 {
                     var ep = pro.Eps.FirstOrDefault(e => e.Id == epId);
-                    if (status != EpStatusEnum.remove)
+                    if (status != EpStatusType.remove)
                     {
                         if (ep != null)
                         {
-                            ep.Status.Id = (int)status;
+                            ep.Status.Id = status;
                             ep.Status.CnName = status.GetCnName();
                             ep.Status.CssName = status.GetCssName();
                             ep.Status.UrlName = status.GetUrlName();
                         }
                         else
                         {
-                            pro.Eps.Add(new EpStatus2()
+                            pro.Eps.Add(new EpStatusE()
                             {
                                 Id = epId,
                                 Status = new EpStatus()
                                 {
-                                    Id = (int)status,
+                                    Id = status,
                                     CnName = status.GetCnName(),
                                     CssName = status.GetCssName(),
                                     UrlName = status.GetUrlName(),
@@ -269,19 +269,19 @@ namespace Bangumi.Api.Services
                         }
                     }
                 }
-                else if (status != EpStatusEnum.remove)
+                else if (status != EpStatusType.remove)
                 {
                     var progress = new Progress()
                     {
                         SubjectId = sub.Id,
-                        Eps = new List<EpStatus2>()
+                        Eps = new List<EpStatusE>()
                         {
-                            new EpStatus2()
+                            new EpStatusE()
                             {
                                 Id = epId,
                                 Status = new EpStatus()
                                 {
-                                    Id = (int)status,
+                                    Id = status,
                                     CnName = status.GetCnName(),
                                     CssName = status.GetCssName(),
                                     UrlName = status.GetUrlName(),
@@ -301,7 +301,7 @@ namespace Bangumi.Api.Services
             }
         }
 
-        List<BangumiTimeLine> IBgmCache.UpdateCalendar(List<BangumiTimeLine> value)
+        List<Calendar> IBgmCache.UpdateCalendar(List<Calendar> value)
         {
             _cache.Calendar = value;
             _isCacheUpdated = true;
@@ -315,19 +315,19 @@ namespace Bangumi.Api.Services
             return _cache.Watching;
         }
 
-        public Collection2 Collections(SubjectTypeEnum key)
+        public CollectionE Collections(SubjectType key)
         {
             _cache.Collections.TryGetValue(key.GetValue(), out var value);
             return value;
         }
 
-        public Subject Subject(string key)
+        public SubjectLarge Subject(string key)
         {
             _cache.Subject.TryGetValue(key, out var value);
             return value;
         }
 
-        public SubjectStatus2 Status(string key)
+        public CollectionStatusE Status(string key)
         {
             _cache.Status.TryGetValue(key, out var value);
             return value;
@@ -339,7 +339,7 @@ namespace Bangumi.Api.Services
             return value;
         }
 
-        public List<BangumiTimeLine> Calendar()
+        public List<Calendar> Calendar()
         {
             return _cache.Calendar;
         }
@@ -350,7 +350,7 @@ namespace Bangumi.Api.Services
         /// <summary>
         /// 缓存更新时间
         /// </summary>
-        public long UpdateDate { get; set; }
+        public int UpdateDate { get; set; }
 
         /// <summary>
         /// 用户收视列表
@@ -360,17 +360,17 @@ namespace Bangumi.Api.Services
         /// <summary>
         /// 收藏，含动画、书籍、音乐、游戏、三次元
         /// </summary>
-        public ConcurrentDictionary<string, Collection2> Collections { get; set; } = new ConcurrentDictionary<string, Collection2>();
+        public ConcurrentDictionary<string, CollectionE> Collections { get; set; } = new ConcurrentDictionary<string, CollectionE>();
 
         /// <summary>
         /// 条目详情
         /// </summary>
-        public ConcurrentDictionary<string, Subject> Subject { get; set; } = new ConcurrentDictionary<string, Subject>();
+        public ConcurrentDictionary<string, SubjectLarge> Subject { get; set; } = new ConcurrentDictionary<string, SubjectLarge>();
 
         /// <summary>
         /// 条目收藏信息
         /// </summary>
-        public ConcurrentDictionary<string, SubjectStatus2> Status { get; set; } = new ConcurrentDictionary<string, SubjectStatus2>();
+        public ConcurrentDictionary<string, CollectionStatusE> Status { get; set; } = new ConcurrentDictionary<string, CollectionStatusE>();
 
         /// <summary>
         /// 条目收视进度
@@ -380,7 +380,7 @@ namespace Bangumi.Api.Services
         /// <summary>
         /// 时间表
         /// </summary>
-        public List<BangumiTimeLine> Calendar { get; set; } = new List<BangumiTimeLine>();
+        public List<Calendar> Calendar { get; set; } = new List<Calendar>();
 
     }
 }

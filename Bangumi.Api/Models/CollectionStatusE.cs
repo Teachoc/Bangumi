@@ -6,29 +6,52 @@ using System.Collections.Generic;
 namespace Bangumi.Api.Models
 {
     /// <summary>
-    /// 收藏的条目的状态信息
+    /// 条目的收藏信息
     /// </summary>
-    public class SubjectStatus2
+    public class CollectionStatusE
     {
         [JsonProperty("status")]
-        public SubjectStatus Status { get; set; }
+        public CollectionStatus Status { get; set; }
 
+        /// <summary>
+        /// 评分
+        /// </summary>
         [JsonProperty("rating")]
         public int Rating { get; set; }
 
+        /// <summary>
+        /// 评论
+        /// </summary>
         [JsonProperty("comment")]
         public string Comment { get; set; }
 
+        /// <summary>
+        /// 标签
+        /// </summary>
         [JsonProperty("tag")]
         public List<string> Tags { get; set; }
 
-        [Obsolete]
+        /// <summary>
+        /// 章节观看状态
+        /// </summary>
         [JsonProperty("ep_status")]
         public int EpStatus { get; set; }
 
+        /// <summary>
+        /// 书籍章节状态
+        /// </summary>
+        [JsonProperty("vol_status")]
+        public int VolStatus { get; set; }
+
+        /// <summary>
+        /// 最后修改时间
+        /// </summary>
         [JsonProperty("lasttouch")]
         public long LastTouch { get; set; }
 
+        /// <summary>
+        /// 仅自己可见
+        /// </summary>
         [JsonProperty("private")]
         public string Private { get; set; }
 
@@ -43,9 +66,11 @@ namespace Bangumi.Api.Models
                 return false;
             }
 
-            SubjectStatus2 s = (SubjectStatus2)obj;
+            CollectionStatusE s = (CollectionStatusE)obj;
             return Rating == s.Rating &&
                    LastTouch == s.LastTouch &&
+                   EpStatus == s.EpStatus &&
+                   VolStatus == s.VolStatus &&
                    Comment.EqualsExT(s.Comment) &&
                    Private.EqualsExT(s.Private) &&
                    Status.EqualsExT(s.Status) &&

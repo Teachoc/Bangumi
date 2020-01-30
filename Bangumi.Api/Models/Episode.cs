@@ -5,40 +5,76 @@ using System.Runtime.CompilerServices;
 
 namespace Bangumi.Api.Models
 {
-    public class Ep : INotifyPropertyChanged
+    public class Episode : INotifyPropertyChanged
     {
+        /// <summary>
+        /// 章节 ID
+        /// </summary>
         [JsonProperty("id")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// 章节地址
+        /// <br/>http://bgm.tv/ep/1027
+        /// </summary>
         [JsonProperty("url")]
         public string Url { get; set; }
 
+        /// <summary>
+        /// 章节类型
+        /// </summary>
         [JsonProperty("type")]
-        public int Type { get; set; }
+        public EpisodeType Type { get; set; }
 
+        /// <summary>
+        /// 集数
+        /// </summary>
         [JsonProperty("sort")]
         public double Sort { get; set; }
 
+        /// <summary>
+        /// 标题
+        /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// 简体中文标题
+        /// </summary>
         [JsonProperty("name_cn")]
         public string NameCn { get; set; }
 
+        /// <summary>
+        /// 时长
+        /// <br/>24m
+        /// </summary>
         [JsonProperty("duration")]
         public string Duration { get; set; }
 
+        /// <summary>
+        /// 放送日期
+        /// <br/>2002-04-03
+        /// </summary>
         [JsonProperty("airdate")]
         public string AirDate { get; set; }
 
+        /// <summary>
+        /// 回复数量
+        /// </summary>
         [JsonProperty("comment")]
         public int Comment { get; set; }
 
+        /// <summary>
+        /// 简介
+        /// </summary>
         [JsonProperty("desc")]
         public string Desc { get; set; }
 
         private string _status { get; set; }
 
+        /// <summary>
+        /// 放送状态
+        /// </summary>
         [JsonProperty("status")]
         public string Status
         {
@@ -64,7 +100,7 @@ namespace Bangumi.Api.Models
                 return false;
             }
 
-            Ep e = (Ep)obj;
+            Episode e = (Episode)obj;
             return Id == e.Id &&
                    Type == e.Type &&
                    Sort == e.Sort &&

@@ -157,7 +157,7 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="collectionStatus"></param>
-        public async void UpdateCollectionStatus(Subject subject, CollectionStatusEnum collectionStatus)
+        public async void UpdateCollectionStatus(SubjectBase subject, CollectionStatusType collectionStatus)
         {
             if (subject != null)
             {
@@ -172,7 +172,7 @@ namespace Bangumi.ViewModels
     /// <summary>
     /// 在页面到达底部时加载更多。
     /// </summary>
-    public class SearchResultIncrementalLoadingCollection : ObservableCollection<Subject>, ISupportIncrementalLoading
+    public class SearchResultIncrementalLoadingCollection : ObservableCollection<SubjectForSearch>, ISupportIncrementalLoading
     {
         int offset = 0;
         int max = 20;
@@ -221,7 +221,7 @@ namespace Bangumi.ViewModels
                                     }
                                 }
                                 max = t.Result.ResultCount;
-                                foreach (Subject item in t.Result.Results)
+                                foreach (var item in t.Result.Results)
                                 {
                                     await DispatcherHelper.ExecuteOnUIThreadAsync(() => Add(item));
                                 }

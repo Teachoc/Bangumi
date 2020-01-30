@@ -1,15 +1,13 @@
 ﻿using Bangumi.Api.Common;
-using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Bangumi.Api.Models
 {
-    public class EpStatus2
+    public class SubjectForSearch : SubjectBase, ICollectionStatus
     {
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("status")]
-        public EpStatus Status { get; set; }
+        public CollectionStatusType? Status { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -18,10 +16,10 @@ namespace Bangumi.Api.Models
             {
                 return false;
             }
+            base.Equals(obj);
 
-            EpStatus2 e = (EpStatus2)obj;
-            return Id == e.Id &&
-                   Status.EqualsExT(e.Status);
+            SubjectForSearch s = (SubjectForSearch)obj;
+            return Status == s.Status;
         }
 
         // override object.GetHashCode

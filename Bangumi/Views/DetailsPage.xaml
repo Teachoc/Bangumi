@@ -60,7 +60,7 @@
                 </Grid>
             </DataTemplate>
 
-            <DataTemplate x:Name="EpTemplate" x:DataType="data:Ep">
+            <DataTemplate x:Name="EpTemplate" x:DataType="data:Episode">
                 <RelativePanel Tapped="Eps_Tapped" 
                                RightTapped="Eps_RightTapped"
                                Holding="Eps_Holding"
@@ -93,7 +93,7 @@
                 </RelativePanel>
             </DataTemplate>
 
-            <DataTemplate x:Name="CrtTemplate" x:DataType="data:Crt">
+            <DataTemplate x:Name="CrtTemplate" x:DataType="data:Character">
                 <RelativePanel DataContext="{x:Bind Url}"
                                Tapped="ItemsRepeater_Tapped"
                                PointerEntered="RelativePanel_PointerEntered"
@@ -137,7 +137,7 @@
                 </RelativePanel>
             </DataTemplate>
 
-            <DataTemplate x:Name="StaffTemplate" x:DataType="data:Staff">
+            <DataTemplate x:Name="StaffTemplate" x:DataType="data:Person">
                 <RelativePanel DataContext="{x:Bind Url}"
                                Tapped="ItemsRepeater_Tapped"
                                PointerEntered="RelativePanel_PointerEntered"

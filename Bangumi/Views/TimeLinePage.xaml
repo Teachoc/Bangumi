@@ -39,7 +39,7 @@
 
             <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModel.TimeLineCollection}" IsSourceGrouped="True" ItemsPath="Items"/>
 
-            <DataTemplate x:Key="NarrowZoomedInTemplate" x:DataType="data:Subject">
+            <DataTemplate x:Key="NarrowZoomedInTemplate" x:DataType="data:SubjectForCalendar">
                 <RelativePanel Padding="5"
                                RightTapped="ItemRelativePanel_RightTapped"
                                Holding="RelativePanel_Holding"
@@ -77,7 +77,7 @@
                             RelativePanel.RightOf="BangumiImage"
                             RelativePanel.Below="SubTitleTextBlock"
                             CornerRadius="8">
-                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, model:SubjectTypeEnum.Anime)}"
+                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, model:SubjectType.Anime)}"
                                    x:Phase="1"
                                    Margin="5,0"
                                    FontSize="12"
@@ -87,7 +87,7 @@
                 </RelativePanel>
             </DataTemplate>
 
-            <DataTemplate x:Key="WideZoomedInTemplate" x:DataType="data:Subject">
+            <DataTemplate x:Key="WideZoomedInTemplate" x:DataType="data:SubjectForCalendar">
                 <RelativePanel Padding="5"
                                RightTapped="ItemRelativePanel_RightTapped"
                                Holding="RelativePanel_Holding"
@@ -126,7 +126,7 @@
                             RelativePanel.RightOf="BangumiImage"
                             RelativePanel.Below="SubTitleTextBlock"
                             CornerRadius="10">
-                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, model:SubjectTypeEnum.Anime)}"
+                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, model:SubjectType.Anime)}"
                                    x:Phase="1"
                                    Margin="6,0"
                                    FontSize="16"
@@ -136,14 +136,14 @@
                 </RelativePanel>
             </DataTemplate>
 
-            <DataTemplate x:Key="ZoomedInGroupHeaderTemplate"  x:DataType="data:BangumiTimeLine">
+            <DataTemplate x:Key="ZoomedInGroupHeaderTemplate"  x:DataType="data:Calendar">
                 <TextBlock Text="{x:Bind Weekday.Chinese}"
                            Foreground="{ThemeResource ApplicationForegroundThemeBrush}"
                            Style="{StaticResource SubtitleTextBlockStyle}"/>
             </DataTemplate>
 
             <DataTemplate x:Key="ZoomedOutTemplate"  x:DataType="wuxdata:ICollectionViewGroup">
-                <TextBlock Text="{x:Bind ((data:BangumiTimeLine)Group).Weekday.Chinese}"
+                <TextBlock Text="{x:Bind ((data:Calendar)Group).Weekday.Chinese}"
                            Style="{StaticResource SubtitleTextBlockStyle}"
                            TextWrapping="Wrap" />
             </DataTemplate>

@@ -42,7 +42,7 @@
 
             <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModel.SubjectCollection}" IsSourceGrouped="True" ItemsPath="Items"/>
 
-            <DataTemplate x:Key="NarrowZoomedInTemplate" x:DataType="data:Subject2">
+            <DataTemplate x:Key="NarrowZoomedInTemplate" x:DataType="data:SubjectBaseE">
                 <RelativePanel Name="ItemRelativePanel" Padding="5"
                                RightTapped="ItemRelativePanel_RightTapped"
                                Holding="ItemRelativePanel_Holding"
@@ -77,7 +77,7 @@
                 </RelativePanel>
             </DataTemplate>
 
-            <DataTemplate x:Key="WideZoomedInTemplate" x:DataType="data:Subject2">
+            <DataTemplate x:Key="WideZoomedInTemplate" x:DataType="data:SubjectBaseE">
                 <RelativePanel Padding="5"
                                RightTapped="ItemRelativePanel_RightTapped"
                                Holding="ItemRelativePanel_Holding"

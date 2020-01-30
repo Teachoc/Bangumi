@@ -121,23 +121,23 @@ namespace Bangumi.Views
             if (sender is MenuFlyoutItem item)
             {
                 var tag = item.Tag;
-                var ep = item.DataContext as Ep;
+                var ep = item.DataContext as Episode;
                 switch (tag)
                 {
                     case "Watched":
-                        ViewModel.UpdateEpStatus(ep, EpStatusEnum.watched);
+                        ViewModel.UpdateEpStatus(ep, EpStatusType.watched);
                         break;
                     case "WatchedTo":
-                        ViewModel.UpdateEpStatusBatch(ep, EpStatusEnum.watched);
+                        ViewModel.UpdateEpStatusBatch(ep, EpStatusType.watched);
                         break;
                     case "Queue":
-                        ViewModel.UpdateEpStatus(ep, EpStatusEnum.queue);
+                        ViewModel.UpdateEpStatus(ep, EpStatusType.queue);
                         break;
                     case "Drop":
-                        ViewModel.UpdateEpStatus(ep, EpStatusEnum.drop);
+                        ViewModel.UpdateEpStatus(ep, EpStatusType.drop);
                         break;
                     case "Remove":
-                        ViewModel.UpdateEpStatus(ep, EpStatusEnum.remove);
+                        ViewModel.UpdateEpStatus(ep, EpStatusType.remove);
                         break;
                 }
             }
@@ -148,7 +148,7 @@ namespace Bangumi.Views
         /// </summary>
         private void Eps_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsProgressLoading && ((sender as RelativePanel)?.DataContext as Ep)?.Status != "NA")
+            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsProgressLoading && ((sender as RelativePanel)?.DataContext as Episode)?.Status != "NA")
             {
                 EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }

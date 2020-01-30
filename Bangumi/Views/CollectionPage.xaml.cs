@@ -55,7 +55,7 @@ namespace Bangumi.Views
 
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var selectedItem = (Subject2)e.ClickedItem;
+            var selectedItem = (SubjectBaseE)e.ClickedItem;
             MainPage.RootFrame.Navigate(typeof(DetailsPage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
         }
 
@@ -67,19 +67,19 @@ namespace Bangumi.Views
                 switch (item.Tag)
                 {
                     case "Wish":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Wish);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBaseE, CollectionStatusType.Wish);
                         break;
                     case "Collect":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Collect);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBaseE, CollectionStatusType.Collect);
                         break;
                     case "Doing":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Do);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBaseE, CollectionStatusType.Do);
                         break;
                     case "OnHold":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.OnHold);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBaseE, CollectionStatusType.OnHold);
                         break;
                     case "Dropped":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as Subject2, CollectionStatusEnum.Dropped);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBaseE, CollectionStatusType.Dropped);
                         break;
                 }
             }

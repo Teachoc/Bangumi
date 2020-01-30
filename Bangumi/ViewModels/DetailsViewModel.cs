@@ -18,7 +18,7 @@ namespace Bangumi.ViewModels
     public class DetailsViewModel : ViewModelBase
     {
         #region 属性
-        public ObservableCollection<Ep> Eps { get; private set; } = new ObservableCollection<Ep>();
+        public ObservableCollection<Episode> Eps { get; private set; } = new ObservableCollection<Episode>();
 
         private bool _isLoading;
         public bool IsLoading
@@ -62,7 +62,7 @@ namespace Bangumi.ViewModels
             set => Set(ref _subjectId, value);
         }
 
-        private SubjectTypeEnum SubjectType { get; set; }
+        private SubjectType SubjectType { get; set; }
 
         private string _imageSource;
         public string ImageSource
@@ -118,8 +118,8 @@ namespace Bangumi.ViewModels
 
 
         // 更多资料用
-        public ObservableCollection<Crt> Characters { get; private set; } = new ObservableCollection<Crt>();
-        public ObservableCollection<Staff> Staffs { get; private set; } = new ObservableCollection<Staff>();
+        public ObservableCollection<Character> Characters { get; private set; } = new ObservableCollection<Character>();
+        public ObservableCollection<Person> Staffs { get; private set; } = new ObservableCollection<Person>();
         private string _name;
         public string Name
         {
@@ -144,14 +144,11 @@ namespace Bangumi.ViewModels
         public ObservableCollection<Topic> Topics { get; private set; } = new ObservableCollection<Topic>();
 
         // 收藏状态，评分，吐槽
-        private int _myRate;
-        private string _myComment;
-        private bool _myPrivacy;
-        private CollectionStatusEnum? _collectionStatus;
+        private CollectionStatusType? _collectionStatus;
         public string CollectionStatusText
         {
-            get => _collectionStatus?.GetDescCn(SubjectType);
-            set => Set(ref _collectionStatus, CollectionStatusEnumEx.FromValue(value));
+            get => _collectionStatus?.GetDesc(SubjectType);
+            set => Set(ref _collectionStatus, CollectionStatusTypeExtension.FromValue(value));
         }
 
         private string _collectionStatusIcon;
@@ -187,9 +184,6 @@ namespace Bangumi.ViewModels
             // 收藏状态，评分，吐槽
             CollectionStatusText = "";
             CollectionStatusIcon = "\uE006";
-            _myRate = 0;
-            _myComment = "";
-            _myPrivacy = false;
             Blogs.Clear();
             Topics.Clear();
             Eps.Clear();
@@ -219,18 +213,15 @@ namespace Bangumi.ViewModels
                     collectionEditContentDialog.CollectionStatus.Value, collectionEditContentDialog.Comment,
                     collectionEditContentDialog.Rate.ToString(), collectionEditContentDialog.Privacy ? "1" : "0"))
                 {
-                    _myRate = collectionEditContentDialog.Rate;
-                    _myComment = collectionEditContentDialog.Comment;
-                    _myPrivacy = collectionEditContentDialog.Privacy;
                     CollectionStatusText = collectionEditContentDialog.CollectionStatus?.GetValue();
                     SetCollectionIcon();
-                    // 若状态修改为看过，且设置启用，则批量修改章节状态为看过
-                    if (_collectionStatus == CollectionStatusEnum.Collect && SettingHelper.EpsBatch)
+                    // 若状态修改为看过，且设置启用，则批量修改正片章节状态为看过
+                    if (_collectionStatus == CollectionStatusType.Collect && SettingHelper.EpsBatch)
                     {
-                        var selectedEps = Eps.Where(ep => Regex.IsMatch(ep.Status, "(Air|Today|NA)"));
+                        var selectedEps = Eps.Where(ep => ep.Type == 0 && Regex.IsMatch(ep.Status, "(Air|Today|NA)"));
                         int epId = selectedEps.LastOrDefault()?.Id ?? 0;
                         string epsId = string.Join(',', selectedEps.Select(it => it.Id));
-                        if (epsId != string.Empty && await BangumiFacade.UpdateProgressBatchAsync(epId, EpStatusEnum.watched, epsId))
+                        if (epsId != string.Empty && await BangumiFacade.UpdateProgressBatchAsync(epId, EpStatusType.watched, epsId))
                         {
                             foreach (var episode in selectedEps)
                             {
@@ -241,7 +232,6 @@ namespace Bangumi.ViewModels
                         {
                             NotificationHelper.Notify("无章节需要更新");
                         }
-
                     }
                 }
                 IsStatusLoaded = true;
@@ -255,7 +245,7 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="ep"></param>
         /// <param name="status">状态</param>
-        public async void UpdateEpStatus(Ep ep, EpStatusEnum status)
+        public async void UpdateEpStatus(Episode ep, EpStatusType status)
         {
             if (ep != null)
             {
@@ -280,9 +270,9 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="ep"></param>
         /// <param name="status">状态</param>
-        public async void UpdateEpStatusBatch(Ep ep, EpStatusEnum status)
+        public async void UpdateEpStatusBatch(Episode ep, EpStatusType status)
         {
-            if (ep != null && status == EpStatusEnum.watched)
+            if (ep != null && status == EpStatusType.watched)
             {
                 IsUpdating = true;
                 var selectedEps = Eps.Where(it => Regex.IsMatch(it.Status, "(Air|Today|NA)")).TakeWhile(it => it.Id <= ep.Id);
@@ -322,7 +312,7 @@ namespace Bangumi.ViewModels
             {
                 CollectionStatusIcon = "\uE006";
             }
-            else if (CollectionStatusText == CollectionStatusEnum.Dropped.GetValue())
+            else if (CollectionStatusText == CollectionStatusType.Dropped.GetValue())
             {
                 CollectionStatusIcon = "\uE007";
             }
@@ -391,7 +381,7 @@ namespace Bangumi.ViewModels
         /// 处理条目信息
         /// </summary>
         /// <param name="subject"></param>
-        private void ProcessSubject(Subject subject)
+        private void ProcessSubject(SubjectLarge subject)
         {
             if (subject == null || subject.Id.ToString() != SubjectId) return;
 
@@ -445,14 +435,14 @@ namespace Bangumi.ViewModels
             }
 
             // 条目类别
-            SubjectType = (SubjectTypeEnum)subject.Type;
+            SubjectType = (SubjectType)subject.Type;
             // 更多资料
             Name = subject.Name;
             MoreSummary = subject.Summary;
-            MoreInfo = "作品分类：" + SubjectType.GetDescCn();
+            MoreInfo = "作品分类：" + SubjectType.GetDesc();
             MoreInfo += subject.AirDate == "0000-00-00" ? "" : "\n放送开始：" + subject.AirDate;
             MoreInfo += subject.AirWeekday == 0 ? "" : "\n放送星期：" + Converters.GetWeekday(subject.AirWeekday);
-            MoreInfo += subject.Eps.Count == 0 ? "" : "\n话数：" + subject.Eps.Count;
+            MoreInfo += subject.Eps?.Count == 0 ? "" : "\n话数：" + subject.Eps.Count;
             // 角色
             Characters.Clear();
             if (subject.Characters != null)
@@ -489,15 +479,15 @@ namespace Bangumi.ViewModels
                     Topics.Add(topic);
                 }
             }
-            // 显示章节
-            if (subject.Eps.Count > 0)
+            // 章节
+            if (!subject.Eps.SequenceEqual(Eps))
             {
-                // 在无章节信息时添加
-                if (Eps.Count == 0)
+                Eps.Clear();
+                if (subject.Eps != null)
                 {
                     foreach (var ep in subject.Eps)
                     {
-                        Ep newEp = new Ep
+                        Episode newEp = new Episode
                         {
                             Id = ep.Id,
                             Url = ep.Url,
@@ -514,24 +504,6 @@ namespace Bangumi.ViewModels
                         Eps.Add(newEp);
                     }
                 }
-                // 在有章节信息时覆盖
-                else
-                {
-                    foreach (var ep in subject.Eps)
-                    {
-                        var oldEp = Eps.FirstOrDefault(e => e.Id == ep.Id);
-                        oldEp.Url = ep.Url;
-                        oldEp.Type = ep.Type;
-                        oldEp.Sort = ep.Sort;
-                        oldEp.Name = ep.Name;
-                        oldEp.NameCn = ep.NameCn;
-                        oldEp.Duration = ep.Duration;
-                        oldEp.AirDate = ep.AirDate;
-                        oldEp.Comment = ep.Comment;
-                        oldEp.Desc = ep.Desc;
-                        oldEp.Status = ep.Status;
-                    }
-                }
             }
             IsDetailLoading = false;
         }
@@ -541,7 +513,7 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="progress"></param>
-        private void ProcessProgress(Subject subject, Progress progress)
+        private void ProcessProgress(SubjectLarge subject, Progress progress)
         {
             if (progress?.Eps == null || progress.SubjectId.ToString() != SubjectId) return;
 
@@ -564,21 +536,15 @@ namespace Bangumi.ViewModels
         /// 处理收藏、评分和吐槽信息。
         /// </summary>
         /// <param name="subjectStatus"></param>
-        private void ProcessCollectionStatus(SubjectStatus2 subjectStatus)
+        private void ProcessCollectionStatus(CollectionStatusE subjectStatus)
         {
             if (subjectStatus?.Status != null)
             {
                 CollectionStatusText = subjectStatus.Status.Type;
-                _myRate = subjectStatus.Rating;
-                _myComment = subjectStatus.Comment;
-                _myPrivacy = subjectStatus.Private == "1";
             }
             else
             {
                 CollectionStatusText = "收藏";
-                _myRate = 0;
-                _myComment = string.Empty;
-                _myPrivacy = false;
             }
             SetCollectionIcon();
             IsStatusLoaded = true;
