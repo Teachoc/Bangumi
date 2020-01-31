@@ -22,10 +22,8 @@ namespace Bangumi.Api
         /// </summary>
         /// <param name="localFolder">本地文件夹</param>
         /// <param name="cacheFolder">缓存文件夹</param>
-        /// <param name="noImageUri">无图片时显示的图片路径</param>
         /// <param name="encryptionDelegate">加密方法</param>
         /// <param name="decryptionDelegate">解密方法</param>
-        /// <param name="checkNetworkActivityDelegate">检查网络是否可用的方法</param>
         public static void Init(
             string localFolder,
             string cacheFolder,

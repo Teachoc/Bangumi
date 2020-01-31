@@ -33,13 +33,13 @@ namespace Bangumi.Helper
                     msg = DateTime.Now.ToLongTimeString() + ": " + msg;
                     duration = 0;
                     dismissButton = true;
+                    break;
 #else
                     return;
 #endif
-                    break;
                 default:
                     notification = MainPage.RootPage.ToastInAppNotification;
-                    duration = 1500;
+                    duration = 2000;
                     dismissButton = false;
                     break;
             }

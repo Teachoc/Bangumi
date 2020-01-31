@@ -49,7 +49,7 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 刷新时间表。
         /// </summary>
-        public async void LoadTimeLine()
+        public async Task LoadTimeLine()
         {
             try
             {
@@ -72,7 +72,7 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="collectionStatus"></param>
-        public async void UpdateCollectionStatus(SubjectBase subject, CollectionStatusType collectionStatus)
+        public async Task UpdateCollectionStatus(SubjectBase subject, CollectionStatusType collectionStatus)
         {
             if (subject != null)
             {

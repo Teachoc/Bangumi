@@ -19,7 +19,7 @@ namespace Bangumi.Api.Services
         public const string RedirectUrl = "BangumiGithubVersion";
 
         private readonly string _localFolder;
-        private static IBgmCache _bgmCache;
+        private readonly IBgmCache _bgmCache;
 
         public bool IsLogin => MyToken?.Expires > DateTime.Now.ToJsTick();
 
@@ -50,14 +50,12 @@ namespace Bangumi.Api.Services
                     if (call.HttpResponseMessage.StatusCode == HttpStatusCode.Unauthorized)
                     {
                         Debug.WriteLine("刷新Token。");
-                        await RefreshToken();
+                        await RefreshToken().ConfigureAwait(false);
                     }
-                    else if (call.HttpResponseMessage.StatusCode == HttpStatusCode.BadRequest)
+                    else if (call.HttpResponseMessage.StatusCode == HttpStatusCode.BadRequest
+                             && (await call.HttpResponseMessage.Content.ReadAsStringAsync()).Contains("Invalid refresh token"))
                     {
-                        if ((await call.HttpResponseMessage.Content.ReadAsStringAsync()).Contains("Invalid refresh token"))
-                        {
-                            throw new BgmUnauthorizedException();
-                        }
+                        throw new BgmUnauthorizedException();
                     }
                     if (call.Exception is TaskCanceledException)
                     {
@@ -89,7 +87,7 @@ namespace Bangumi.Api.Services
                         {
                             MyToken = t.Result;
                             MyToken.Expires = (int)DateTime.Now.AddSeconds(t.Result.ExpiresIn).ToJsTick();
-                            await SaveToken();
+                            await SaveToken().ConfigureAwait(false);
                         }, TaskContinuationOptions.OnlyOnRanToCompletion);
                     break;
                 }
@@ -97,7 +95,7 @@ namespace Bangumi.Api.Services
                 {
                     Debug.WriteLine($"第{i + 1}次尝试获取Token失败。");
                     Debug.WriteLine(e.StackTrace);
-                    await Task.Delay(1000);
+                    await Task.Delay(1000).ConfigureAwait(false);
                 }
             }
         }
@@ -105,6 +103,7 @@ namespace Bangumi.Api.Services
         public async Task<bool> CheckToken()
         {
             if (MyToken == null) return false;
+
             Debug.WriteLine("检查 Token 有效期。");
             await $"{OAuthHOST}/token_status"
                 .PostStringAsync(string.Empty)
@@ -114,8 +113,11 @@ namespace Bangumi.Api.Services
                     // 若token对应的用户ID不同，
                     // 获取1天后的时间戳，离过期不足1天时或过期后，
                     // 更新 access_token
-                    if (t.Result.UserId != MyToken.UserId || t.Result.Expires < DateTime.Now.AddDays(1).ToJsTick())
-                        await RefreshToken();
+                    if (t.Result.UserId != MyToken.UserId
+                        || t.Result.Expires < DateTime.Now.AddDays(1).ToJsTick())
+                    {
+                        await RefreshToken().ConfigureAwait(false);
+                    }
                 });
             return true;
         }
@@ -132,6 +134,7 @@ namespace Bangumi.Api.Services
         public async Task RefreshToken()
         {
             if (MyToken == null) return;
+
             await $"{OAuthHOST}/access_token"
                 .PostUrlEncodedAsync(new
                 {
@@ -146,7 +149,7 @@ namespace Bangumi.Api.Services
                 {
                     MyToken = t.Result;
                     MyToken.Expires = (int)DateTime.Now.AddSeconds(t.Result.ExpiresIn).ToJsTick();
-                    await SaveToken();
+                    await SaveToken().ConfigureAwait(false);
                 });
         }
 

@@ -108,6 +108,8 @@ namespace Bangumi.Views
                     case "UseBangumiDataAirTime":
                         SettingHelper.UseBangumiDataAirTime = toggleSwitch.IsOn;
                         break;
+                    default:
+                        break;
                 }
             }
         }
@@ -175,7 +177,9 @@ namespace Bangumi.Views
         {
             // 删除图片缓存文件夹
             if (Directory.Exists(Path.Combine(ApplicationData.Current.TemporaryFolder.Path, "ImageCache")))
+            {
                 await (await ApplicationData.Current.TemporaryFolder.GetFolderAsync("ImageCache")).DeleteAsync();
+            }
             ImageCacheSizeTextBlock.Text = "0";
             DeleteImageTempFileButton.IsEnabled = false;
         }

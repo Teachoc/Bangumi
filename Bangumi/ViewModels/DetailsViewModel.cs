@@ -1,4 +1,5 @@
 ﻿using Bangumi.Api;
+using Bangumi.Api.Common;
 using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.ContentDialogs;
@@ -193,10 +194,12 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 更新收藏状态、评分、吐槽
         /// </summary>
-        public async void EditCollectionStatus()
+        public async Task EditCollectionStatus()
         {
             if (!BangumiApi.BgmOAuth.IsLogin)
+            {
                 return;
+            }
             var subjectStatus = BangumiApi.BgmApi.Status(SubjectId);
             CollectionEditContentDialog collectionEditContentDialog = new CollectionEditContentDialog(
                 this.SubjectType, subjectStatus)
@@ -221,7 +224,7 @@ namespace Bangumi.ViewModels
                         var selectedEps = Eps.Where(ep => ep.Type == 0 && Regex.IsMatch(ep.Status, "(Air|Today|NA)"));
                         int epId = selectedEps.LastOrDefault()?.Id ?? 0;
                         string epsId = string.Join(',', selectedEps.Select(it => it.Id));
-                        if (epsId != string.Empty && await BangumiFacade.UpdateProgressBatchAsync(epId, EpStatusType.watched, epsId))
+                        if (!string.IsNullOrEmpty(epsId) && await BangumiFacade.UpdateProgressBatchAsync(epId, epsId))
                         {
                             foreach (var episode in selectedEps)
                             {
@@ -245,7 +248,7 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="ep"></param>
         /// <param name="status">状态</param>
-        public async void UpdateEpStatus(Episode ep, EpStatusType status)
+        public async Task UpdateEpStatus(Episode ep, EpStatusType status)
         {
             if (ep != null)
             {
@@ -269,37 +272,42 @@ namespace Bangumi.ViewModels
         /// 批量更新章节状态为看过
         /// </summary>
         /// <param name="ep"></param>
-        /// <param name="status">状态</param>
-        public async void UpdateEpStatusBatch(Episode ep, EpStatusType status)
+        public async Task UpdateEpStatusBatch(Episode ep)
         {
-            if (ep != null && status == EpStatusType.watched)
+            if (ep == null)
             {
-                IsUpdating = true;
-                var selectedEps = Eps.Where(it => Regex.IsMatch(it.Status, "(Air|Today|NA)")).TakeWhile(it => it.Id <= ep.Id);
-                string epsId = string.Empty;
+                return;
+            }
+            IsUpdating = true;
+            var selectedEps = GetSelectedEps();
+            string epsId = string.Join(',', selectedEps.Select(it => it.Id.ToString()));
+            if (!string.IsNullOrEmpty(epsId) && await BangumiFacade.UpdateProgressBatchAsync(ep.Id, epsId))
+            {
+                foreach (var episode in selectedEps)
+                {
+                    episode.Status = "看过";
+                }
+            }
+            else
+            {
+                NotificationHelper.Notify("无章节需要更新");
+            }
+            IsUpdating = false;
+
+            // 获取点击看到章节及之前所有未标记的章节
+            IEnumerable<Episode> GetSelectedEps()
+            {
                 foreach (var episode in Eps)
                 {
-                    if (episode.Status == "Air" || episode.Status == "Today" || episode.Status == "NA")
-                        epsId += episode.Id.ToString() + ",";
+                    if (Regex.IsMatch(episode.Status, "(Air|Today|NA)"))
+                    {
+                        yield return episode;
+                    }
                     if (episode.Id == ep.Id)
                     {
-                        break;
+                        yield break;
                     }
                 }
-                epsId = epsId.TrimEnd(',');
-                epsId = string.Join(',', selectedEps.Select(it => it.Id));
-                if (epsId != string.Empty && await BangumiFacade.UpdateProgressBatchAsync(ep.Id, status, epsId))
-                {
-                    foreach (var episode in selectedEps)
-                    {
-                        episode.Status = "看过";
-                    }
-                }
-                else
-                {
-                    NotificationHelper.Notify("无章节需要更新");
-                }
-                IsUpdating = false;
             }
         }
 
@@ -326,10 +334,12 @@ namespace Bangumi.ViewModels
         /// 加载详情和章节，
         /// 用户进度，收藏状态。
         /// </summary>
-        public async void LoadDetails()
+        public async Task LoadDetails()
         {
             if (IsLoading)
+            {
                 return;
+            }
             try
             {
                 IsLoading = true;
@@ -383,8 +393,10 @@ namespace Bangumi.ViewModels
         /// <param name="subject"></param>
         private void ProcessSubject(SubjectLarge subject)
         {
-            if (subject == null || subject.Id.ToString() != SubjectId) return;
-
+            if (subject == null || subject.Id.ToString() != SubjectId)
+            {
+                return;
+            }
             // 条目标题
             NameCn = string.IsNullOrEmpty(subject.NameCn) ? subject.Name : subject.NameCn;
             // 条目图片
@@ -442,7 +454,7 @@ namespace Bangumi.ViewModels
             MoreInfo = "作品分类：" + SubjectType.GetDesc();
             MoreInfo += subject.AirDate == "0000-00-00" ? "" : "\n放送开始：" + subject.AirDate;
             MoreInfo += subject.AirWeekday == 0 ? "" : "\n放送星期：" + Converters.GetWeekday(subject.AirWeekday);
-            MoreInfo += subject.Eps?.Count == 0 ? "" : "\n话数：" + subject.Eps.Count;
+            MoreInfo += subject.Eps == null ? "" : "\n话数：" + subject.Eps.Count;
             // 角色
             Characters.Clear();
             if (subject.Characters != null)
@@ -480,7 +492,7 @@ namespace Bangumi.ViewModels
                 }
             }
             // 章节
-            if (!subject.Eps.SequenceEqual(Eps))
+            if (!subject.Eps.SequenceEqualExT(Eps))
             {
                 Eps.Clear();
                 if (subject.Eps != null)
@@ -515,8 +527,10 @@ namespace Bangumi.ViewModels
         /// <param name="progress"></param>
         private void ProcessProgress(SubjectLarge subject, Progress progress)
         {
-            if (progress?.Eps == null || progress.SubjectId.ToString() != SubjectId) return;
-
+            if (progress?.Eps == null || progress.SubjectId.ToString() != SubjectId)
+            {
+                return;
+            }
             foreach (var ep in Eps) //用户观看状态
             {
                 var prog = progress.Eps?.Where(p => p.Id == ep.Id).FirstOrDefault();
@@ -560,6 +574,10 @@ namespace Bangumi.ViewModels
 
         public int CompareTo(SimpleRate other)
         {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
             return Count.CompareTo(other.Count);
         }
     }

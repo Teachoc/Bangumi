@@ -44,7 +44,9 @@ namespace Bangumi.Views
             {
                 var tag = button.Tag;
                 if (tag.Equals("时间表"))
+                {
                     ViewModel.LoadTimeLine();
+                }
             }
         }
 
@@ -76,6 +78,8 @@ namespace Bangumi.Views
                     case "Dropped":
                         ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Dropped);
                         break;
+                    default:
+                        break;
                 }
             }
         }
@@ -83,24 +87,22 @@ namespace Bangumi.Views
         // 鼠标右键弹出菜单
         private void ItemRelativePanel_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsLoading)
+            if (BangumiApi.BgmOAuth.IsLogin
+                && !ViewModel.IsLoading
+                && e.PointerDeviceType == PointerDeviceType.Mouse)
             {
-                if (e.PointerDeviceType == PointerDeviceType.Mouse)
-                {
-                    CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-                }
+                CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
 
         // 触摸长按弹出菜单
         private void RelativePanel_Holding(object sender, HoldingRoutedEventArgs e)
         {
-            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsLoading)
+            if (BangumiApi.BgmOAuth.IsLogin
+                && !ViewModel.IsLoading
+                && e.HoldingState == HoldingState.Started)
             {
-                if (e.HoldingState == HoldingState.Started)
-                {
-                    CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-                }
+                CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
     }

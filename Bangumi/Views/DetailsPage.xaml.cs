@@ -5,6 +5,7 @@ using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.ViewModels;
 using System;
+using System.Threading.Tasks;
 using Windows.Devices.Input;
 using Windows.System;
 using Windows.UI.Input;
@@ -120,15 +121,14 @@ namespace Bangumi.Views
         {
             if (sender is MenuFlyoutItem item)
             {
-                var tag = item.Tag;
                 var ep = item.DataContext as Episode;
-                switch (tag)
+                switch (item.Tag)
                 {
                     case "Watched":
                         ViewModel.UpdateEpStatus(ep, EpStatusType.watched);
                         break;
                     case "WatchedTo":
-                        ViewModel.UpdateEpStatusBatch(ep, EpStatusType.watched);
+                        ViewModel.UpdateEpStatusBatch(ep);
                         break;
                     case "Queue":
                         ViewModel.UpdateEpStatus(ep, EpStatusType.queue);
@@ -138,6 +138,8 @@ namespace Bangumi.Views
                         break;
                     case "Remove":
                         ViewModel.UpdateEpStatus(ep, EpStatusType.remove);
+                        break;
+                    default:
                         break;
                 }
             }
@@ -159,12 +161,11 @@ namespace Bangumi.Views
         /// </summary>
         private void Eps_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsProgressLoading)
+            if (BangumiApi.BgmOAuth.IsLogin
+                && !ViewModel.IsProgressLoading
+                && e.PointerDeviceType == PointerDeviceType.Mouse)
             {
-                if (e.PointerDeviceType == PointerDeviceType.Mouse)
-                {
-                    EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-                }
+                EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
 
@@ -173,12 +174,11 @@ namespace Bangumi.Views
         /// </summary>
         private void Eps_Holding(object sender, HoldingRoutedEventArgs e)
         {
-            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsProgressLoading)
+            if (BangumiApi.BgmOAuth.IsLogin
+                && !ViewModel.IsProgressLoading
+                && e.HoldingState == HoldingState.Started)
             {
-                if (e.HoldingState == HoldingState.Started)
-                {
-                    EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-                }
+                EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
 
@@ -201,7 +201,7 @@ namespace Bangumi.Views
             var uriWebPage = new Uri("https://bgm.tv/subject/" + ViewModel.SubjectId);
 
             // Launch the URI
-            var success = await Launcher.LaunchUriAsync(uriWebPage);
+            await Launcher.LaunchUriAsync(uriWebPage);
         }
 
         private async void ItemsRepeater_Tapped(object sender, TappedRoutedEventArgs e)
@@ -212,7 +212,7 @@ namespace Bangumi.Views
                 var uriWebPage = new Uri(panel.DataContext.ToString());
 
                 // Launch the URI
-                var success = await Launcher.LaunchUriAsync(uriWebPage);
+                await Launcher.LaunchUriAsync(uriWebPage);
             }
         }
 
@@ -221,7 +221,7 @@ namespace Bangumi.Views
             if (sender is RelativePanel panel)
             {
                 panel.Background = Resources["ListViewItemBackgroundPointerOver"] as SolidColorBrush;
-                //Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 10);
+                Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 10);
             }
         }
 
@@ -230,7 +230,7 @@ namespace Bangumi.Views
             if (sender is RelativePanel panel)
             {
                 panel.Background = Resources["ListViewItemBackgroundPressed"] as SolidColorBrush;
-                //Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 10);
+                Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 10);
             }
         }
 
@@ -239,7 +239,7 @@ namespace Bangumi.Views
             if (sender is RelativePanel panel)
             {
                 panel.Background = Converters.ConvertBrushFromString("Transparent");
-                //Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 10);
+                Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 10);
             }
         }
 
@@ -276,7 +276,7 @@ namespace Bangumi.Views
         /// <summary>
         /// 初始化放送站点及拆分按钮
         /// </summary>
-        private async void InitAirSites()
+        private async Task InitAirSites()
         {
             SitesMenuFlyout.Items.Clear();
             SelectedTextBlock.Text = "";

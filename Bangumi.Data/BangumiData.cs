@@ -34,7 +34,9 @@ namespace Bangumi.Data
             _folderPath = dataFolderPath ?? throw new ArgumentNullException(nameof(dataFolderPath));
             UseBiliApp = useBiliApp;
             if (!Directory.Exists(_folderPath))
+            {
                 Directory.CreateDirectory(_folderPath);
+            }
             Task.Run(async () =>
             {
                 if (_dataSet == null &&
@@ -64,7 +66,10 @@ namespace Bangumi.Data
             var siteList = _dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
                                           .Where(s => _dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
             string[] airSites = { "bilibili", "acfun", "iqiyi", "qq" };
-            if (siteList == null) return null;
+            if (siteList == null)
+            {
+                return null;
+            }
             foreach (var siteName in airSites)
             {
                 if (!(siteList.FirstOrDefault(s => s.SiteName == siteName) is Site site)) continue;
@@ -84,8 +89,10 @@ namespace Bangumi.Data
         {
             var siteList = _dataSet?.Items.FirstOrDefault(e => e.Sites.FirstOrDefault(s => s.SiteName == "bangumi" && s.Id == id) != null)?.Sites
                                          .Where(s => _dataSet.SiteMeta[s.SiteName].Type == "onair").ToList();
-            if (siteList == null) return new List<Site>();
-
+            if (siteList == null)
+            {
+                return new List<Site>();
+            }
             foreach (var site in siteList)
             {
                 site.Url = string.IsNullOrEmpty(site.Id)
@@ -157,10 +164,11 @@ namespace Bangumi.Data
         /// <returns></returns>
         public static async Task<bool> DownloadLatestBangumiData()
         {
-            if (string.IsNullOrEmpty(_latestVersion))
-                await GetLatestVersion();
-            if (string.IsNullOrEmpty(_latestVersion)) return false;
-
+            if (string.IsNullOrEmpty(_latestVersion)
+                && string.IsNullOrEmpty(await GetLatestVersion().ConfigureAwait(false)))
+            {
+                return false;
+            }
             try
             {
                 var data = await BangumiDataCDNUrl.GetStringAsync();
@@ -200,7 +208,7 @@ namespace Bangumi.Data
         /// <returns></returns>
         private static string GetFilePath(this AppFile file, string folder)
         {
-            return Path.Combine(folder, file.ToString().ToLower().Replace('_', '.'));
+            return Path.Combine(folder, file.ToString().ToLowerInvariant().Replace('_', '.'));
         }
 
         #endregion

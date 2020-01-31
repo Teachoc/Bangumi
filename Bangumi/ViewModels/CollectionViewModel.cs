@@ -55,7 +55,7 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 刷新收藏列表，API限制每类最多25条。
         /// </summary>
-        public async void LoadCollectionList()
+        public async Task LoadCollectionList()
         {
             try
             {
@@ -86,53 +86,57 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="collectionStatus"></param>
-        public async void UpdateCollectionStatus(SubjectBaseE subject, CollectionStatusType collectionStatus)
+        public async Task UpdateCollectionStatus(SubjectBaseE subject, CollectionStatusType collectionStatus)
         {
-            if (subject == null) return;
-
+            if (subject == null)
+            {
+                return;
+            }
             // 由于服务器原因，导致条目在多个类别下出现，则有不属于同一类别的存在，则进行更新
             var cols = SubjectCollection.Where(sub => sub.Items.FirstOrDefault(it => it.SubjectId == subject.SubjectId) != null).ToList();
             if (cols.All(c => c.Status.Id == collectionStatus))
+            {
                 return;
+            }
             var col = cols.FirstOrDefault(c => c.Status.Id != collectionStatus);
             IsUpdating = true;
-            if (await BangumiFacade.UpdateCollectionStatusAsync(subject.SubjectId.ToString(), collectionStatus))
+            // 更新收藏状态成功后将条目从原类别中删除
+            if (await BangumiFacade.UpdateCollectionStatusAsync(subject.SubjectId.ToString(), collectionStatus)
+                && col != null)
             {
-                // 将条目从原类别中删除
-                if (col != null)
+                col.Items.Remove(subject);
+                col.Count--;
+                var index = SubjectCollection.IndexOf(col);
+                SubjectCollection.Remove(col);
+                if (col.Items.Count != 0)
                 {
-                    col.Items.Remove(subject);
-                    col.Count--;
-                    var index = SubjectCollection.IndexOf(col);
-                    SubjectCollection.Remove(col);
-                    if (col.Items.Count != 0)
-                        SubjectCollection.Insert(index, col);
-                    // 找到新所属类别，有则加入，无则新增
-                    var newCol = SubjectCollection.FirstOrDefault(sub =>
-                        sub.Status.Id == collectionStatus);
-                    if (newCol != null)
+                    SubjectCollection.Insert(index, col);
+                }
+                // 找到新所属类别，有则加入，无则新增
+                var newCol = SubjectCollection.FirstOrDefault(sub =>
+                    sub.Status.Id == collectionStatus);
+                if (newCol != null)
+                {
+                    newCol.Items.Insert(0, subject);
+                    newCol.Count++;
+                    index = SubjectCollection.IndexOf(newCol);
+                    SubjectCollection.Remove(newCol);
+                    SubjectCollection.Insert(index, newCol);
+                }
+                else
+                {
+                    newCol = new Collection
                     {
-                        newCol.Items.Insert(0, subject);
-                        newCol.Count++;
-                        index = SubjectCollection.IndexOf(newCol);
-                        SubjectCollection.Remove(newCol);
-                        SubjectCollection.Insert(index, newCol);
-                    }
-                    else
-                    {
-                        newCol = new Collection()
+                        Items = new List<SubjectBaseE> { subject },
+                        Status = new CollectionStatus
                         {
-                            Items = new List<SubjectBaseE>() { subject },
-                            Status = new CollectionStatus()
-                            {
-                                Id = collectionStatus,
-                                Type = collectionStatus.GetValue(),
-                                Name = collectionStatus.GetDesc(subject.Subject.Type)
-                            },
-                            Count = 1
-                        };
-                        SubjectCollection.Add(newCol);
-                    }
+                            Id = collectionStatus,
+                            Type = collectionStatus.GetValue(),
+                            Name = collectionStatus.GetDesc(subject.Subject.Type)
+                        },
+                        Count = 1
+                    };
+                    SubjectCollection.Add(newCol);
                 }
             }
             IsUpdating = false;

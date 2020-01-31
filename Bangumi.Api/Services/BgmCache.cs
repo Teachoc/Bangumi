@@ -26,7 +26,7 @@ namespace Bangumi.Api.Services
         /// <summary>
         /// 定时器
         /// </summary>
-        private Timer _timer;
+        private readonly Timer _timer;
 
         /// <summary>
         /// 定时器触发间隔
@@ -56,7 +56,7 @@ namespace Bangumi.Api.Services
             _cache ??= new Cache();
             // 启动定时器，定时将缓存写入文件，30 秒
             _timer = new Timer(TimerInterval);
-            _timer.Elapsed += WriteCacheToFileTimer_Elapsed;
+            _timer.Elapsed += (sender, e) => WriteToFile();
             _timer.AutoReset = true;
             _timer.Start();
         }
@@ -73,16 +73,6 @@ namespace Bangumi.Api.Services
                     _isCacheUpdated = true;
                 }
             }
-        }
-
-        /// <summary>
-        /// 定时器事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void WriteCacheToFileTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            await WriteToFile();
         }
 
         public async Task WriteToFile()
@@ -123,7 +113,9 @@ namespace Bangumi.Api.Services
             return _cache.Collections.AddOrUpdate(key.GetValue(), value, (k, v) =>
             {
                 if (!v.EqualsExT(value))
+                {
                     _isCacheUpdated = true;
+                }
                 return value;
             });
         }
@@ -135,7 +127,9 @@ namespace Bangumi.Api.Services
             return _cache.Subject.AddOrUpdate(key, value, (k, v) =>
             {
                 if (!v.EqualsExT(value))
+                {
                     _isCacheUpdated = true;
+                }
                 return value;
             });
         }
@@ -221,7 +215,9 @@ namespace Bangumi.Api.Services
             return _cache.Progress.AddOrUpdate(key, value, (k, v) =>
             {
                 if (!v.EqualsExT(value))
+                {
                     _isCacheUpdated = true;
+                }
                 return value;
             });
         }
@@ -248,10 +244,10 @@ namespace Bangumi.Api.Services
                         }
                         else
                         {
-                            pro.Eps.Add(new EpStatusE()
+                            pro.Eps.Add(new EpStatusE
                             {
                                 Id = epId,
-                                Status = new EpStatus()
+                                Status = new EpStatus
                                 {
                                     Id = status,
                                     CnName = status.GetCnName(),
@@ -271,15 +267,15 @@ namespace Bangumi.Api.Services
                 }
                 else if (status != EpStatusType.remove)
                 {
-                    var progress = new Progress()
+                    var progress = new Progress
                     {
                         SubjectId = sub.Id,
-                        Eps = new List<EpStatusE>()
+                        Eps = new List<EpStatusE>
                         {
-                            new EpStatusE()
+                            new EpStatusE
                             {
                                 Id = epId,
-                                Status = new EpStatus()
+                                Status = new EpStatus
                                 {
                                     Id = status,
                                     CnName = status.GetCnName(),

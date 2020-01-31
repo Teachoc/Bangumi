@@ -14,7 +14,7 @@ namespace Bangumi.Data
         {
             using (var reader = File.OpenText(filePath))
             {
-                return await reader.ReadToEndAsync();
+                return await reader.ReadToEndAsync().ConfigureAwait(false);
             }
         }
 
@@ -28,7 +28,7 @@ namespace Bangumi.Data
         {
             using (var writer = File.CreateText(filePath))
             {
-                await writer.WriteAsync(data);
+                await writer.WriteAsync(data).ConfigureAwait(false);
             }
         }
 

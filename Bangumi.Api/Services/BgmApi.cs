@@ -16,8 +16,8 @@ namespace Bangumi.Api.Services
     public class BgmApi : IBgmApi
     {
         private const string HOST = "https://api.bgm.tv";
-        private static IBgmCache _bgmCache;
-        private static IBgmOAuth _bgmOAuth;
+        private readonly IBgmCache _bgmCache;
+        private readonly IBgmOAuth _bgmOAuth;
 
         public BgmApi(IBgmCache bgmCache, IBgmOAuth bgmOAuth)
         {
@@ -36,13 +36,11 @@ namespace Bangumi.Api.Services
                 };
                 client.Settings.OnErrorAsync = async call =>
                 {
-                    if (call.HttpResponseMessage.StatusCode == HttpStatusCode.Unauthorized)
+                    // 若请求为未认证则检查Token
+                    if (call.HttpResponseMessage.StatusCode == HttpStatusCode.Unauthorized
+                        && !await _bgmOAuth.CheckToken())
                     {
-                        // 检查Token
-                        if (!await _bgmOAuth.CheckToken())
-                        {
-                            throw new BgmUnauthorizedException();
-                        }
+                        throw new BgmUnauthorizedException();
                     }
                     if (call.Exception is TaskCanceledException)
                     {
@@ -125,7 +123,10 @@ namespace Bangumi.Api.Services
                 .ContinueWith(t =>
                 {
                     SubjectLarge subject = t.Result;
-                    if (subject == null) return null;
+                    if (subject == null)
+                    {
+                        return null;
+                    }
                     subject.Name = System.Net.WebUtility.HtmlDecode(subject.Name);
                     subject.NameCn = System.Net.WebUtility.HtmlDecode(subject.NameCn);
                     subject.Images?.ConvertImageHttpToHttps();
@@ -173,7 +174,10 @@ namespace Bangumi.Api.Services
                 .ContinueWith(t =>
                 {
                     SubjectLarge subject = t.Result;
-                    if (subject == null) return null;
+                    if (subject == null)
+                    {
+                        return null;
+                    }
                     // 将章节按类别排序
                     if (subject.Eps != null)
                     {
@@ -207,7 +211,16 @@ namespace Bangumi.Api.Services
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, CollectionStatus>> Status(IEnumerable<string> subjectIds)
+        public Task<Dictionary<string, CollectionStatus>> Status(IEnumerable<string> subjectIds)
+        {
+            if (subjectIds == null)
+            {
+                throw new ArgumentNullException(nameof(subjectIds));
+            }
+            return StatusInternal(subjectIds);
+        }
+
+        private async Task<Dictionary<string, CollectionStatus>> StatusInternal(IEnumerable<string> subjectIds)
         {
             Dictionary<string, CollectionStatus> status = new Dictionary<string, CollectionStatus>();
             for (int i = 0; i < subjectIds.Count(); i += 20)
@@ -221,7 +234,10 @@ namespace Bangumi.Api.Services
                     .ReceiveJson<Dictionary<string, CollectionStatus>>()
                     .ContinueWith(t =>
                     {
-                        if (t.Result == null) return;
+                        if (t.Result == null)
+                        {
+                            return;
+                        }
                         foreach (var item in t.Result)
                         {
                             status.Add(item.Key, item.Value);
@@ -300,15 +316,15 @@ namespace Bangumi.Api.Services
 
         /// <summary>
         /// 批量更新收视进度。
+        /// 仅支持标记为看过。
         /// 使用 post 的 UrlEncoded 提交进行更新，更新收藏状态使用相同方法。
         /// </summary>
         /// <param name="ep"></param>
-        /// <param name="status"></param>
         /// <param name="ep_id">章节id，逗号分隔</param>
         /// <returns></returns>
-        public async Task<bool> UpdateProgressBatch(int ep, EpStatusType status, string ep_id)
+        public async Task<bool> UpdateProgressBatch(int ep, string ep_id)
         {
-            return await $"{HOST}/ep/{ep}/status/{status}"
+            return await $"{HOST}/ep/{ep}/status/{EpStatusType.watched}"
                 .PostUrlEncodedAsync(new
                 {
                     ep_id
@@ -321,7 +337,7 @@ namespace Bangumi.Api.Services
                     {
                         foreach (var ep in ep_id.Split(','))
                         {
-                            _bgmCache.UpdateProgress(int.Parse(ep), status);
+                            _bgmCache.UpdateProgress(int.Parse(ep), EpStatusType.watched);
                         }
                     }
                     return success;

@@ -33,10 +33,10 @@ namespace Bangumi.Api.Models
             {
                 return false;
             }
-            base.Equals(obj);
 
             SubjectForCalendar s = (SubjectForCalendar)obj;
-            return Rank == s.Rank &&
+            return base.Equals(obj) &&
+                   Rank == s.Rank &&
                    Rating.EqualsExT(s.Rating) &&
                    Collection.EqualsExT(s.Collection) &&
                    Status == s.Status;

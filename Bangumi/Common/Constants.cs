@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bangumi.Common
 {
-    class Constants
+    internal static class Constants
     {
         public const string NoImageUri = "ms-appx:///Assets/resource/err_404.png";
     }

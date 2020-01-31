@@ -33,10 +33,10 @@ namespace Bangumi.Api.Models
             {
                 return false;
             }
-            base.Equals(obj);
 
             Mono c = (Mono)obj;
-            return NameCn.EqualsExT(c.NameCn) &&
+            return base.Equals(obj) &&
+                   NameCn.EqualsExT(c.NameCn) &&
                    Comment == c.Comment &&
                    Collects == c.Collects;
         }

@@ -63,7 +63,7 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 获取搜索建议。
         /// </summary>
-        public async void GetSearchSuggestions()
+        public async Task GetSearchSuggestions()
         {
             if (!string.IsNullOrEmpty(SearchText))
             {
@@ -75,11 +75,14 @@ namespace Bangumi.ViewModels
                     {
                         return;
                     }
-                    Suggestions.Clear();
-                    foreach (var item in result.Results)
+                    await DispatcherHelper.ExecuteOnUIThreadAsync(() =>
                     {
-                        Suggestions.Add(item.NameCn);
-                    }
+                        Suggestions.Clear();
+                        foreach (var item in result.Results)
+                        {
+                            Suggestions.Add(item.NameCn);
+                        }
+                    });
                 }
                 catch (Exception e)
                 {
@@ -157,7 +160,7 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="collectionStatus"></param>
-        public async void UpdateCollectionStatus(SubjectBase subject, CollectionStatusType collectionStatus)
+        public async Task UpdateCollectionStatus(SubjectBase subject, CollectionStatusType collectionStatus)
         {
             if (subject != null)
             {
@@ -197,7 +200,9 @@ namespace Bangumi.ViewModels
             return AsyncInfo.Run(async cancelToken =>
             {
                 if (isSearching)
+                {
                     return new LoadMoreItemsResult { Count = count };
+                }
                 await Task.WhenAll(dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
                     try

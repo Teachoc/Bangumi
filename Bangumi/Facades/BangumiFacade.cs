@@ -39,22 +39,21 @@ namespace Bangumi.Facades
 
         /// <summary>
         /// 批量更新收视进度。
-        /// 使用 HttpWebRequest 提交表单进行更新，更新收藏状态使用相同方法。
+        /// 仅支持标记为看过。
         /// </summary>
         /// <param name="ep"></param>
-        /// <param name="status"></param>
         /// <param name="epsId"></param>
         /// <returns></returns>
-        public static async Task<bool> UpdateProgressBatchAsync(int ep, EpStatusType status, string epsId)
+        public static async Task<bool> UpdateProgressBatchAsync(int ep, string epsId)
         {
             try
             {
-                if (await BangumiApi.BgmApi.UpdateProgressBatch(ep, status, epsId))
+                if (await BangumiApi.BgmApi.UpdateProgressBatch(ep, epsId))
                 {
-                    NotificationHelper.Notify($"批量标记章节{epsId}{status.GetCnName()}状态成功");
+                    NotificationHelper.Notify($"批量标记章节{epsId}{EpStatusType.watched.GetCnName()}状态成功");
                     return true;
                 }
-                NotificationHelper.Notify($"批量标记章节{epsId}{status.GetCnName()}状态失败，请重试！",
+                NotificationHelper.Notify($"批量标记章节{epsId}{EpStatusType.watched.GetCnName()}状态失败，请重试！",
                                           NotificationHelper.NotifyType.Warn);
                 return false;
             }

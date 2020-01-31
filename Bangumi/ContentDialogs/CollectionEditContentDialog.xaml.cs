@@ -107,8 +107,6 @@ namespace Bangumi.ContentDialogs
                     CollectRadio.Content = "玩过";
                     DoRadio.Content = "在玩";
                     break;
-                case SubjectType.Anime:
-                case SubjectType.Real:
                 default:
                     WishRadio.Content = "想看";
                     CollectRadio.Content = "看过";
@@ -133,7 +131,9 @@ namespace Bangumi.ContentDialogs
             Privacy = subjectStatus.Private?.Equals("1") ?? false;
 
             if (CollectionStatus != null)
+            {
                 StatusPanel.Children.Cast<RadioButton>().FirstOrDefault(c => c?.Tag?.ToString() == CollectionStatus?.GetValue()).IsChecked = true;
+            }
         }
     }
 }

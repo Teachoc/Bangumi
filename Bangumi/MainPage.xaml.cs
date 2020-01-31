@@ -135,17 +135,20 @@ namespace Bangumi
         private bool On_BackRequested()
         {
             if (!MainPage.RootFrame.CanGoBack)
+            {
                 return false;
-
+            }
             // 有弹出框时不向后导航
             if (HasDialog)
+            {
                 return false;
-
+            }
             // 处于首页或登录页时不向后导航
             if (MainPage.RootFrame.CurrentSourcePageType == typeof(HomePage) ||
                 MainPage.RootFrame.CurrentSourcePageType == typeof(LoginPage))
+            {
                 return false;
-
+            }
             MainPage.RootFrame.GoBack();
             return true;
         }

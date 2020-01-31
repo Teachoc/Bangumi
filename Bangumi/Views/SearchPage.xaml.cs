@@ -2,6 +2,7 @@
 using Bangumi.Api.Models;
 using Bangumi.ViewModels;
 using System;
+using System.Timers;
 using Windows.Devices.Input;
 using Windows.System.Profile;
 using Windows.System.Threading;
@@ -22,11 +23,14 @@ namespace Bangumi.Views
     public sealed partial class SearchPage : Page
     {
         public SearchViewModel ViewModel { get; } = new SearchViewModel();
-        ThreadPoolTimer delayTimer;
+        private readonly Timer delayTimer;
 
         public SearchPage()
         {
             InitializeComponent();
+            delayTimer = new Timer(1000);
+            delayTimer.Elapsed += (sender, e) => ViewModel.GetSearchSuggestions();
+            delayTimer.AutoReset = false;
         }
 
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
@@ -41,20 +45,8 @@ namespace Bangumi.Views
             {
                 if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
                 {
-                    if (delayTimer != null && delayTimer.Delay != TimeSpan.Zero)
-                        delayTimer.Cancel();
-                    TimeSpan delay = TimeSpan.FromMilliseconds(1000);
-                    delayTimer = ThreadPoolTimer.CreateTimer(
-                        async source =>
-                        {
-                            await Dispatcher.RunAsync(
-                                CoreDispatcherPriority.High,
-                                () =>
-                                {
-                                    ViewModel.GetSearchSuggestions();
-                                });
-                        },
-                        delay);
+                    delayTimer.Stop();
+                    delayTimer.Start();
                 }
             }
         }
@@ -143,6 +135,8 @@ namespace Bangumi.Views
                     ViewModel.SearchResultCollection = new SearchResultIncrementalLoadingCollection(ViewModel.SearchText, type, ViewModel.SelectedIndex);
                     RealGridView.ItemsSource = ViewModel.SearchResultCollection;
                     break;
+                default:
+                    break;
             }
             ViewModel.SearchResultCollection.OnLoadMoreStarted += ViewModel.OnLoadMoreStarted;
             ViewModel.SearchResultCollection.OnLoadMoreCompleted += ViewModel.OnLoadMoreCompleted;
@@ -156,26 +150,20 @@ namespace Bangumi.Views
         // 鼠标右键弹出菜单
         private void ItemRelativePanel_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            if (BangumiApi.BgmOAuth.IsLogin)
+            if (BangumiApi.BgmOAuth.IsLogin && e.PointerDeviceType == PointerDeviceType.Mouse)
             {
-                if (e.PointerDeviceType == PointerDeviceType.Mouse)
-                {
-                    SetMenuFlyoutByType();
-                    CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-                }
+                SetMenuFlyoutByType();
+                CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
 
         // 触摸长按弹出菜单
         private void ItemRelativePanel_Holding(object sender, HoldingRoutedEventArgs e)
         {
-            if (BangumiApi.BgmOAuth.IsLogin)
+            if (BangumiApi.BgmOAuth.IsLogin && e.HoldingState == HoldingState.Started)
             {
-                if (e.HoldingState == HoldingState.Started)
-                {
-                    SetMenuFlyoutByType();
-                    CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-                }
+                SetMenuFlyoutByType();
+                CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
 
@@ -201,6 +189,8 @@ namespace Bangumi.Views
                     case "Dropped":
                         ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Dropped);
                         break;
+                    default:
+                        break;
                 }
             }
         }
@@ -210,16 +200,6 @@ namespace Bangumi.Views
         {
             switch (ViewModel.SelectedIndex)
             {
-                case 0:
-                    WishMenuFlyoutItem.Text = "想看";
-                    CollectMenuFlyoutItem.Text = "看过";
-                    DoingMenuFlyoutItem.Text = "在看";
-                    break;
-                case 1:
-                    WishMenuFlyoutItem.Text = "想看";
-                    CollectMenuFlyoutItem.Text = "看过";
-                    DoingMenuFlyoutItem.Text = "在看";
-                    break;
                 case 2:
                     WishMenuFlyoutItem.Text = "想读";
                     CollectMenuFlyoutItem.Text = "读过";
@@ -235,15 +215,14 @@ namespace Bangumi.Views
                     CollectMenuFlyoutItem.Text = "玩过";
                     DoingMenuFlyoutItem.Text = "在玩";
                     break;
+                case 0:
+                case 1:
                 case 5:
                     WishMenuFlyoutItem.Text = "想看";
                     CollectMenuFlyoutItem.Text = "看过";
                     DoingMenuFlyoutItem.Text = "在看";
                     break;
                 default:
-                    WishMenuFlyoutItem.Text = "想看";
-                    CollectMenuFlyoutItem.Text = "看过";
-                    DoingMenuFlyoutItem.Text = "在看";
                     break;
             }
         }

@@ -1,6 +1,7 @@
 ﻿using Bangumi.Api;
 using Bangumi.Api.Models;
 using Bangumi.ViewModels;
+using System;
 using Windows.Devices.Input;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
@@ -44,7 +45,9 @@ namespace Bangumi.Views
             {
                 var tag = button.Tag;
                 if (tag.Equals("收藏"))
+                {
                     ViewModel.LoadCollectionList();
+                }
             }
         }
 
@@ -64,22 +67,25 @@ namespace Bangumi.Views
         {
             if (sender is MenuFlyoutItem item)
             {
+                var sub = item.DataContext as SubjectBaseE;
                 switch (item.Tag)
                 {
                     case "Wish":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBaseE, CollectionStatusType.Wish);
+                        ViewModel.UpdateCollectionStatus(sub, CollectionStatusType.Wish);
                         break;
                     case "Collect":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBaseE, CollectionStatusType.Collect);
+                        ViewModel.UpdateCollectionStatus(sub, CollectionStatusType.Collect);
                         break;
                     case "Doing":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBaseE, CollectionStatusType.Do);
+                        ViewModel.UpdateCollectionStatus(sub, CollectionStatusType.Do);
                         break;
                     case "OnHold":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBaseE, CollectionStatusType.OnHold);
+                        ViewModel.UpdateCollectionStatus(sub, CollectionStatusType.OnHold);
                         break;
                     case "Dropped":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBaseE, CollectionStatusType.Dropped);
+                        ViewModel.UpdateCollectionStatus(sub, CollectionStatusType.Dropped);
+                        break;
+                    default:
                         break;
                 }
             }
@@ -88,26 +94,24 @@ namespace Bangumi.Views
         // 鼠标右键弹出菜单
         private void ItemRelativePanel_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsLoading)
+            if (BangumiApi.BgmOAuth.IsLogin
+                && !ViewModel.IsLoading
+                && e.PointerDeviceType == PointerDeviceType.Mouse)
             {
-                if (e.PointerDeviceType == PointerDeviceType.Mouse)
-                {
-                    SetMenuFlyoutByType();
-                    CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-                }
+                SetMenuFlyoutByType();
+                CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
 
         // 触摸长按弹出菜单
         private void ItemRelativePanel_Holding(object sender, HoldingRoutedEventArgs e)
         {
-            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsLoading)
+            if (BangumiApi.BgmOAuth.IsLogin
+                && !ViewModel.IsLoading
+                && e.HoldingState == HoldingState.Started)
             {
-                if (e.HoldingState == HoldingState.Started)
-                {
-                    SetMenuFlyoutByType();
-                    CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-                }
+                SetMenuFlyoutByType();
+                CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
 
@@ -116,11 +120,6 @@ namespace Bangumi.Views
         {
             switch (TypeCombobox.SelectedIndex)
             {
-                case 0:
-                    WishMenuFlyoutItem.Text = "想看";
-                    CollectMenuFlyoutItem.Text = "看过";
-                    DoingMenuFlyoutItem.Text = "在看";
-                    break;
                 case 1:
                     WishMenuFlyoutItem.Text = "想读";
                     CollectMenuFlyoutItem.Text = "读过";
@@ -136,15 +135,16 @@ namespace Bangumi.Views
                     CollectMenuFlyoutItem.Text = "玩过";
                     DoingMenuFlyoutItem.Text = "在玩";
                     break;
+                case 0:
                 case 4:
                     WishMenuFlyoutItem.Text = "想看";
                     CollectMenuFlyoutItem.Text = "看过";
                     DoingMenuFlyoutItem.Text = "在看";
                     break;
                 default:
-                    WishMenuFlyoutItem.Text = "想看";
-                    CollectMenuFlyoutItem.Text = "看过";
-                    DoingMenuFlyoutItem.Text = "在看";
+                    WishMenuFlyoutItem.Text = "想做";
+                    CollectMenuFlyoutItem.Text = "做过";
+                    DoingMenuFlyoutItem.Text = "在做";
                     break;
             }
         }

@@ -59,10 +59,10 @@ namespace Bangumi.Api.Models
             {
                 return false;
             }
-            base.Equals(obj);
 
             SubjectLarge s = (SubjectLarge)obj;
-            return Rank == s.Rank &&
+            return base.Equals(obj) &&
+                   Rank == s.Rank &&
                    EpsCount == s.EpsCount &&
                    Rating.EqualsExT(s.Rating) &&
                    Collection.EqualsExT(s.Collection) &&

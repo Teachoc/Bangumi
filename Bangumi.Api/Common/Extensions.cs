@@ -39,10 +39,15 @@ namespace Bangumi.Api.Common
         /// <returns></returns>
         public static string ToHttps(this string http)
         {
+            if (http == null)
+            {
+                throw new ArgumentNullException(nameof(http));
+            }
             if (http.StartsWith("http"))
+            {
                 return http.StartsWith("https") ? http : http.Insert(4, "s");
-            else
-                return http;
+            }
+            return http;
         }
 
         /// <summary>
@@ -70,7 +75,7 @@ namespace Bangumi.Api.Common
         /// <param name="o"></param>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static bool EqualsExT<T>(this T o, T obj)
+        public static bool EqualsExT<T>(this T o, T obj) where T : class
         {
             return o == null ? obj == null : o.Equals(obj);
         }
@@ -97,7 +102,7 @@ namespace Bangumi.Api.Common
         /// <returns></returns>
         public static string GetFilePath(this AppFile file, string folder)
         {
-            return Path.Combine(folder, file.ToString().ToLower().Replace('_', '.'));
+            return Path.Combine(folder, file.ToString().ToLowerInvariant().Replace('_', '.'));
         }
 
     }

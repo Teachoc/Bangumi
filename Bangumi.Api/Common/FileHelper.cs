@@ -29,7 +29,7 @@ namespace Bangumi.Api.Common
             {
                 using (var reader = File.OpenText(filePath))
                 {
-                    return await reader.ReadToEndAsync();
+                    return await reader.ReadToEndAsync().ConfigureAwait(false);
                 }
             }
             return string.Empty;
@@ -45,7 +45,7 @@ namespace Bangumi.Api.Common
         {
             using (var writer = File.CreateText(filePath))
             {
-                await writer.WriteAsync(data);
+                await writer.WriteAsync(data).ConfigureAwait(false);
             }
         }
 
@@ -65,7 +65,7 @@ namespace Bangumi.Api.Common
                 var encryptedData = await EncryptionAsync(data);
                 using (var writer = File.Create(filePath))
                 {
-                    await writer.WriteAsync(encryptedData, 0, encryptedData.Length);
+                    await writer.WriteAsync(encryptedData, 0, encryptedData.Length).ConfigureAwait(false);
                 }
             }
             catch (Exception e)
@@ -89,9 +89,9 @@ namespace Bangumi.Api.Common
                     using (var reader = File.OpenRead(filePath))
                     {
                         encryptedData = new byte[reader.Length];
-                        await reader.ReadAsync(encryptedData, 0, (int)reader.Length);
+                        await reader.ReadAsync(encryptedData, 0, (int)reader.Length).ConfigureAwait(false);
                     }
-                    return await DecryptionAsync(encryptedData);
+                    return await DecryptionAsync(encryptedData).ConfigureAwait(false);
                 }
                 return string.Empty;
             }
@@ -136,7 +136,9 @@ namespace Bangumi.Api.Common
         internal static void DeleteFile(string filePath)
         {
             if (File.Exists(filePath))
+            {
                 File.Delete(filePath);
+            }
         }
 
     }

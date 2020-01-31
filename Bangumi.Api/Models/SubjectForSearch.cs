@@ -16,10 +16,10 @@ namespace Bangumi.Api.Models
             {
                 return false;
             }
-            base.Equals(obj);
 
             SubjectForSearch s = (SubjectForSearch)obj;
-            return Status == s.Status;
+            return base.Equals(obj) &&
+                   Status == s.Status;
         }
 
         // override object.GetHashCode

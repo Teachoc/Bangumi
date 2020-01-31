@@ -1,4 +1,5 @@
 ﻿using Bangumi.Api;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -95,6 +96,8 @@ namespace Bangumi.Views
                         break;
                     case "时间表":
                         TimeLinePageFrame.Navigate(typeof(TimeLinePage), null, new SuppressNavigationTransitionInfo());
+                        break;
+                    default:
                         break;
                 }
             }

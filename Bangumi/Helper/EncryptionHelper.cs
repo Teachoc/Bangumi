@@ -7,7 +7,7 @@ using Windows.Storage.Streams;
 
 namespace Bangumi.Helper
 {
-    public class EncryptionHelper
+    public static class EncryptionHelper
     {
         /// <summary>
         /// 加密字符串。
@@ -40,7 +40,16 @@ namespace Bangumi.Helper
         /// </summary>
         /// <param name="buffProtected"></param>
         /// <returns></returns>
-        public static async Task<string> DecryptionAsync(byte[] buffProtected)
+        public static Task<string> DecryptionAsync(byte[] buffProtected)
+        {
+            if (buffProtected == null)
+            {
+                throw new ArgumentNullException(nameof(buffProtected));
+            }
+            return DecryptionInternalAsync(buffProtected);
+        }
+
+        private static async Task<string> DecryptionInternalAsync(byte[] buffProtected)
         {
             // Create a DataProtectionProvider object.
             DataProtectionProvider provider = new DataProtectionProvider();

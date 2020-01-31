@@ -144,15 +144,12 @@ namespace Bangumi.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="point"></param>
-        private async void ShowSitesMenuFlyout(FrameworkElement sender, Point point)
+        private async Task ShowSitesMenuFlyout(FrameworkElement sender, Point point)
         {
-            if (sender is RelativePanel panel)
+            if (sender is RelativePanel panel && panel.DataContext is WatchStatus watch)
             {
-                if (panel.DataContext is WatchStatus watch)
-                {
-                    await InitAirSites(watch.SubjectId.ToString());
-                    SitesMenuFlyout.ShowAt(sender, point);
-                }
+                await InitAirSites(watch.SubjectId.ToString());
+                SitesMenuFlyout.ShowAt(sender, point);
             }
         }
 
@@ -163,13 +160,10 @@ namespace Bangumi.Views
         /// <param name="e"></param>
         private void RelativePanel_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            if (SettingHelper.UseBangumiDataAirSites)
+            if (SettingHelper.UseBangumiDataAirSites && e.PointerDeviceType == PointerDeviceType.Mouse)
             {
-                if (e.PointerDeviceType == PointerDeviceType.Mouse)
-                {
-                    ShowSitesMenuFlyout((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-                    e.Handled = true;
-                }
+                e.Handled = true;
+                ShowSitesMenuFlyout((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
 
@@ -180,13 +174,10 @@ namespace Bangumi.Views
         /// <param name="e"></param>
         private void RelativePanel_Holding(object sender, HoldingRoutedEventArgs e)
         {
-            if (SettingHelper.UseBangumiDataAirSites)
+            if (SettingHelper.UseBangumiDataAirSites && e.HoldingState == HoldingState.Started)
             {
-                if (e.HoldingState == HoldingState.Started)
-                {
-                    ShowSitesMenuFlyout((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-                    e.Handled = true;
-                }
+                e.Handled = true;
+                ShowSitesMenuFlyout((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
     }

@@ -86,7 +86,7 @@ namespace Bangumi.Common
         /// <returns></returns>
         public static string ConvertJsTickToDateTime(int dateTime)
         {
-            return dateTime.ToDateTime().ToString("yyyy-MM-dd HH:mm"); ;
+            return dateTime.ToDateTime().ToString("yyyy-MM-dd HH:mm");
         }
 
         /// <summary>
@@ -124,21 +124,15 @@ namespace Bangumi.Common
         /// <returns></returns>
         public static SolidColorBrush GetSolidColorBrush(CollectionStatusType? status)
         {
-            switch (status)
+            return status switch
             {
-                case CollectionStatusType.Wish:
-                    return (SolidColorBrush)Application.Current.Resources["WishBackground"];
-                case CollectionStatusType.Collect:
-                    return (SolidColorBrush)Application.Current.Resources["CollectBackground"];
-                case CollectionStatusType.Do:
-                    return (SolidColorBrush)Application.Current.Resources["DoBackground"];
-                case CollectionStatusType.OnHold:
-                    return (SolidColorBrush)Application.Current.Resources["OnHoldBackground"];
-                case CollectionStatusType.Dropped:
-                    return (SolidColorBrush)Application.Current.Resources["DroppedBackground"];
-                default:
-                    return (SolidColorBrush)Application.Current.Resources["DoBackground"];
-            }
+                CollectionStatusType.Wish => (SolidColorBrush)Application.Current.Resources["WishBackground"],
+                CollectionStatusType.Collect => (SolidColorBrush)Application.Current.Resources["CollectBackground"],
+                CollectionStatusType.Do => (SolidColorBrush)Application.Current.Resources["DoBackground"],
+                CollectionStatusType.OnHold => (SolidColorBrush)Application.Current.Resources["OnHoldBackground"],
+                CollectionStatusType.Dropped => (SolidColorBrush)Application.Current.Resources["DroppedBackground"],
+                _ => (SolidColorBrush)Application.Current.Resources["DoBackground"],
+            };
         }
 
         /// <summary>
@@ -159,25 +153,17 @@ namespace Bangumi.Common
         /// <returns></returns>
         public static string GetWeekday(int day)
         {
-            switch (day)
+            return day switch
             {
-                case 1:
-                    return "星期一";
-                case 2:
-                    return "星期二";
-                case 3:
-                    return "星期三";
-                case 4:
-                    return "星期四";
-                case 5:
-                    return "星期五";
-                case 6:
-                    return "星期六";
-                case 7:
-                    return "星期日";
-                default:
-                    return string.Empty;
-            }
+                1 => "星期一",
+                2 => "星期二",
+                3 => "星期三",
+                4 => "星期四",
+                5 => "星期五",
+                6 => "星期六",
+                7 => "星期日",
+                _ => string.Empty,
+            };
         }
 
         /// <summary>
@@ -188,9 +174,13 @@ namespace Bangumi.Common
         public static string GetWatchedEpsDesc(int watchedEps)
         {
             if (watchedEps == -1)
+            {
                 return string.Empty;
+            }
             if (watchedEps == 0)
+            {
                 return "尚未观看";
+            }
             return "看到" + watchedEps + "话";
         }
 
@@ -203,9 +193,13 @@ namespace Bangumi.Common
         public static string GetUpdatedEpsDesc(int updatedEps, List<ViewModels.SimpleEp> eps)
         {
             if (updatedEps == -1)
+            {
                 return "无章节";
+            }
             if (updatedEps == 0)
+            {
                 return "尚未放送";
+            }
             if (eps != null)
             {
                 return eps.Count(ep => ep.Type == 0) == updatedEps ? "全" + updatedEps + "话" : "更新到" + updatedEps + "话";
@@ -221,7 +215,7 @@ namespace Bangumi.Common
         /// <returns></returns>
         public static string GetEpSortDesc(double sort, EpisodeType type)
         {
-            if (type == 0)
+            if (type == EpisodeType.本篇)
             {
                 return "第 " + sort + " 话";
             }
@@ -283,9 +277,10 @@ namespace Bangumi.Common
         public static string DoubleToString(double d, int n)
         {
             if (d == 0)
+            {
                 return "-";
-            else
-                return Math.Round(d, n, MidpointRounding.AwayFromZero).ToString();
+            }
+            return Math.Round(d, n, MidpointRounding.AwayFromZero).ToString();
         }
 
         /// <summary>
@@ -310,8 +305,7 @@ namespace Bangumi.Common
             {
                 return "CV：" + string.Join('、', actors.Select(a => a.Name));
             }
-            else
-                return string.Empty;
+            return string.Empty;
         }
 
         /// <summary>
@@ -325,8 +319,7 @@ namespace Bangumi.Common
             {
                 return string.Join('、', jobs);
             }
-            else
-                return string.Empty;
+            return string.Empty;
         }
 
         /// <summary>

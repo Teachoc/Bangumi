@@ -29,10 +29,10 @@ namespace Bangumi.Api.Models
             {
                 return false;
             }
-            base.Equals(obj);
 
             Person s = (Person)obj;
-            return RoleName.EqualsExT(s.RoleName) &&
+            return base.Equals(obj) &&
+                   RoleName.EqualsExT(s.RoleName) &&
                    Jobs.SequenceEqualExT(s.Jobs);
         }
 

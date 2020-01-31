@@ -29,7 +29,7 @@ namespace Bangumi.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Parameter is string uri)
+            if (e?.Parameter is string uri)
             {
                 BitmapImage image = new BitmapImage {UriSource = new Uri(uri)};
                 WelcomeImage.Source = image;

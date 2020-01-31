@@ -33,10 +33,10 @@ namespace Bangumi.Api.Models
             {
                 return false;
             }
-            base.Equals(obj);
 
             SubjectForWatching s = (SubjectForWatching)obj;
-            return Eps.EqualsExT(s.Eps) &&
+            return base.Equals(obj) &&
+                   Eps == s.Eps &&
                    EpsCount == s.EpsCount &&
                    Collection.EqualsExT(s.Collection);
         }
