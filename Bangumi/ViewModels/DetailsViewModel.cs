@@ -146,17 +146,29 @@ namespace Bangumi.ViewModels
 
         // 收藏状态，评分，吐槽
         private CollectionStatusType? _collectionStatus;
-        public string CollectionStatusText
+        private void SetCollectionStatus(CollectionStatusType? value)
         {
-            get => _collectionStatus?.GetDesc(SubjectType);
-            set => Set(ref _collectionStatus, CollectionStatusTypeExtension.FromValue(value));
+            Set(ref _collectionStatus, value);
+            OnPropertyChanged(nameof(CollectionStatusText));
+            OnPropertyChanged(nameof(CollectionStatusIcon));
         }
 
-        private string _collectionStatusIcon;
+        public string CollectionStatusText
+        {
+            get => _collectionStatus?.GetDesc(SubjectType) ?? "收藏";
+        }
+
         public string CollectionStatusIcon
         {
-            get => _collectionStatusIcon;
-            set => Set(ref _collectionStatusIcon, value);
+            get
+            {
+                return _collectionStatus switch
+                {
+                    CollectionStatusType.Dropped => "\uE007",
+                    null => "\uE006",
+                    _ => "\uE00B",
+                };
+            }
         }
         #endregion
 
@@ -183,8 +195,7 @@ namespace Bangumi.ViewModels
             MoreInfo = "";
             MoreSummary = "";
             // 收藏状态，评分，吐槽
-            CollectionStatusText = "";
-            CollectionStatusIcon = "\uE006";
+            SetCollectionStatus(null);
             Blogs.Clear();
             Topics.Clear();
             Eps.Clear();
@@ -216,8 +227,7 @@ namespace Bangumi.ViewModels
                     collectionEditContentDialog.CollectionStatus.Value, collectionEditContentDialog.Comment,
                     collectionEditContentDialog.Rate.ToString(), collectionEditContentDialog.Privacy ? "1" : "0"))
                 {
-                    CollectionStatusText = collectionEditContentDialog.CollectionStatus?.GetValue();
-                    SetCollectionIcon();
+                    SetCollectionStatus(collectionEditContentDialog.CollectionStatus);
                     // 若状态修改为看过，且设置启用，则批量修改正片章节状态为看过
                     if (_collectionStatus == CollectionStatusType.Collect && SettingHelper.EpsBatch)
                     {
@@ -312,25 +322,6 @@ namespace Bangumi.ViewModels
         }
 
         /// <summary>
-        /// 设置收藏按钮的图标
-        /// </summary>
-        private void SetCollectionIcon()
-        {
-            if (CollectionStatusText == null)
-            {
-                CollectionStatusIcon = "\uE006";
-            }
-            else if (CollectionStatusText == CollectionStatusType.Dropped.GetValue())
-            {
-                CollectionStatusIcon = "\uE007";
-            }
-            else
-            {
-                CollectionStatusIcon = "\uE00B";
-            }
-        }
-
-        /// <summary>
         /// 加载详情和章节，
         /// 用户进度，收藏状态。
         /// </summary>
@@ -356,14 +347,26 @@ namespace Bangumi.ViewModels
                     var progress = BangumiApi.BgmApi.Progress(SubjectId);
                     var status = BangumiApi.BgmApi.Status(SubjectId);
                     ProcessProgress(BangumiApi.BgmCache.Subject(SubjectId), BangumiApi.BgmCache.Progress(SubjectId));
-                    ProcessCollectionStatus(BangumiApi.BgmCache.Status(SubjectId));
+                    SetCollectionStatus(BangumiApi.BgmCache.Status(SubjectId)?.Status?.Id);
                     await subject.ContinueWith(async t =>
                     {
-                        await DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessSubject(t.Result));
+                        await DispatcherHelper.ExecuteOnUIThreadAsync(() =>
+                        {
+                            ProcessSubject(t.Result);
+                            IsDetailLoading = false;
+                        });
                         await progress.ContinueWith(t2 =>
-                            DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessProgress(t.Result, t2.Result))).Unwrap();
+                            DispatcherHelper.ExecuteOnUIThreadAsync(() =>
+                            {
+                                ProcessProgress(t.Result, t2.Result);
+                                IsProgressLoading = false;
+                            })).Unwrap();
                         await status.ContinueWith(t3 =>
-                            DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessCollectionStatus(t3.Result))).Unwrap();
+                            DispatcherHelper.ExecuteOnUIThreadAsync(() =>
+                            {
+                                SetCollectionStatus(t3.Result?.Status?.Id);
+                                IsStatusLoaded = true;
+                            })).Unwrap();
                     }).Unwrap();
                 }
                 else
@@ -517,7 +520,6 @@ namespace Bangumi.ViewModels
                     }
                 }
             }
-            IsDetailLoading = false;
         }
 
         /// <summary>
@@ -543,25 +545,6 @@ namespace Bangumi.ViewModels
                     ep.Status = subject.Eps.FirstOrDefault(e => e.Id == ep.Id)?.Status;
                 }
             }
-            IsProgressLoading = false;
-        }
-
-        /// <summary>
-        /// 处理收藏、评分和吐槽信息。
-        /// </summary>
-        /// <param name="subjectStatus"></param>
-        private void ProcessCollectionStatus(CollectionStatusE subjectStatus)
-        {
-            if (subjectStatus?.Status != null)
-            {
-                CollectionStatusText = subjectStatus.Status.Type;
-            }
-            else
-            {
-                CollectionStatusText = "收藏";
-            }
-            SetCollectionIcon();
-            IsStatusLoaded = true;
         }
     }
 

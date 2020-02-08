@@ -6,7 +6,9 @@
     xmlns:local2="using:Bangumi.Controls.TitleBar"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Loaded="Page_Loaded"
+    xmlns:common="using:Bangumi.Common"
+    xmlns:viewmodels="using:Bangumi.ViewModels"
+    Loaded="{x:Bind ViewModel.Load}"
     mc:Ignorable="d"
     NavigationCacheMode="Enabled"
     Background="{ThemeResource SystemChromeLowColor}">
@@ -26,35 +28,23 @@
                        AccessKey="I">
                 <ScrollViewer>
                     <StackPanel Padding="12,10">
-                    
+
                         <!-- 看过逻辑 -->
-                        <ToggleSwitch Name="EpsBatchToggleSwitch"
-                                      OnContent="开启" 
-                                      OffContent="关闭"
-                                      Tag="EpsBatch"
-                                      FontSize="16"
-                                      Toggled="SettingToggleSwitch_Toggled">
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.EpsBatch, Mode=TwoWay}" >
                             <ToggleSwitch.Header>
                                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                            Text="收藏状态修改为看过时，将所有章节状态修改为看过（仅修改正片且仅在详情页有效）"
                                            Margin="0,4,0,0"
-                                           FontWeight="Normal"
                                            TextWrapping="Wrap" />
                             </ToggleSwitch.Header>
                         </ToggleSwitch>
 
                         <!-- 看完逻辑 -->
-                        <ToggleSwitch Name="SubjectCompleteToggleSwitch"
-                                      OnContent="开启" 
-                                      OffContent="关闭"
-                                      Tag="SubjectComplete"
-                                      FontSize="16"
-                                      Toggled="SettingToggleSwitch_Toggled">
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.SubjectComplete, Mode=TwoWay}" >
                             <ToggleSwitch.Header>
                                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                            Text="看完所有剧集后弹窗提示评价"
                                            Margin="0,4,0,0"
-                                           FontWeight="Normal"
                                            TextWrapping="Wrap" />
                             </ToggleSwitch.Header>
                         </ToggleSwitch>
@@ -62,32 +52,28 @@
                         <!-- 用户数据缓存 -->
                         <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                    Text="用户数据缓存"
-                                   Margin="0,10,0,0"
-                                   FontWeight="Normal"/>
+                                   Margin="0,10,0,0" />
                         <TextBlock Margin="0,10,0,0">
                             <Run Text="缓存大小："/>
-                            <Run x:Name="JsonCacheSizeTextBlock" Text="0" />
-                            <Run Text="KB"/>
+                            <Run Text="{x:Bind ViewModel.UserCacheSize, Mode=OneWay}" />
                         </TextBlock>
-                        <Button Name="DeleteUserCacheFileButton"
-                                Content="清空缓存" 
+                        <Button Content="清空缓存" 
+                                IsEnabled="{x:Bind ViewModel.UserCacheCanDelete, Mode=OneWay}"
                                 Margin="0,4,0,0"
-                                Click="DeleteJsonCacheFileButton_Click"/>
+                                Click="{x:Bind ViewModel.DeleteUserCacheFile}"/>
 
                         <!-- 图片缓存 -->
                         <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                    Text="图片缓存"
-                                   Margin="0,10,0,0"
-                                   FontWeight="Normal"/>
+                                   Margin="0,10,0,0" />
                         <TextBlock Margin="0,10,0,0">
                             <Run Text="缓存大小："/>
-                            <Run x:Name="ImageCacheSizeTextBlock" Text="0" />
-                            <Run Text="KB"/>
+                            <Run Text="{x:Bind ViewModel.ImageCacheSize, Mode=OneWay}" />
                         </TextBlock>
-                        <Button Name="DeleteImageTempFileButton"
-                                Content="清空缓存" 
+                        <Button Content="清空缓存" 
+                                IsEnabled="{x:Bind ViewModel.ImageCacheCanDelete, Mode=OneWay}"
                                 Margin="0,4,0,0"
-                                Click="DeleteImageTempFileButton_Click"/>
+                                Click="{x:Bind ViewModel.DeleteImageTempFile}"/>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -99,80 +85,61 @@
                 <ScrollViewer>
                     <StackPanel Padding="12,10">
                         <!-- 使用BangumiData -->
-                        <ToggleSwitch Name="UseBangumiDataToggleSwitch"
-                                      OnContent="开启" 
-                                      OffContent="关闭"
-                                      Tag="UseBangumiData"
-                                      FontSize="16"
-                                      Toggled="SettingToggleSwitch_Toggled">
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.UseBangumiData, Mode=TwoWay}" >
                             <ToggleSwitch.Header>
                                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                            Text="使用 bangumi-data "
                                            Margin="0,4,0,0"
-                                           FontWeight="Normal"
                                            TextWrapping="Wrap" />
                             </ToggleSwitch.Header>
                         </ToggleSwitch>
-                        <StackPanel Visibility="{x:Bind UseBangumiDataToggleSwitch.IsOn, Mode=OneWay}">
-                            <TextBlock Name="BangumiDataTextBlock" 
-                                       Text="数据版本："
-                                       Margin="0,10,0,0"/>
+                        <StackPanel Visibility="{x:Bind ViewModel.UseBangumiData, Mode=OneWay}">
+                            <TextBlock Margin="0,10,0,0">
+                                <Run Text="数据版本："/>
+                                <Run Text="{x:Bind ViewModel.BangumiDataVersion, Mode=OneWay}"/>
+                            </TextBlock>
                             <Grid Margin="0,4,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Button Name="BangumiDataButton"
-                                        Content="检查更新"
-                                        Click="BangumiDataButton_Click"
+                                <Button Content="{x:Bind ViewModel.BangumiDataStatus, Mode=OneWay}"
+                                        IsEnabled="{x:Bind common:Converters.Not(ViewModel.BangumiDataVersionChecking), Mode=OneWay}"
+                                        Click="{x:Bind ViewModel.UpdateOrDownloadBangumiData}"
                                         Tag="Update"/>
-                                <ProgressRing Name="BangumiDataProgressRing"
-                                              Grid.Column="1"
-                                              Visibility="Collapsed"
+                                <ProgressRing Grid.Column="1"
+                                              Visibility="{x:Bind ViewModel.BangumiDataVersionChecking, Mode=OneWay}"
                                               HorizontalAlignment="Left"
                                               IsActive="True"
                                               Margin="10,0,0,0"/>
                             </Grid>
-                            <ToggleSwitch Name="UseBangumiDataAirSitesToggleSwitch"
-                                          OnContent="开启" 
-                                          OffContent="关闭"
-                                          Tag="UseBangumiDataAirSites"
-                                          FontSize="16"
-                                          Toggled="SettingToggleSwitch_Toggled">
+                            <!-- 显示番剧放送网站 -->
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.UseBangumiDataAirSites, Mode=TwoWay}" >
                                 <ToggleSwitch.Header>
                                     <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                            Text="使用 bangumi-data 数据显示番剧放送网站"
                                            Margin="0,4,0,0"
-                                           FontWeight="Normal"
                                            TextWrapping="Wrap" />
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
-                            <ToggleSwitch Name="UseBilibiliUWPToggleSwitch"
-                                          Visibility="{x:Bind UseBangumiDataAirSitesToggleSwitch.IsOn, Mode=OneWay}"
+                            <!-- 使用哔哩哔哩动画应用打开 -->
+                            <ToggleSwitch Visibility="{x:Bind ViewModel.UseBangumiDataAirSites, Mode=OneWay}"
                                           OnContent="使用哔哩哔哩动画应用打开" 
                                           OffContent="使用默认浏览器打开"
-                                          Tag="UseBilibiliUWP"
-                                          FontSize="16"
-                                          Toggled="SettingToggleSwitch_Toggled">
+                                          IsOn="{x:Bind ViewModel.UseBiliApp, Mode=TwoWay}" >
                                 <ToggleSwitch.Header>
                                     <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                                Text="B站放送链接打开方式"
                                                Margin="0,4,0,0"
-                                               FontWeight="Normal"
                                                TextWrapping="Wrap" />
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
-                            <ToggleSwitch Name="UseBangumiDataAirTimeToggleSwitch"
-                                          OnContent="开启" 
-                                          OffContent="关闭"
-                                          Tag="UseBangumiDataAirTime"
-                                          FontSize="16"
-                                          Toggled="SettingToggleSwitch_Toggled">
+                            <!-- 推测放送时间 -->
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.UseBangumiDataAirTime, Mode=TwoWay}" >
                                 <ToggleSwitch.Header>
                                     <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                                Text="进度页使用 bangumi-data 推测放送时间"
                                                Margin="0,4,0,0"
-                                               FontWeight="Normal"
                                                TextWrapping="Wrap" />
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -181,7 +148,7 @@
                     </StackPanel>
                 </ScrollViewer>
             </PivotItem>
-            
+
             <PivotItem Header="关于"
                        Margin="0"
                        AccessKey="P">
@@ -191,12 +158,12 @@
                                    Style="{StaticResource TitleTextBlockStyle}" />
                         <TextBlock TextWrapping="Wrap">
                             <LineBreak/>
-                            © 2008-2019 Bangumi (a.k.a.Chobits), some rights reserved
+                            © 2008-2020 Bangumi (a.k.a.Chobits), some rights reserved
                             <LineBreak/>
-                            © 2019 Teachoc
+                            © 2019-2020 Teachoc
                             <LineBreak/>
                             版本：
-                            <Run Text="{x:Bind Version}"/>
+                            <Run Text="{x:Bind ViewModel.Version}"/>
                             <LineBreak/>
                         </TextBlock>
                         <TextBlock TextWrapping="Wrap">
@@ -216,49 +183,18 @@
                         <TextBlock Text="引用及参考" 
                                    Margin="0,0,0,5"
                                    Style="{StaticResource SubtitleTextBlockStyle}" />
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,0,0,5">
-                            <Hyperlink NavigateUri="https://github.com/bangumi/api">
-                                Bangumi API(https://github.com/bangumi/api)
-                            </Hyperlink>
-                        </TextBlock>
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,0,0,5">
-                            <Hyperlink NavigateUri="https://www.newtonsoft.com/json">
-                                Newtonsoft.Json(https://www.newtonsoft.com/json)
-                            </Hyperlink>
-                        </TextBlock>
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,0,0,5">
-                            <Hyperlink NavigateUri="https://github.com/Microsoft/microsoft-ui-xaml">
-                                Microsoft.UI.Xaml(https://github.com/Microsoft/microsoft-ui-xaml)
-                            </Hyperlink>
-                        </TextBlock>
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,0,0,5">
-                            <Hyperlink NavigateUri="https://github.com/windows-toolkit/WindowsCommunityToolkit">
-                                WindowsCommunityToolkit(https://github.com/windows-toolkit/WindowsCommunityToolkit)
-                            </Hyperlink>
-                        </TextBlock>
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,0,0,5">
-                            <Hyperlink NavigateUri="https://github.com/bangumi-data/bangumi-data">
-                                bangumi-data(https://github.com/bangumi-data/bangumi-data)
-                            </Hyperlink>
-                        </TextBlock>
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,0,0,5">
-                            <Hyperlink NavigateUri="https://flurl.dev/">
-                                Flurl(https://flurl.dev/)
-                            </Hyperlink>
-                        </TextBlock>
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,0,0,5">
-                            <Hyperlink NavigateUri="https://github.com/Tlaster/WeiPo">
-                                WeiPo(https://github.com/Tlaster/WeiPo)
-                            </Hyperlink>
-                        </TextBlock>
-
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.Urls}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:Url">
+                                    <TextBlock TextWrapping="Wrap"
+                                               Margin="0,0,0,5">
+                                        <Hyperlink NavigateUri="{x:Bind Uri}">
+                                            <Run Text="{x:Bind Desc}"/>
+                                        </Hyperlink>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </ScrollViewer>
             </PivotItem>

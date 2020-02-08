@@ -111,16 +111,8 @@ namespace Bangumi.ViewModels
             }
             catch (Exception e)
             {
-                if (e is BgmTimeoutException)
-                {
-                    NotificationHelper.Notify("请求超时，请重试！",
-                                              NotificationHelper.NotifyType.Error);
-                }
-                else
-                {
-                    NotificationHelper.Notify("获取收视进度失败！\n" + e.Message + e.StackTrace,
-                                              NotificationHelper.NotifyType.Error);
-                }
+                NotificationHelper.Notify("获取收视进度失败！\n" + e.Message + e.StackTrace,
+                                          NotificationHelper.NotifyType.Error);
             }
             finally
             {

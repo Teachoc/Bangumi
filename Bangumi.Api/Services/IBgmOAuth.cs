@@ -8,7 +8,7 @@ namespace Bangumi.Api.Services
         bool IsLogin { get; }
         AccessToken MyToken { get; }
         Task GetToken(string code);
-        Task<bool> CheckToken();
+        Task CheckToken();
         void DeleteUserFiles();
     }
 }

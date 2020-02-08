@@ -16,7 +16,7 @@ namespace Bangumi.Api.Models
                 CollectionStatusType.Do => "在做",
                 CollectionStatusType.OnHold => "搁置",
                 CollectionStatusType.Dropped => "抛弃",
-                _ => "收藏",
+                _ => throw new NotImplementedException(),
             };
             return subjectType switch
             {
@@ -36,7 +36,7 @@ namespace Bangumi.Api.Models
                 CollectionStatusType.Do => "do",
                 CollectionStatusType.OnHold => "on_hold",
                 CollectionStatusType.Dropped => "dropped",
-                _ => status.ToString(),
+                _ => throw new NotImplementedException(),
             };
         }
 

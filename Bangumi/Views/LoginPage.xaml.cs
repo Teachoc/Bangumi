@@ -1,6 +1,7 @@
 ﻿using Bangumi.Api;
 using Bangumi.Helper;
 using System;
+using System.Diagnostics;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -31,7 +32,7 @@ namespace Bangumi.Views
         {
             if (e?.Parameter is string uri)
             {
-                BitmapImage image = new BitmapImage {UriSource = new Uri(uri)};
+                BitmapImage image = new BitmapImage { UriSource = new Uri(uri) };
                 WelcomeImage.Source = image;
             }
         }
@@ -39,16 +40,17 @@ namespace Bangumi.Views
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Wait, 10);
-            await OAuthHelper.Authorize();
-            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 10);
-            if (BangumiApi.BgmOAuth.IsLogin)
+            try
             {
+                await OAuthHelper.Authorize();
                 MainPage.RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
             }
-            else
+            catch (Exception ex)
             {
                 NotificationHelper.Notify("登录失败，请重试！", NotificationHelper.NotifyType.Error);
+                Debug.WriteLine(ex.StackTrace);
             }
+            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 10);
         }
 
         private void EnterButton_Click(object sender, RoutedEventArgs e)

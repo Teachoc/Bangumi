@@ -10,4 +10,9 @@
     <SolidColorBrush x:Key="OnHoldBackground">#cccccc</SolidColorBrush>
     <SolidColorBrush x:Key="DroppedBackground">#9b9997</SolidColorBrush>
 
+    <Style TargetType="ToggleSwitch">
+        <Setter Property="OnContent" Value="开启"/>
+        <Setter Property="OffContent" Value="关闭"/>
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
 </ResourceDictionary>

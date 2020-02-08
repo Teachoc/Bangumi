@@ -28,11 +28,10 @@ namespace Bangumi.Helper
                     break;
                 case NotifyType.Debug:
 #if DEBUG
-                    MainPage.RootPage.ToastInAppNotification.Dismiss();
                     notification = MainPage.RootPage.ToastInAppNotification;
                     msg = DateTime.Now.ToLongTimeString() + ": " + msg;
-                    duration = 0;
-                    dismissButton = true;
+                    duration = 5000;
+                    dismissButton = false;
                     break;
 #else
                     return;

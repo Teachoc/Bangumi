@@ -184,22 +184,22 @@ namespace Bangumi
         /// 只检查 Token 是否存在。
         /// </summary>
         /// <returns></returns>
-        private void UpdateUserStatus()
+        private async Task UpdateUserStatus()
         {
             if (BangumiApi.BgmOAuth.IsLogin)
             {
                 LoginButton.Label = "注销";
                 UserIcon.Glyph = "\uE7E8";
                 RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
-                _ = BangumiApi.BgmOAuth.CheckToken()
-                    .ContinueWith(t =>
-                    {
-                        if (!t.Result)
-                        {
-                            // 授权过期，返回登录界面
-                            MainPage.RootFrame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
-                        }
-                    });
+                try
+                {
+                    await BangumiApi.BgmOAuth.CheckToken();
+                }
+                catch (BgmUnauthorizedException)
+                {
+                    // 授权过期，返回登录界面
+                    MainPage.RootFrame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
+                }
             }
             else
             {

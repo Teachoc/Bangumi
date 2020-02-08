@@ -43,7 +43,7 @@ namespace Bangumi.Helper
             {
                 Debug.WriteLine("换取Token失败。");
                 Debug.WriteLine(e.StackTrace);
-                NotificationHelper.Notify(e.StackTrace, NotificationHelper.NotifyType.Error);
+                throw;
                 //var msgDialog = new Windows.UI.Popups.MessageDialog("登录失败，请重试！\n" + e.Message) { Title = "登录失败！" };
                 //msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("确定"));
                 //await msgDialog.ShowAsync();
