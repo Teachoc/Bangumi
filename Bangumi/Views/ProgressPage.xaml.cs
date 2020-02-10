@@ -1,4 +1,5 @@
 ﻿using Bangumi.Api;
+using Bangumi.Api.Exceptions;
 using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.ViewModels;
@@ -37,6 +38,18 @@ namespace Bangumi.Views
                 if (ViewModel.WatchingCollection.Count == 0)
                 {
                     ViewModel.PopulateWatchingListFromCache();
+                    if(!BangumiApi.BgmCache.IsUpdatedToday)
+                    {
+                        try
+                        {
+                            await BangumiApi.BgmOAuth.CheckToken();
+                        }
+                        catch (BgmUnauthorizedException)
+                        {
+                            // 授权过期，返回登录界面
+                            MainPage.RootFrame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
+                        }
+                    }
                     await ViewModel.PopulateWatchingListAsync();
                 }
                 else

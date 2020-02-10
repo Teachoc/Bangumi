@@ -23,7 +23,21 @@ namespace Bangumi.Api.Services
         private readonly IBgmCache _bgmCache;
         private bool IsTokenChecking;
 
-        public bool IsLogin => MyToken?.Expires > DateTime.Now.ToJsTick();
+        public bool IsLogin
+        {
+            get => MyToken != null;
+            private set
+            {
+                if (!value)
+                {
+                    MyToken = null;
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+        }
 
         public AccessToken MyToken { get; private set; }
 
@@ -82,7 +96,7 @@ namespace Bangumi.Api.Services
                     }
                 }
             }
-            if (MyToken == null)
+            if (!IsLogin)
             {
                 throw new BgmUnauthorizedException();
             }
@@ -90,7 +104,7 @@ namespace Bangumi.Api.Services
 
         public async Task CheckToken()
         {
-            if (MyToken == null)
+            if (!IsLogin)
             {
                 throw new BgmUnauthorizedException();
             }
@@ -136,7 +150,7 @@ namespace Bangumi.Api.Services
         public void DeleteUserFiles()
         {
             // 删除用户认证文件
-            MyToken = null;
+            IsLogin = false;
             FileHelper.DeleteFile(AppFile.Token_data.GetFilePath(_localFolder));
             // 清空缓存
             _bgmCache.Delete();
@@ -144,7 +158,7 @@ namespace Bangumi.Api.Services
 
         private async Task RefreshToken()
         {
-            if (MyToken == null)
+            if (!IsLogin)
             {
                 throw new BgmUnauthorizedException();
             }

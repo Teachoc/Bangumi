@@ -191,15 +191,6 @@ namespace Bangumi
                 LoginButton.Label = "注销";
                 UserIcon.Glyph = "\uE7E8";
                 RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
-                try
-                {
-                    await BangumiApi.BgmOAuth.CheckToken();
-                }
-                catch (BgmUnauthorizedException)
-                {
-                    // 授权过期，返回登录界面
-                    MainPage.RootFrame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
-                }
             }
             else
             {
