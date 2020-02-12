@@ -6,44 +6,31 @@ namespace Bangumi.Helper
     {
         public static void Notify(string msg, NotifyType notifyType = NotifyType.Message)
         {
-            Microsoft.Toolkit.Uwp.UI.Controls.InAppNotification notification;
-            int duration;
-            bool dismissButton;
+            string color;
             switch (notifyType)
             {
                 case NotifyType.Message:
-                    notification = MainPage.RootPage.ToastInAppNotification;
-                    duration = 1500;
-                    dismissButton = false;
+                    color = "#4caf50";
                     break;
                 case NotifyType.Warn:
-                    notification = MainPage.RootPage.ErrorInAppNotification;
-                    duration = 1500;
-                    dismissButton = false;
+                    color = "#f44336";
                     break;
                 case NotifyType.Error:
-                    notification = MainPage.RootPage.ErrorInAppNotification;
-                    duration = 3000;
-                    dismissButton = false;
+                    color = "#f44336";
                     break;
                 case NotifyType.Debug:
 #if DEBUG
-                    notification = MainPage.RootPage.ToastInAppNotification;
+                    color = "#4caf50";
                     msg = DateTime.Now.ToLongTimeString() + ": " + msg;
-                    duration = 5000;
-                    dismissButton = false;
                     break;
 #else
                     return;
 #endif
                 default:
-                    notification = MainPage.RootPage.ToastInAppNotification;
-                    duration = 2000;
-                    dismissButton = false;
+                    color = "#4caf50";
                     break;
             }
-            notification.ShowDismissButton = dismissButton;
-            notification.Show(msg, duration);
+            MainPage.RootPage.NotifyControl.AddNotification(msg, color);
         }
 
         public enum NotifyType

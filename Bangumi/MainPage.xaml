@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Bangumi"
     xmlns:local2="using:Bangumi.Controls.TitleBar"
+    xmlns:local3="using:Bangumi.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
@@ -68,7 +69,8 @@
                             <KeyboardAccelerator Modifiers="Control" Key="Q"/>
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
-                    <AppBarButton Width="48"
+                    <AppBarButton x:Name="LoginButton"
+                                  Width="48"
                                   Click="LoginButton_Click">
                         <Grid Padding="-8">
                             <ProgressRing Height="40" Width="40"
@@ -93,38 +95,9 @@
         </muxc:NavigationView>
 
 
-
-        <controls:InAppNotification x:Name="ToastInAppNotification"
-                                    x:FieldModifier="public"
-                                    Grid.Row="1"
-                                    ShowDismissButton="False"
-                                    AnimationDuration="00:00:00.1000000"
-                                    Margin="0,16,0,0"
-                                    Padding="16,0"
-                                    BorderThickness="0"
-                                    Background="#4caf50"
-                                    Foreground="White"
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Top"
-                                    VerticalOffset="0"
-                                    HorizontalOffset="200"
-                                    StackMode="Replace" />
-
-        <controls:InAppNotification x:Name="ErrorInAppNotification"
-                                    x:FieldModifier="public"
-                                    Grid.Row="1"
-                                    ShowDismissButton="False"
-                                    AnimationDuration="00:00:00.1000000"
-                                    Margin="0,16,0,0"
-                                    Padding="16,0"
-                                    BorderThickness="0"
-                                    Background="#f44336"
-                                    Foreground="White"
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Top"
-                                    VerticalOffset="0"
-                                    HorizontalOffset="200"
-                                    StackMode="Replace" />
+        <local3:InAppNotification x:Name="NotifyControl"
+                                  x:FieldModifier="public"
+                                  Grid.Row="1"/>
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
@@ -133,15 +106,21 @@
                         <AdaptiveTrigger MinWindowWidth="0"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="MyCommandBar.DefaultLabelPosition" Value="Bottom"/>
+                        <Setter Target="RefreshButton.Width" Value="36"/>
+                        <Setter Target="SearchButton.Width" Value="36"/>
+                        <Setter Target="LoginButton.Width" Value="36"/>
+                        <Setter Target="SettingButton.Width" Value="36"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="600"/>
+                        <AdaptiveTrigger MinWindowWidth="420"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="MyCommandBar.DefaultLabelPosition" Value="Right"/>
+                        <Setter Target="RefreshButton.Width" Value="48"/>
+                        <Setter Target="SearchButton.Width" Value="48"/>
+                        <Setter Target="LoginButton.Width" Value="48"/>
+                        <Setter Target="SettingButton.Width" Value="48"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

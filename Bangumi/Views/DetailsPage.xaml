@@ -529,10 +529,11 @@
             </PivotItem>
 
         </Pivot>
-        
+
         <CommandBar VerticalAlignment="Bottom"
                     RequestedTheme="Dark"
                     Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}"
+                    DefaultLabelPosition="Right"
                     AccessKey="M">
             <AppBarButton IsEnabled="{x:Bind ViewModel.IsStatusLoaded, Mode=OneWay}"
                           Label="{x:Bind ViewModel.CollectionStatusText, Mode=OneWay}"

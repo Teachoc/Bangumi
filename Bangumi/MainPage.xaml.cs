@@ -87,7 +87,7 @@ namespace Bangumi
             this.InitializeComponent();
             RootPage = this;
             // 设置窗口的最小大小
-            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(300, 200));
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(320, 200));
             // 标题栏后退按钮
             SystemNavigationManager.GetForCurrentView().BackRequested += (sender, e) =>
             {
@@ -106,8 +106,8 @@ namespace Bangumi
             };
 
             RefreshButton.Click += (sender, e) => (ContentFrame.Content as IPageStatus)?.Refresh();
-            SearchButton.Click += (sender, e) => NavigateToPage(typeof(SearchPage), null, new DrillInNavigationTransitionInfo());
-            SettingButton.Click += (sender, e) => NavigateToPage(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
+            SearchButton.Click += (sender, e) => NavigateToPage(typeof(SearchPage), null, new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromRight });
+            SettingButton.Click += (sender, e) => NavigateToPage(typeof(SettingsPage), null, new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromRight });
 
             // 初始化 Api 对象
             BangumiApi.Init(ApplicationData.Current.LocalFolder.Path,

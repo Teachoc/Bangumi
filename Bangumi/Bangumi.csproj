@@ -127,6 +127,9 @@
     <Compile Include="ContentDialogs\CollectionEditContentDialog.xaml.cs">
       <DependentUpon>CollectionEditContentDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\InAppNotification.xaml.cs">
+      <DependentUpon>InAppNotification.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TitleBar\TitleBarEx.xaml.cs">
       <DependentUpon>TitleBarEx.xaml</DependentUpon>
     </Compile>
@@ -236,6 +239,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="ContentDialogs\CollectionEditContentDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\InAppNotification.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
