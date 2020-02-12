@@ -5,7 +5,7 @@
 
     <Brush x:Key="BangumiPinkBrush">#d26585</Brush>
     <SolidColorBrush x:Key="WishBackground">#ff7e8b</SolidColorBrush>
-    <SolidColorBrush x:Key="CollectBackground">#ffc34d</SolidColorBrush>
+    <SolidColorBrush x:Key="CollectBackground">#ffa900</SolidColorBrush>
     <SolidColorBrush x:Key="DoBackground">#33c5f9</SolidColorBrush>
     <SolidColorBrush x:Key="OnHoldBackground">#cccccc</SolidColorBrush>
     <SolidColorBrush x:Key="DroppedBackground">#9b9997</SolidColorBrush>

@@ -42,74 +42,69 @@
 
             <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModel.SubjectCollection}" IsSourceGrouped="True" ItemsPath="Items"/>
 
-            <DataTemplate x:Key="NarrowZoomedInTemplate" x:DataType="data:SubjectBaseE">
-                <RelativePanel Name="ItemRelativePanel" Padding="5"
-                               RightTapped="ItemRelativePanel_RightTapped"
-                               Holding="ItemRelativePanel_Holding"
-                               Background="Transparent">
-                    <controls:ImageEx Name="BangumiImage"
-                                      IsCacheEnabled="True"
-                                      CacheMode="BitmapCache"
-                                      Source="{x:Bind Subject.Images.Common}" 
-                                      PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
-                                      PlaceholderStretch="UniformToFill"
-                                      CornerRadius="2"
-                                      RelativePanel.AlignLeftWithPanel="True"
-                                      RelativePanel.AlignTopWithPanel="True"
-                                      x:Phase="2"
-                                      Height="75" 
-                                      Width="75" 
-                                      Margin="0,0,6,0"
-                                      Stretch="UniformToFill" />
-                    <TextBlock Name="TitleTextBlock" Text="{x:Bind Subject.NameCn}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.AlignTopWithPanel="True"
-                               FontSize="14" 
-                               Foreground="{StaticResource BangumiPinkBrush}"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{x:Bind Subject.Name}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="TitleTextBlock"
-                               x:Phase="1"
-                               FontSize="12"
-                               Foreground="Gray"
-                               TextTrimming="CharacterEllipsis"/>
-                </RelativePanel>
-            </DataTemplate>
+            <DataTemplate x:Key="ZoomedInTemplate" x:DataType="data:SubjectBaseE">
+                <UserControl>
+                    <RelativePanel Padding="5"
+                                   RightTapped="ItemRelativePanel_RightTapped"
+                                   Holding="ItemRelativePanel_Holding"
+                                   Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup>
+                                <VisualState x:Name="Narrow">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="0"/>
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="BangumiImage.Height" Value="75"/>
+                                        <Setter Target="BangumiImage.Width" Value="75"/>
+                                        <Setter Target="BangumiImage.Margin" Value="0,0,6,0"/>
+                                        <Setter Target="TitleTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="SubtitleTextBlock.FontSize" Value="12"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Wide">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="420" />
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="BangumiImage.Height" Value="100"/>
+                                        <Setter Target="BangumiImage.Width" Value="100"/>
+                                        <Setter Target="BangumiImage.Margin" Value="0,0,10,0"/>
+                                        <Setter Target="TitleTextBlock.FontSize" Value="20"/>
+                                        <Setter Target="SubtitleTextBlock.FontSize" Value="16"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
 
-            <DataTemplate x:Key="WideZoomedInTemplate" x:DataType="data:SubjectBaseE">
-                <RelativePanel Padding="5"
-                               RightTapped="ItemRelativePanel_RightTapped"
-                               Holding="ItemRelativePanel_Holding"
-                               Background="Transparent">
-                    <controls:ImageEx Name="BangumiImage"
-                                      IsCacheEnabled="True"
-                                      CacheMode="BitmapCache"
-                                      Source="{x:Bind Subject.Images.Common}" 
-                                      PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
-                                      PlaceholderStretch="UniformToFill"
-                                      CornerRadius="2"
-                                      RelativePanel.AlignLeftWithPanel="True"
-                                      RelativePanel.AlignTopWithPanel="True"
-                                      x:Phase="2"
-                                      Height="120" 
-                                      Width="85" 
-                                      Margin="0,0,10,0"
-                                      Stretch="UniformToFill" />
-                    <TextBlock Name="TitleTextBlock" Text="{x:Bind Subject.NameCn}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.AlignTopWithPanel="True"
-                               FontSize="20" 
-                               Foreground="{StaticResource BangumiPinkBrush}"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{x:Bind Subject.Name}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="TitleTextBlock"
-                               x:Phase="1"
-                               FontSize="16"
-                               Foreground="Gray"
-                               TextTrimming="CharacterEllipsis"/>
-                </RelativePanel>
+                        <controls:ImageEx x:Name="BangumiImage"
+                                          IsCacheEnabled="True"
+                                          CacheMode="BitmapCache"
+                                          Source="{x:Bind Subject.Images.Common}" 
+                                          PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
+                                          PlaceholderStretch="UniformToFill"
+                                          CornerRadius="2"
+                                          RelativePanel.AlignLeftWithPanel="True"
+                                          RelativePanel.AlignTopWithPanel="True"
+                                          x:Phase="2"
+                                          Stretch="UniformToFill" />
+                        <TextBlock x:Name="TitleTextBlock" 
+                                   Text="{x:Bind Subject.NameCn}" 
+                                   ToolTipService.ToolTip="{x:Bind Subject.NameCn}"
+                                   RelativePanel.RightOf="BangumiImage"
+                                   RelativePanel.AlignTopWithPanel="True"
+                                   Foreground="{StaticResource BangumiPinkBrush}"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="SubtitleTextBlock"
+                                   Text="{x:Bind Subject.Name}" 
+                                   ToolTipService.ToolTip="{x:Bind Subject.Name}"
+                                   RelativePanel.RightOf="BangumiImage"
+                                   RelativePanel.Below="TitleTextBlock"
+                                   x:Phase="1"
+                                   Foreground="Gray"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </RelativePanel>
+                </UserControl>
             </DataTemplate>
 
             <DataTemplate x:Key="ZoomedInGroupHeaderTemplate" x:DataType="data:Collection">
@@ -138,8 +133,6 @@
                         <AdaptiveTrigger MinWindowWidth="0"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="MyGridView.ItemTemplate" 
-                                Value="{StaticResource NarrowZoomedInTemplate}"/>
                         <Setter Target="MyGridView.DesiredWidth" Value="300"/>
                         <Setter Target="EmptyImage.Width" Value="200"/>
                         <Setter Target="EmptyImage.Height" Value="326"/>
@@ -147,11 +140,9 @@
                 </VisualState>
                 <VisualState x:Name="Wide">
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="400" />
+                        <AdaptiveTrigger MinWindowWidth="420" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="MyGridView.ItemTemplate" 
-                                Value="{StaticResource WideZoomedInTemplate}"/>
                         <Setter Target="MyGridView.DesiredWidth" Value="360"/>
                         <Setter Target="EmptyImage.Width" Value="300"/>
                         <Setter Target="EmptyImage.Height" Value="490"/>
@@ -169,6 +160,7 @@
                                            ShowsScrollingPlaceholders="False"
                                            SelectionMode="None"
                                            IsItemClickEnabled="True" 
+                                           ItemTemplate="{StaticResource ZoomedInTemplate}"
                                            ItemClick="GridView_ItemClick">
                     <GridView.GroupStyle>
                         <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}"

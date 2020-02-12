@@ -39,212 +39,175 @@
                                 Tag="Dropped"/>
             </MenuFlyout>
 
-            <DataTemplate x:Key="NarrowSubjectWithTypeTemplate" x:DataType="data:SubjectForSearch">
-                <RelativePanel Padding="5"
-                               RightTapped="ItemRelativePanel_RightTapped"
-                               Holding="ItemRelativePanel_Holding"
-                               Background="Transparent">
-                    <controls:ImageEx Name="BangumiImage"
-                                      IsCacheEnabled="True"
-                                      CacheMode="BitmapCache"
-                                      Source="{x:Bind Images.Common}" 
-                                      PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
-                                      PlaceholderStretch="UniformToFill"
-                                      CornerRadius="2"
-                                      RelativePanel.AlignLeftWithPanel="True"
-                                      RelativePanel.AlignTopWithPanel="True"
-                                      x:Phase="2"
-                                      Height="75" 
-                                      Width="75" 
-                                      Margin="0,0,6,0"
-                                      Stretch="UniformToFill" />
-                    <TextBlock Name="TitleTextBlock" Text="{x:Bind NameCn}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.AlignTopWithPanel="True"
-                               FontSize="14" 
-                               Foreground="{StaticResource BangumiPinkBrush}"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="SubTitleTextBlock"
-                               Text="{x:Bind Name}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="TitleTextBlock"
-                               x:Phase="1"
-                               FontSize="12"
-                               Foreground="Gray"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="TypeTextBlock"
-                               Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="SubTitleTextBlock"
-                               x:Phase="1"
-                               FontSize="12" 
-                               Foreground="Gray"
-                               TextTrimming="CharacterEllipsis"/>
-                    <Border Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
-                            Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
-                            RelativePanel.RightOf="BangumiImage"
-                            RelativePanel.Below="TypeTextBlock"
-                            CornerRadius="8">
-                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
-                                   x:Phase="1"
-                                   Margin="5,0"
-                                   FontSize="12"
-                                   Foreground="White"
+            <DataTemplate x:Key="SubjectWithTypeTemplate" x:DataType="data:SubjectForSearch">
+                <UserControl>
+                    <RelativePanel Padding="5"
+                                   RightTapped="ItemRelativePanel_RightTapped"
+                                   Holding="ItemRelativePanel_Holding"
+                                   Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup>
+                                <VisualState x:Name="Narrow">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="0"/>
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="BangumiImage.Width" Value="75"/>
+                                        <Setter Target="BangumiImage.Height" Value="75"/>
+                                        <Setter Target="BangumiImage.Margin" Value="0,0,6,0"/>
+                                        <Setter Target="TitleTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="SubtitleTextBlock.FontSize" Value="12"/>
+                                        <Setter Target="TypeTextBlock.FontSize" Value="12"/>
+                                        <Setter Target="CollectionStatusBorder.CornerRadius" Value="7.5"/>
+                                        <Setter Target="CollectionStatusTextBlock.FontSize" Value="12"/>
+                                        <Setter Target="CollectionStatusTextBlock.Margin" Value="5,0"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Wide">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="420" />
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="BangumiImage.Width" Value="100"/>
+                                        <Setter Target="BangumiImage.Height" Value="100"/>
+                                        <Setter Target="BangumiImage.Margin" Value="0,0,10,0"/>
+                                        <Setter Target="TitleTextBlock.FontSize" Value="20"/>
+                                        <Setter Target="SubtitleTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="TypeTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="CollectionStatusBorder.CornerRadius" Value="10"/>
+                                        <Setter Target="CollectionStatusTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="CollectionStatusTextBlock.Margin" Value="6,0"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <controls:ImageEx x:Name="BangumiImage"
+                                          IsCacheEnabled="True"
+                                          CacheMode="BitmapCache"
+                                          Source="{x:Bind Images.Common}" 
+                                          PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
+                                          PlaceholderStretch="UniformToFill"
+                                          CornerRadius="2"
+                                          RelativePanel.AlignLeftWithPanel="True"
+                                          RelativePanel.AlignTopWithPanel="True"
+                                          x:Phase="2"
+                                          Stretch="UniformToFill" />
+                        <TextBlock x:Name="TitleTextBlock" 
+                                   Text="{x:Bind NameCn}" 
+                                   ToolTipService.ToolTip="{x:Bind NameCn}"
+                                   RelativePanel.RightOf="BangumiImage"
+                                   RelativePanel.AlignTopWithPanel="True"
+                                   Foreground="{StaticResource BangumiPinkBrush}"
                                    TextTrimming="CharacterEllipsis"/>
-                    </Border>
-                </RelativePanel>
+                        <TextBlock x:Name="SubtitleTextBlock"
+                                   Text="{x:Bind Name}" 
+                                   ToolTipService.ToolTip="{x:Bind Name}"
+                                   RelativePanel.RightOf="BangumiImage"
+                                   RelativePanel.Below="TitleTextBlock"
+                                   x:Phase="1"
+                                   Foreground="Gray"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="TypeTextBlock"
+                                   Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
+                                   RelativePanel.RightOf="BangumiImage"
+                                   RelativePanel.Below="SubtitleTextBlock"
+                                   x:Phase="1"
+                                   Foreground="Gray"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <Border x:Name="CollectionStatusBorder"
+                                Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
+                                Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
+                                RelativePanel.RightOf="BangumiImage"
+                                RelativePanel.Below="TypeTextBlock">
+                            <TextBlock x:Name="CollectionStatusTextBlock"
+                                       Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
+                                       x:Phase="1"
+                                       Foreground="White"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Border>
+                    </RelativePanel>
+                </UserControl>
             </DataTemplate>
 
-            <DataTemplate x:Key="WideSubjectWithTypeTemplate" x:DataType="data:SubjectForSearch">
-                <RelativePanel Padding="5"
-                               RightTapped="ItemRelativePanel_RightTapped"
-                               Holding="ItemRelativePanel_Holding"
-                               Background="Transparent">
-                    <controls:ImageEx Name="BangumiImage"
-                                      IsCacheEnabled="True"
-                                      CacheMode="BitmapCache"
-                                      Source="{x:Bind Images.Common}" 
-                                      PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
-                                      PlaceholderStretch="UniformToFill"
-                                      CornerRadius="2"
-                                      RelativePanel.AlignLeftWithPanel="True"
-                                      RelativePanel.AlignTopWithPanel="True"
-                                      x:Phase="2"
-                                      Height="134" 
-                                      Width="100" 
-                                      Margin="0,0,12,0"
-                                      Stretch="UniformToFill" />
-                    <TextBlock Name="TitleTextBlock" Text="{x:Bind NameCn}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.AlignTopWithPanel="True"
-                               FontSize="20" 
-                               Foreground="{StaticResource BangumiPinkBrush}"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="SubTitleTextBlock"
-                               Text="{x:Bind Name}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="TitleTextBlock"
-                               x:Phase="1"
-                               FontSize="16"
-                               Foreground="Gray"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="TypeTextBlock"
-                               Text="{x:Bind common:Converters.GetSubjectTypeName(Type)}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="SubTitleTextBlock"
-                               x:Phase="1"
-                               FontSize="16" 
-                               Foreground="Gray"
-                               TextTrimming="CharacterEllipsis"/>
-                    <Border Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
-                            Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
-                            RelativePanel.RightOf="BangumiImage"
-                            RelativePanel.Below="TypeTextBlock"
-                            CornerRadius="10">
-                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
-                                   x:Phase="1"
-                                   Margin="6,0"
-                                   FontSize="16"
-                                   Foreground="White"
+            <DataTemplate x:Key="SubjectTemplate" x:DataType="data:SubjectForSearch">
+                <UserControl>
+                    <RelativePanel Padding="5"
+                                   RightTapped="ItemRelativePanel_RightTapped"
+                                   Holding="ItemRelativePanel_Holding"
+                                   Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup>
+                                <VisualState x:Name="Narrow">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="0"/>
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="BangumiImage.Width" Value="75"/>
+                                        <Setter Target="BangumiImage.Height" Value="75"/>
+                                        <Setter Target="BangumiImage.Margin" Value="0,0,6,0"/>
+                                        <Setter Target="TitleTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="SubtitleTextBlock.FontSize" Value="12"/>
+                                        <Setter Target="CollectionStatusBorder.CornerRadius" Value="7.5"/>
+                                        <Setter Target="CollectionStatusTextBlock.FontSize" Value="12"/>
+                                        <Setter Target="CollectionStatusTextBlock.Margin" Value="5,0"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Wide">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="420" />
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="BangumiImage.Width" Value="100"/>
+                                        <Setter Target="BangumiImage.Height" Value="100"/>
+                                        <Setter Target="BangumiImage.Margin" Value="0,0,10,0"/>
+                                        <Setter Target="TitleTextBlock.FontSize" Value="20"/>
+                                        <Setter Target="SubtitleTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="CollectionStatusBorder.CornerRadius" Value="10"/>
+                                        <Setter Target="CollectionStatusTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="CollectionStatusTextBlock.Margin" Value="6,0"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <controls:ImageEx x:Name="BangumiImage"
+                                          IsCacheEnabled="True"
+                                          CacheMode="BitmapCache"
+                                          Source="{x:Bind Images.Common}" 
+                                          PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
+                                          PlaceholderStretch="UniformToFill"
+                                          CornerRadius="2"
+                                          RelativePanel.AlignLeftWithPanel="True"
+                                          RelativePanel.AlignTopWithPanel="True"
+                                          x:Phase="2"
+                                          Stretch="UniformToFill" />
+                        <TextBlock x:Name="TitleTextBlock" 
+                                   Text="{x:Bind NameCn}"
+                                   ToolTipService.ToolTip="{x:Bind NameCn}"
+                                   RelativePanel.RightOf="BangumiImage"
+                                   RelativePanel.AlignTopWithPanel="True"
+                                   Foreground="{StaticResource BangumiPinkBrush}"
                                    TextTrimming="CharacterEllipsis"/>
-                    </Border>
-                </RelativePanel>
-            </DataTemplate>
-
-            <DataTemplate x:Key="NarrowSubjectTemplate" x:DataType="data:SubjectForSearch">
-                <RelativePanel Padding="5"
-                               RightTapped="ItemRelativePanel_RightTapped"
-                               Holding="ItemRelativePanel_Holding"
-                               Background="Transparent">
-                    <controls:ImageEx Name="BangumiImage"
-                                      IsCacheEnabled="True"
-                                      CacheMode="BitmapCache"
-                                      Source="{x:Bind Images.Common}" 
-                                      PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
-                                      PlaceholderStretch="UniformToFill"
-                                      CornerRadius="2"
-                                      RelativePanel.AlignLeftWithPanel="True"
-                                      RelativePanel.AlignTopWithPanel="True"
-                                      x:Phase="2"
-                                      Height="75" 
-                                      Width="75" 
-                                      Margin="0,0,6,0"
-                                      Stretch="UniformToFill" />
-                    <TextBlock Name="TitleTextBlock" Text="{x:Bind NameCn}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.AlignTopWithPanel="True"
-                               FontSize="14" 
-                               Foreground="{StaticResource BangumiPinkBrush}"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="SubTitleTextBlock"
-                               Text="{x:Bind Name}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="TitleTextBlock"
-                               x:Phase="1"
-                               FontSize="12"
-                               Foreground="Gray"
-                               TextTrimming="CharacterEllipsis"/>
-                    <Border Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
-                            Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
-                            RelativePanel.RightOf="BangumiImage"
-                            RelativePanel.Below="SubTitleTextBlock"
-                            CornerRadius="8">
-                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
+                        <TextBlock x:Name="SubtitleTextBlock"
+                                   Text="{x:Bind Name}" 
+                                   ToolTipService.ToolTip="{x:Bind Name}"
+                                   RelativePanel.RightOf="BangumiImage"
+                                   RelativePanel.Below="TitleTextBlock"
                                    x:Phase="1"
-                                   Margin="5,0"
-                                   FontSize="12"
-                                   Foreground="White"
+                                   Foreground="Gray"
                                    TextTrimming="CharacterEllipsis"/>
-                    </Border>
-                </RelativePanel>
-            </DataTemplate>
-
-            <DataTemplate x:Key="WideSubjectTemplate" x:DataType="data:SubjectForSearch">
-                <RelativePanel Padding="5"
-                               RightTapped="ItemRelativePanel_RightTapped"
-                               Holding="ItemRelativePanel_Holding"
-                               Background="Transparent">
-                    <controls:ImageEx Name="BangumiImage"
-                                      IsCacheEnabled="True"
-                                      CacheMode="BitmapCache"
-                                      Source="{x:Bind Images.Common}" 
-                                      PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
-                                      PlaceholderStretch="UniformToFill"
-                                      CornerRadius="2"
-                                      RelativePanel.AlignLeftWithPanel="True"
-                                      RelativePanel.AlignTopWithPanel="True"
-                                      x:Phase="2"
-                                      Height="134" 
-                                      Width="100" 
-                                      Margin="0,0,12,0"
-                                      Stretch="UniformToFill" />
-                    <TextBlock Name="TitleTextBlock" Text="{x:Bind NameCn}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.AlignTopWithPanel="True"
-                               FontSize="20" 
-                               Foreground="{StaticResource BangumiPinkBrush}"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="SubTitleTextBlock"
-                               Text="{x:Bind Name}" 
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="TitleTextBlock"
-                               x:Phase="1"
-                               FontSize="16"
-                               Foreground="Gray"
-                               TextTrimming="CharacterEllipsis"/>
-                    <Border Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
-                            Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
-                            RelativePanel.RightOf="BangumiImage"
-                            RelativePanel.Below="SubTitleTextBlock"
-                            CornerRadius="10">
-                        <TextBlock Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
-                                   x:Phase="1"
-                                   Margin="6,0"
-                                   FontSize="16"
-                                   Foreground="White"
-                                   TextTrimming="CharacterEllipsis"/>
-                    </Border>
-                </RelativePanel>
+                        <Border x:Name="CollectionStatusBorder"
+                                Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
+                                Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
+                                RelativePanel.RightOf="BangumiImage"
+                                RelativePanel.Below="SubtitleTextBlock">
+                            <TextBlock x:Name="CollectionStatusTextBlock"
+                                       Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
+                                       x:Phase="1"
+                                       Foreground="White"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Border>
+                    </RelativePanel>
+                </UserControl>
             </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
@@ -257,61 +220,25 @@
                         <AdaptiveTrigger MinWindowWidth="0"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="AllGridView.ItemTemplate" 
-                                Value="{StaticResource NarrowSubjectWithTypeTemplate}"/>
-                        <Setter Target="AllGridView.DesiredWidth" 
-                                Value="300"/>
-                        <Setter Target="AnimeGridView.ItemTemplate" 
-                                Value="{StaticResource NarrowSubjectTemplate}"/>
-                        <Setter Target="AnimeGridView.DesiredWidth" 
-                                Value="300"/>
-                        <Setter Target="BookGridView.ItemTemplate" 
-                                Value="{StaticResource NarrowSubjectTemplate}"/>
-                        <Setter Target="BookGridView.DesiredWidth" 
-                                Value="300"/>
-                        <Setter Target="MusicGridView.ItemTemplate" 
-                                Value="{StaticResource NarrowSubjectTemplate}"/>
-                        <Setter Target="MusicGridView.DesiredWidth" 
-                                Value="300"/>
-                        <Setter Target="GameGridView.ItemTemplate" 
-                                Value="{StaticResource NarrowSubjectTemplate}"/>
-                        <Setter Target="GameGridView.DesiredWidth" 
-                                Value="300"/>
-                        <Setter Target="RealGridView.ItemTemplate" 
-                                Value="{StaticResource NarrowSubjectTemplate}"/>
-                        <Setter Target="RealGridView.DesiredWidth" 
-                                Value="300"/>
+                        <Setter Target="AllGridView.DesiredWidth" Value="300"/>
+                        <Setter Target="AnimeGridView.DesiredWidth" Value="300"/>
+                        <Setter Target="BookGridView.DesiredWidth" Value="300"/>
+                        <Setter Target="MusicGridView.DesiredWidth" Value="300"/>
+                        <Setter Target="GameGridView.DesiredWidth" Value="300"/>
+                        <Setter Target="RealGridView.DesiredWidth" Value="300"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="Wide">
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="400" />
+                        <AdaptiveTrigger MinWindowWidth="420" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="AllGridView.ItemTemplate" 
-                                Value="{StaticResource WideSubjectWithTypeTemplate}"/>
-                        <Setter Target="AllGridView.DesiredWidth" 
-                                Value="370"/>
-                        <Setter Target="AnimeGridView.ItemTemplate" 
-                                Value="{StaticResource WideSubjectTemplate}"/>
-                        <Setter Target="AnimeGridView.DesiredWidth" 
-                                Value="370"/>
-                        <Setter Target="BookGridView.ItemTemplate" 
-                                Value="{StaticResource WideSubjectTemplate}"/>
-                        <Setter Target="BookGridView.DesiredWidth" 
-                                Value="370"/>
-                        <Setter Target="MusicGridView.ItemTemplate" 
-                                Value="{StaticResource WideSubjectTemplate}"/>
-                        <Setter Target="MusicGridView.DesiredWidth" 
-                                Value="370"/>
-                        <Setter Target="GameGridView.ItemTemplate" 
-                                Value="{StaticResource WideSubjectTemplate}"/>
-                        <Setter Target="GameGridView.DesiredWidth" 
-                                Value="370"/>
-                        <Setter Target="RealGridView.ItemTemplate" 
-                                Value="{StaticResource WideSubjectTemplate}"/>
-                        <Setter Target="RealGridView.DesiredWidth" 
-                                Value="370"/>
+                        <Setter Target="AllGridView.DesiredWidth" Value="360"/>
+                        <Setter Target="AnimeGridView.DesiredWidth" Value="360"/>
+                        <Setter Target="BookGridView.DesiredWidth" Value="360"/>
+                        <Setter Target="MusicGridView.DesiredWidth" Value="360"/>
+                        <Setter Target="GameGridView.DesiredWidth" Value="360"/>
+                        <Setter Target="RealGridView.DesiredWidth"  Value="360"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -343,13 +270,14 @@
                     </TextBlock>
                 </PivotItem.Header>
                 <controls:AdaptiveGridView Name="AllGridView"
-                                           Padding="10,0"
+                                           Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
-                                           DataFetchSize="1">
+                                           DataFetchSize="1"
+                                           ItemTemplate="{StaticResource SubjectWithTypeTemplate}">
                     <GridView.Header>
                         <TextBlock Text="无搜索结果，请换个关键词再试"
                                    Visibility="{x:Bind ViewModel.NoResult[0], Mode=OneWay}"
@@ -379,13 +307,14 @@
                     </TextBlock>
                 </PivotItem.Header>
                 <controls:AdaptiveGridView Name="AnimeGridView"
-                                           Padding="10,0"
+                                           Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
-                                           DataFetchSize="1">
+                                           DataFetchSize="1"
+                                           ItemTemplate="{StaticResource SubjectTemplate}">
                     <GridView.Header>
                         <TextBlock Text="无搜索结果，请换个关键词再试"
                                    Visibility="{x:Bind ViewModel.NoResult[1], Mode=OneWay}"
@@ -415,13 +344,14 @@
                     </TextBlock>
                 </PivotItem.Header>
                 <controls:AdaptiveGridView Name="BookGridView"
-                                           Padding="10,0"
+                                           Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
-                                           DataFetchSize="1">
+                                           DataFetchSize="1"
+                                           ItemTemplate="{StaticResource SubjectTemplate}">
                     <GridView.Header>
                         <TextBlock Text="无搜索结果，请换个关键词再试"
                                    Visibility="{x:Bind ViewModel.NoResult[2], Mode=OneWay}"
@@ -451,13 +381,14 @@
                     </TextBlock>
                 </PivotItem.Header>
                 <controls:AdaptiveGridView Name="MusicGridView"
-                                           Padding="10,0"
+                                           Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
-                                           DataFetchSize="1">
+                                           DataFetchSize="1"
+                                           ItemTemplate="{StaticResource SubjectTemplate}">
                     <GridView.Header>
                         <TextBlock Text="无搜索结果，请换个关键词再试"
                                    Visibility="{x:Bind ViewModel.NoResult[3], Mode=OneWay}"
@@ -487,13 +418,14 @@
                     </TextBlock>
                 </PivotItem.Header>
                 <controls:AdaptiveGridView Name="GameGridView"
-                                           Padding="10,0"
+                                           Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
-                                           DataFetchSize="1">
+                                           DataFetchSize="1"
+                                           ItemTemplate="{StaticResource SubjectTemplate}">
                     <GridView.Header>
                         <TextBlock Text="无搜索结果，请换个关键词再试"
                                    Visibility="{x:Bind ViewModel.NoResult[4], Mode=OneWay}"
@@ -523,13 +455,14 @@
                     </TextBlock>
                 </PivotItem.Header>
                 <controls:AdaptiveGridView Name="RealGridView"
-                                           Padding="10,0"
+                                           Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
-                                           DataFetchSize="1">
+                                           DataFetchSize="1"
+                                           ItemTemplate="{StaticResource SubjectTemplate}">
                     <GridView.Header>
                         <TextBlock Text="无搜索结果，请换个关键词再试"
                                    Visibility="{x:Bind ViewModel.NoResult[5], Mode=OneWay}"

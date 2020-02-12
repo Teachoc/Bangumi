@@ -18,237 +18,164 @@
         <ResourceDictionary>
             <!-- 右键放送站点菜单 -->
             <MenuFlyout x:Name="SitesMenuFlyout"/>
-
-            <DataTemplate x:Key="NarrowProgressSubjectTemplate" x:DataType="data:WatchStatus">
-                <RelativePanel Padding="5"
-                               RightTapped="RelativePanel_RightTapped"
-                               Holding="RelativePanel_Holding"
-                               Background="Transparent">
-                    <controls:ImageEx x:Name="BangumiImage"
-                                      IsCacheEnabled="True"
-                                      CacheMode="BitmapCache"
-                                      Source="{x:Bind Image}" 
-                                      PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
-                                      PlaceholderStretch="UniformToFill"
-                                      CornerRadius="2"
-                                      x:Phase="2"
-                                      RelativePanel.AlignLeftWithPanel="True"
-                                      RelativePanel.AlignTopWithPanel="True"
-                                      Height="75" 
-                                      Width="75" 
-                                      Margin="0,0,6,0"
-                                      Stretch="UniformToFill" />
-                    <TextBlock Name="TitleTextBlock"
-                               Text="{x:Bind NameCn}" 
-                               FontSize="14" 
-                               ToolTipService.ToolTip="{x:Bind common:Converters.Split(NameCn, Name, '\\n'), Mode=OneWay}"
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.AlignTopWithPanel="True"
-                               Foreground="{StaticResource BangumiPinkBrush}"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="AirWeekdayTextBlock"
-                               Text="{x:Bind common:Converters.GetWeekday(AirTime)}" 
-                               x:Phase="1"
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="TitleTextBlock"
-                               FontSize="12" 
-                               Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="WatchedTextBlock"
-                               FontSize="12" 
-                               x:Phase="1"
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="AirWeekdayTextBlock"
-                               Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
-                               TextTrimming="CharacterEllipsis">
-                            <Run Text="{x:Bind common:Converters.GetWatchedEpsDesc(WatchedEps), Mode=OneWay}"/>
-                            <Run Text="/"/>
-                            <Run Text="{x:Bind common:Converters.GetUpdatedEpsDesc(UpdatedEps,Eps), Mode=OneWay}"/>
-                    </TextBlock>
-
-                    <Button Name="CollectionButton"
-                            Click="CollectionButton_Click"
-                            Padding="8,1"
-                            RelativePanel.RightOf="BangumiImage"
-                            RelativePanel.AlignBottomWithPanel="True"
-                            ToolTipService.ToolTip="收藏"
-                            Background="{ThemeResource AppBarItemBackgroundThemeBrush}">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" 
-                                  Glyph="&#xE00B;" 
-                                  Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
-                                  Margin="0">
-                            <FontIcon.RenderTransform>
-                                <CompositeTransform CenterX="10"
-                                                    CenterY="10"
-                                                    ScaleX="0.6" 
-                                                    ScaleY="0.6"/>
-                            </FontIcon.RenderTransform>
-                        </FontIcon>
-                    </Button>
-
-                    <Button Name="NextEpButton"
-                            Click="NextEpButton_Click"
-                            Padding="8,3"
-                            RelativePanel.AlignRightWithPanel="True"
-                            RelativePanel.AlignBottomWithPanel="True"
-                            RelativePanel.RightOf="CollectionButton"
-                            HorizontalAlignment="Right"
-                            Visibility="{x:Bind common:Converters.CollapsedIf(IsUpdating), Mode=OneWay}"
-                            ToolTipService.ToolTip="{Binding ElementName=NextEpTextBlock, Path=Text}"
-                            Background="{ThemeResource AppBarItemBackgroundThemeBrush}">
-                        <TextBlock Name="NextEpTextBlock" 
-                                   FontSize="12" 
-                                   Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
-                                   VerticalAlignment="Center"
-                                   HorizontalTextAlignment="Right"
-                                   TextTrimming="CharacterEllipsis"
-                                   Text="{x:Bind common:Converters.GetEpNextSortDesc(NextEp,Eps), Mode=OneWay}">
-                        </TextBlock>
-                    </Button>
-
-                    <ProgressBar Maximum="{x:Bind EpsCount, Mode=OneWay}"
-                                 Value="{x:Bind WatchedEps, Mode=OneWay}"
-                                 Width="{Binding ElementName=BangumiImage, Path=Width}"
-                                 RelativePanel.Below="BangumiImage"
-                                 RelativePanel.AlignLeftWithPanel="True"
-                                 ToolTipService.ToolTip="{x:Bind common:Converters.Split(WatchedEps, EpsCount, ' / '), Mode=OneWay}"
-                                 Margin="0,1,0,0"
-                                 Background="{ThemeResource SystemChromeHighColor}"
-                                 Foreground="{StaticResource BangumiPinkBrush}" />
-
-                    <ProgressRing IsActive="True"
-                                  Visibility="{x:Bind IsUpdating, Mode=OneWay}"
-                                  RelativePanel.AlignRightWithPanel="True"
-                                  RelativePanel.AlignBottomWithPanel="True"
-                                  Width="20" 
-                                  Height="20" >
-                        <ProgressRing.RenderTransform>
-                            <CompositeTransform CenterX="0"
-                                                CenterY="3"
-                                                ScaleX="0.75" 
-                                                ScaleY="0.75"/>
-                        </ProgressRing.RenderTransform>
-                    </ProgressRing>
-
-                </RelativePanel>
-            </DataTemplate>
         
-            <DataTemplate x:Key="WideProgressSubjectTemplate" x:DataType="data:WatchStatus">
-                <RelativePanel Padding="5"
-                               RightTapped="RelativePanel_RightTapped"
-                               Holding="RelativePanel_Holding"
-                               Background="Transparent">
-                    <controls:ImageEx x:Name="BangumiImage"
-                                      IsCacheEnabled="True"
-                                      CacheMode="BitmapCache"
-                                      Source="{x:Bind Image}" 
-                                      PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
-                                      PlaceholderStretch="UniformToFill"
-                                      CornerRadius="2"
-                                      x:Phase="2"
-                                      RelativePanel.AlignLeftWithPanel="True"
-                                      RelativePanel.AlignTopWithPanel="True"
-                                      Height="120" 
-                                      Width="85" 
-                                      Margin="0,0,10,0"
-                                      Stretch="UniformToFill" />
-                    <TextBlock Name="TitleTextBlock"
-                               FontSize="20" 
-                               Foreground="Gray"
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.AlignTopWithPanel="True"
-                               MaxLines="2"
-                               ToolTipService.ToolTip="{x:Bind common:Converters.Split(NameCn, Name, '\\n'), Mode=OneWay}"
-                               TextTrimming="CharacterEllipsis"
-                               TextWrapping="Wrap">
-                        <Run Text="{x:Bind NameCn}"
-                             Foreground="{StaticResource BangumiPinkBrush}"/>
-                        <Run Text="/"
-                             Foreground="Gray"/>
-                        <Run Text="{x:Bind Name}"
-                             Foreground="Gray"
-                             FontSize="16"/>
-                    </TextBlock>
-                    <TextBlock Name="AirWeekdayTextBlock"
-                               Text="{x:Bind common:Converters.GetWeekday(AirTime)}" 
-                               x:Phase="1"
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="TitleTextBlock"
-                               FontSize="16" 
-                               Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Name="WatchedTextBlock"
-                               FontSize="16" 
-                               x:Phase="1"
-                               RelativePanel.RightOf="BangumiImage"
-                               RelativePanel.Below="AirWeekdayTextBlock"
-                               Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
-                               TextTrimming="CharacterEllipsis">
-                            <Run Text="{x:Bind common:Converters.GetWatchedEpsDesc(WatchedEps), Mode=OneWay}"/>
-                            <Run Text="/"/>
-                            <Run Text="{x:Bind common:Converters.GetUpdatedEpsDesc(UpdatedEps,Eps), Mode=OneWay}"/>
-                    </TextBlock>
-
-                    <Button Name="CollectionButton"
-                            Click="CollectionButton_Click"
-                            Padding="12,4"
-                            RelativePanel.RightOf="BangumiImage"
-                            RelativePanel.AlignBottomWithPanel="True"
-                            ToolTipService.ToolTip="收藏"
-                            Background="{ThemeResource AppBarItemBackgroundThemeBrush}">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" 
-                                  Glyph="&#xE00B;" 
-                                  Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
-                                  Margin="0">
-                            <FontIcon.RenderTransform>
-                                <CompositeTransform CenterX="10"
-                                                    CenterY="10"
-                                                    ScaleX="0.9" 
-                                                    ScaleY="0.9"/>
-                            </FontIcon.RenderTransform>
-                        </FontIcon>
-                    </Button>
-
-                    <Button Name="NextEpButton"
-                            Click="NextEpButton_Click"
-                            Padding="8,3"
-                            RelativePanel.AlignRightWithPanel="True"
-                            RelativePanel.AlignBottomWithPanel="True"
-                            RelativePanel.RightOf="CollectionButton"
-                            HorizontalAlignment="Right"
-                            Visibility="{x:Bind common:Converters.CollapsedIf(IsUpdating), Mode=OneWay}"
-                            ToolTipService.ToolTip="{Binding ElementName=NextEpTextBlock, Path=Text}"
-                            Background="{ThemeResource AppBarItemBackgroundThemeBrush}">
-                        <TextBlock Name="NextEpTextBlock" 
-                                   FontSize="16" 
-                                   Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
-                                   VerticalAlignment="Center"
-                                   HorizontalTextAlignment="Right"
-                                   TextTrimming="CharacterEllipsis"
-                                   Text="{x:Bind common:Converters.GetEpNextSortDesc(NextEp,Eps), Mode=OneWay}">
+            <DataTemplate x:Key="ProgressSubjectTemplate" x:DataType="data:WatchStatus">
+                <UserControl>
+                    <RelativePanel Padding="5"
+                                   RightTapped="RelativePanel_RightTapped"
+                                   Holding="RelativePanel_Holding"
+                                   Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup>
+                                <VisualState x:Name="Narrow">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="0"/>
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="BangumiImage.Height" Value="75"/>
+                                        <Setter Target="BangumiImage.Width" Value="75"/>
+                                        <Setter Target="BangumiImage.Margin" Value="0,0,6,0"/>
+                                        <Setter Target="TitleTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="AirWeekdayTextBlock.FontSize" Value="12"/>
+                                        <Setter Target="WatchedTextBlock.FontSize" Value="12"/>
+                                        <Setter Target="CollectionButton.Padding" Value="8,1"/>
+                                        <Setter Target="CollectionButtonTransform.ScaleX" Value="0.6"/>
+                                        <Setter Target="CollectionButtonTransform.ScaleY" Value="0.6"/>
+                                        <Setter Target="NextEpTextBlock.FontSize" Value="12"/>
+                                        <Setter Target="ProgressRing.Margin" Value="0"/>
+                                        <Setter Target="ProgressRingTransform.ScaleX" Value="0.75"/>
+                                        <Setter Target="ProgressRingTransform.ScaleY" Value="0.75"/>
+                                        <Setter Target="ProgressRingTransform.CenterX" Value="0"/>
+                                        <Setter Target="ProgressRingTransform.CenterY" Value="3"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Wide">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="420" />
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="BangumiImage.Height" Value="100"/>
+                                        <Setter Target="BangumiImage.Width" Value="100"/>
+                                        <Setter Target="BangumiImage.Margin" Value="0,0,10,0"/>
+                                        <Setter Target="TitleTextBlock.FontSize" Value="20"/>
+                                        <Setter Target="AirWeekdayTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="WatchedTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="CollectionButton.Padding" Value="12,4"/>
+                                        <Setter Target="CollectionButtonTransform.ScaleX" Value="0.9"/>
+                                        <Setter Target="CollectionButtonTransform.ScaleY" Value="0.9"/>
+                                        <Setter Target="NextEpTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="ProgressRing.Margin" Value="4"/>
+                                        <Setter Target="ProgressRingTransform.ScaleX" Value="1"/>
+                                        <Setter Target="ProgressRingTransform.ScaleY" Value="1"/>
+                                        <Setter Target="ProgressRingTransform.CenterX" Value="0"/>
+                                        <Setter Target="ProgressRingTransform.CenterY" Value="0"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <controls:ImageEx x:Name="BangumiImage"
+                                          IsCacheEnabled="True"
+                                          CacheMode="BitmapCache"
+                                          Source="{x:Bind Image}" 
+                                          PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
+                                          PlaceholderStretch="UniformToFill"
+                                          CornerRadius="2"
+                                          x:Phase="2"
+                                          RelativePanel.AlignLeftWithPanel="True"
+                                          RelativePanel.AlignTopWithPanel="True"
+                                          Stretch="UniformToFill" />
+                        <TextBlock x:Name="TitleTextBlock"
+                                   RelativePanel.RightOf="BangumiImage"
+                                   RelativePanel.AlignTopWithPanel="True"
+                                   Text="{x:Bind NameCn}" 
+                                   Foreground="{StaticResource BangumiPinkBrush}"
+                                   TextTrimming="CharacterEllipsis">
+                            <ToolTipService.ToolTip>
+                                <TextBlock>
+                                    <Run Text="{x:Bind NameCn}"/>
+                                    <LineBreak/>
+                                    <Run Text="{x:Bind Name}"/>
+                                </TextBlock>
+                            </ToolTipService.ToolTip>
                         </TextBlock>
-                    </Button>
+                        <TextBlock x:Name="AirWeekdayTextBlock"
+                                   Text="{x:Bind common:Converters.GetWeekday(AirTime)}" 
+                                   x:Phase="1"
+                                   RelativePanel.RightOf="BangumiImage"
+                                   RelativePanel.Below="TitleTextBlock"
+                                   Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="WatchedTextBlock"
+                                   x:Phase="1"
+                                   RelativePanel.RightOf="BangumiImage"
+                                   RelativePanel.Below="AirWeekdayTextBlock"
+                                   Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
+                                   TextTrimming="CharacterEllipsis">
+                                <Run Text="{x:Bind common:Converters.GetWatchedEpsDesc(WatchedEps), Mode=OneWay}"/>
+                                <Run Text="/"/>
+                                <Run Text="{x:Bind common:Converters.GetUpdatedEpsDesc(UpdatedEps,Eps), Mode=OneWay}"/>
+                        </TextBlock>
 
-                    <ProgressBar Maximum="{x:Bind EpsCount, Mode=OneWay}"
-                                 Value="{x:Bind WatchedEps, Mode=OneWay}"
-                                 Width="{Binding ElementName=BangumiImage, Path=Width}"
-                                 RelativePanel.Below="BangumiImage"
-                                 RelativePanel.AlignLeftWithPanel="True"
-                                 ToolTipService.ToolTip="{x:Bind common:Converters.Split(WatchedEps, EpsCount, ' / '), Mode=OneWay}"
-                                 Margin="0,1,0,0"
-                                 Background="{ThemeResource SystemChromeHighColor}"
-                                 Foreground="{StaticResource BangumiPinkBrush}" />
+                        <Button x:Name="CollectionButton"
+                                Click="CollectionButton_Click"
+                                RelativePanel.RightOf="BangumiImage"
+                                RelativePanel.AlignBottomWithPanel="True"
+                                ToolTipService.ToolTip="收藏"
+                                Background="{ThemeResource AppBarItemBackgroundThemeBrush}">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" 
+                                      Glyph="&#xE00B;" 
+                                      Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
+                                      Margin="0">
+                                <FontIcon.RenderTransform>
+                                    <CompositeTransform x:Name="CollectionButtonTransform"
+                                                        CenterX="10"
+                                                        CenterY="10"/>
+                                </FontIcon.RenderTransform>
+                            </FontIcon>
+                        </Button>
 
-                    <ProgressRing IsActive="True"
-                                  Visibility="{x:Bind IsUpdating, Mode=OneWay}"
-                                  RelativePanel.AlignRightWithPanel="True"
-                                  RelativePanel.AlignBottomWithPanel="True"
-                                  Margin="4"
-                                  Width="20" 
-                                  Height="20" >
-                    </ProgressRing>
+                        <Button x:Name="NextEpButton"
+                                Click="NextEpButton_Click"
+                                Padding="8,3"
+                                RelativePanel.AlignRightWithPanel="True"
+                                RelativePanel.AlignBottomWithPanel="True"
+                                RelativePanel.RightOf="CollectionButton"
+                                HorizontalAlignment="Right"
+                                Visibility="{x:Bind common:Converters.CollapsedIf(IsUpdating), Mode=OneWay}"
+                                ToolTipService.ToolTip="{Binding ElementName=NextEpTextBlock, Path=Text}"
+                                Background="{ThemeResource AppBarItemBackgroundThemeBrush}">
+                            <TextBlock x:Name="NextEpTextBlock" 
+                                       Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Right"
+                                       TextTrimming="CharacterEllipsis"
+                                       Text="{x:Bind common:Converters.GetEpNextSortDesc(NextEp,Eps), Mode=OneWay}">
+                            </TextBlock>
+                        </Button>
 
-                </RelativePanel>
+                        <ProgressBar Maximum="{x:Bind EpsCount, Mode=OneWay}"
+                                     Value="{x:Bind WatchedEps, Mode=OneWay}"
+                                     Width="{Binding ElementName=BangumiImage, Path=Width}"
+                                     RelativePanel.Below="BangumiImage"
+                                     RelativePanel.AlignLeftWithPanel="True"
+                                     ToolTipService.ToolTip="{x:Bind common:Converters.Split(WatchedEps, EpsCount, ' / '), Mode=OneWay}"
+                                     Margin="0,1,0,0"
+                                     Background="{ThemeResource SystemChromeHighColor}"
+                                     Foreground="{StaticResource BangumiPinkBrush}" />
+
+                        <ProgressRing x:Name="ProgressRing"
+                                      IsActive="True"
+                                      Visibility="{x:Bind IsUpdating, Mode=OneWay}"
+                                      RelativePanel.AlignRightWithPanel="True"
+                                      RelativePanel.AlignBottomWithPanel="True"
+                                      Width="20" 
+                                      Height="20" >
+                            <ProgressRing.RenderTransform>
+                                <CompositeTransform x:Name="ProgressRingTransform"/>
+                            </ProgressRing.RenderTransform>
+                        </ProgressRing>
+                    </RelativePanel>
+                </UserControl>
             </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
@@ -261,8 +188,6 @@
                         <AdaptiveTrigger MinWindowWidth="0"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="MyGridView.ItemTemplate" 
-                                Value="{StaticResource NarrowProgressSubjectTemplate}"/>
                         <Setter Target="MyGridView.DesiredWidth" Value="300"/>
                         <Setter Target="EmptyImage.Width" Value="200"/>
                         <Setter Target="EmptyImage.Height" Value="326"/>
@@ -270,11 +195,9 @@
                 </VisualState>
                 <VisualState x:Name="Wide">
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="400" />
+                        <AdaptiveTrigger MinWindowWidth="420" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="MyGridView.ItemTemplate" 
-                                Value="{StaticResource WideProgressSubjectTemplate}"/>
                         <Setter Target="MyGridView.DesiredWidth" Value="360"/>
                         <Setter Target="EmptyImage.Width" Value="300"/>
                         <Setter Target="EmptyImage.Height" Value="490"/>
@@ -289,6 +212,7 @@
                                    ShowsScrollingPlaceholders="False"
                                    IsItemClickEnabled="True" 
                                    SelectionMode="None"
+                                   ItemTemplate="{StaticResource ProgressSubjectTemplate}"
                                    ItemClick="GridView_ItemClick">
             <GridView.ItemContainerTransitions>
                 <TransitionCollection>
