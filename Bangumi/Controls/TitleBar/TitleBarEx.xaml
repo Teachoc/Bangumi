@@ -35,7 +35,7 @@
                 <Image Source="/Assets/Square44x44Logo.png" 
                        Grid.Column="0" 
                        Visibility="{x:Bind ImageVisibility, Mode=OneWay}"
-                       Width="32" 
+                       Width="40" 
                        Height="32" 
                        Margin="8,0,0,0"/>
                 <TextBlock x:Name="AppTitleTextBlock"

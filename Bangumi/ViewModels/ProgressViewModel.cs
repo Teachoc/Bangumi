@@ -33,8 +33,7 @@ namespace Bangumi.ViewModels
             private set
             {
                 Set(ref _isLoading, value);
-                HomePage.homePage.IsLoading = value;
-                MainPage.RootPage.RefreshButton.IsEnabled = !value;
+                MainPage.RootPage.PageStatusChanged();
             }
         }
 

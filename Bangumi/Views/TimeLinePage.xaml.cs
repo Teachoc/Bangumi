@@ -1,6 +1,7 @@
 ﻿using Bangumi.Api;
 using Bangumi.Api.Models;
 using Bangumi.ViewModels;
+using System.Threading.Tasks;
 using Windows.Devices.Input;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
@@ -15,9 +16,16 @@ namespace Bangumi.Views
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class TimeLinePage : Page
+    public sealed partial class TimeLinePage : Page, IPageStatus
     {
         public TimeLineViewModel ViewModel { get; } = new TimeLineViewModel();
+
+        public bool IsLoading => ViewModel.IsLoading;
+
+        public async Task Refresh()
+        {
+            await ViewModel.LoadTimeLine();
+        }
 
         public TimeLinePage()
         {
@@ -26,7 +34,6 @@ namespace Bangumi.Views
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.RefreshButton.Click += TimeLinePageRefresh;
             if (ViewModel.TimeLineCollection.Count == 0 && !ViewModel.IsLoading)
             {
                 ViewModel.LoadTimeLine();
@@ -35,7 +42,6 @@ namespace Bangumi.Views
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.RefreshButton.Click -= TimeLinePageRefresh;
         }
 
         private void TimeLinePageRefresh(object sender, RoutedEventArgs e)
@@ -43,7 +49,7 @@ namespace Bangumi.Views
             if (sender is AppBarButton button)
             {
                 var tag = button.Tag;
-                if (tag.Equals("时间表"))
+                if (tag.Equals("calendar"))
                 {
                     ViewModel.LoadTimeLine();
                 }
@@ -53,7 +59,7 @@ namespace Bangumi.Views
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var selectedItem = (SubjectForCalendar)e.ClickedItem;
-            MainPage.RootFrame.Navigate(typeof(DetailsPage), selectedItem.Id, new DrillInNavigationTransitionInfo());
+            this.Frame.Navigate(typeof(DetailsPage), selectedItem.Id, new DrillInNavigationTransitionInfo());
         }
 
         // 更新条目收藏状态

@@ -1,5 +1,4 @@
 ﻿using Bangumi.Api;
-using Bangumi.Api.Exceptions;
 using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.Views;
@@ -16,6 +15,8 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Media.Imaging;
+using mxuc = Microsoft.UI.Xaml.Controls;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 
@@ -26,16 +27,6 @@ namespace Bangumi
     /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        private bool _isOffline;
-        public bool IsOffline
-        {
-            get => _isOffline;
-            private set => Set(ref _isOffline, value);
-        }
-        public static MainPage RootPage;
-        public static Frame RootFrame;
-        public bool HasDialog = false;
-
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         /// <summary>
@@ -68,13 +59,55 @@ namespace Bangumi
         }
         #endregion
 
+        public bool IsLoading
+        {
+            get => (ContentFrame.Content as IPageStatus)?.IsLoading ?? false;
+        }
+        public void PageStatusChanged()
+        {
+            OnPropertyChanged(nameof(IsRefreshable));
+            OnPropertyChanged(nameof(IsLoading));
+            OnPropertyChanged(nameof(CanGoBack));
+        }
+
+        private bool _canGoBack;
+        public bool CanGoBack
+        {
+            get => _canGoBack;
+            private set => Set(ref _canGoBack, value);
+        }
+
+        public bool IsRefreshable => ContentFrame.Content is IPageStatus;
+
+        public static MainPage RootPage;
+        public bool HasDialog = false;
+
         public MainPage()
         {
             this.InitializeComponent();
             RootPage = this;
-            RootFrame = MyFrame;
             // 设置窗口的最小大小
             ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(300, 200));
+            // 标题栏后退按钮
+            SystemNavigationManager.GetForCurrentView().BackRequested += (sender, e) =>
+            {
+                if (!e.Handled)
+                {
+                    e.Handled = TryGoBack();
+                }
+            };
+            // 鼠标后退按钮
+            Window.Current.CoreWindow.PointerPressed += (sender, args) =>
+            {
+                if (args.CurrentPoint.Properties.IsXButton1Pressed)
+                {
+                    args.Handled = TryGoBack();
+                }
+            };
+
+            RefreshButton.Click += (sender, e) => (ContentFrame.Content as IPageStatus)?.Refresh();
+            SearchButton.Click += (sender, e) => NavigateToPage(typeof(SearchPage), null, new DrillInNavigationTransitionInfo());
+            SettingButton.Click += (sender, e) => NavigateToPage(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
 
             // 初始化 Api 对象
             BangumiApi.Init(ApplicationData.Current.LocalFolder.Path,
@@ -88,53 +121,35 @@ namespace Bangumi
                 BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
                                  SettingHelper.UseBiliApp);
             }
+
         }
 
-        private void Page_Loaded(object s, RoutedEventArgs ev)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // 标题栏后退按钮
-            SystemNavigationManager.GetForCurrentView().BackRequested += (sender, e) =>
-            {
-                if (!e.Handled)
-                {
-                    e.Handled = On_BackRequested();
-                }
-            };
-            // 将 Esc 添加为后导航的键盘快捷键
-            var goBack = new KeyboardAccelerator { Key = VirtualKey.Escape };
-            goBack.Invoked += (sender, args) =>
-            {
-                On_BackRequested();
-                args.Handled = true;
-            };
-            this.KeyboardAccelerators.Add(goBack);
-            // 鼠标后退按钮
-            Window.Current.CoreWindow.PointerPressed += (sender, args) =>
-            {
-                if (args.CurrentPoint.Properties.IsXButton1Pressed)
-                {
-                    args.Handled = On_BackRequested();
-                }
-            };
+            ContentFrame.BackStack.Clear();
+            UpdateBackButtonStatus();
+        }
 
-            SearchButton.Click += (sender, e) => RootFrame.Navigate(typeof(SearchPage), null, new DrillInNavigationTransitionInfo());
-            SettingButton.Click += (sender, e) => RootFrame.Navigate(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
-            OfflineAppBarButton.Click += (sender, e) =>
+        private void Page_Loading(FrameworkElement sender, object args)
+        {
+            if (BangumiApi.BgmOAuth.IsLogin)
             {
-                // 检查网络状态
-                IsOffline = Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile() == null;
-            };
-
-            UpdateUserStatus();
+                NavigateToPage(typeof(ProgressPage), null, new SuppressNavigationTransitionInfo());
+                UpdateAvatar();
+            }
+            else
+            {
+                NavigateToPage(typeof(TimeLinePage), null, new SuppressNavigationTransitionInfo());
+            }
         }
 
         /// <summary>
         /// 页面向后导航
         /// </summary>
         /// <returns></returns>
-        private bool On_BackRequested()
+        private bool TryGoBack()
         {
-            if (!MainPage.RootFrame.CanGoBack)
+            if (!ContentFrame.CanGoBack)
             {
                 return false;
             }
@@ -143,14 +158,18 @@ namespace Bangumi
             {
                 return false;
             }
-            // 处于首页或登录页时不向后导航
-            if (MainPage.RootFrame.CurrentSourcePageType == typeof(HomePage) ||
-                MainPage.RootFrame.CurrentSourcePageType == typeof(LoginPage))
+            // 处于登录页时不向后导航
+            if (this.Frame.CurrentSourcePageType == typeof(LoginPage))
             {
                 return false;
             }
-            MainPage.RootFrame.GoBack();
+            ContentFrame.GoBack();
             return true;
+        }
+
+        private void UpdateBackButtonStatus()
+        {
+            CanGoBack = ContentFrame.CanGoBack && !(this.Frame.CurrentSourcePageType == typeof(LoginPage));
         }
 
         /// <summary>
@@ -160,11 +179,7 @@ namespace Bangumi
         /// <param name="e"></param>
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            if (LoginButton.Label == "登录")
-            {
-                UpdateUserStatus();
-            }
-            else if (LoginButton.Label == "注销")
+            if (BangumiApi.BgmOAuth.IsLogin)
             {
                 string choice = "";
                 var msgDialog = new Windows.UI.Popups.MessageDialog("确定要退出登录吗？") { Title = "注销" };
@@ -174,31 +189,87 @@ namespace Bangumi
                 if (choice == "确定")
                 {
                     BangumiApi.BgmOAuth.DeleteUserFiles();
-                    UpdateUserStatus();
+                    this.Frame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
                 }
-            }
-        }
-
-        /// <summary>
-        /// 根据用户登录状态改变用户图标。
-        /// 只检查 Token 是否存在。
-        /// </summary>
-        /// <returns></returns>
-        private async Task UpdateUserStatus()
-        {
-            if (BangumiApi.BgmOAuth.IsLogin)
-            {
-                LoginButton.Label = "注销";
-                UserIcon.Glyph = "\uE7E8";
-                RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
             }
             else
             {
-                LoginButton.Label = "登录";
-                UserIcon.Glyph = "\uEE57";
-                RootFrame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
+                this.Frame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
             }
         }
 
+        private async Task UpdateAvatar()
+        {
+            AvaterImage.ImageSource = null;
+            var user = await BangumiApi.BgmApi.User();
+            var img = new BitmapImage(new Uri(user.Avatar.Medium));
+            AvaterImage.ImageSource = img;
+        }
+
+        private void NavigateToPage(Type type, object parameter, NavigationTransitionInfo transitionInfo)
+        {
+            if (type == null || ContentFrame.CurrentSourcePageType == type)
+            {
+                return;
+            }
+            ContentFrame.Navigate(type, parameter, transitionInfo);
+        }
+
+        public void SelectPlaceholderItem(string title)
+        {
+            PlaceholderItem.Content = title;
+            PlaceholderItem.Visibility = Visibility.Visible;
+            NavView.SelectedItem = PlaceholderItem;
+        }
+
+        private async Task HidePlaceholderItem()
+        {
+            await Task.Delay(500);
+            PlaceholderItem.Visibility = Visibility.Collapsed;
+        }
+
+        private void NavView_ItemInvoked(mxuc.NavigationView sender, mxuc.NavigationViewItemInvokedEventArgs args)
+        {
+            Type type = args.InvokedItemContainer.Tag switch
+            {
+                "progress" => typeof(ProgressPage),
+                "collection" => typeof(CollectionPage),
+                "calendar" => typeof(TimeLinePage),
+                _ => null
+            };
+            NavigateToPage(type, null, args.RecommendedNavigationTransitionInfo);
+        }
+
+        private void ContentFrame_Navigated(object sender, Windows.UI.Xaml.Navigation.NavigationEventArgs e)
+        {
+            UpdateBackButtonStatus();
+            PageStatusChanged();
+            if (e.SourcePageType == typeof(ProgressPage))
+            {
+                NavView.SelectedItem = NavView.MenuItems[0];
+                HidePlaceholderItem();
+            }
+            else if (e.SourcePageType == typeof(CollectionPage))
+            {
+                NavView.SelectedItem = NavView.MenuItems[1];
+                HidePlaceholderItem();
+            }
+            else if (e.SourcePageType == typeof(TimeLinePage))
+            {
+                NavView.SelectedItem = NavView.MenuItems[2];
+                HidePlaceholderItem();
+            }
+            else
+            {
+                NavView.SelectedItem = PlaceholderItem;
+            }
+        }
     }
+    public class Category
+    {
+        public string Name { get; set; }
+        public string Tooltip { get; set; }
+        public Symbol Glyph { get; set; }
+    }
+
 }

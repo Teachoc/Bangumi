@@ -2,6 +2,7 @@
 using Bangumi.Api.Models;
 using Bangumi.ViewModels;
 using System;
+using System.Threading.Tasks;
 using Windows.Devices.Input;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
@@ -16,9 +17,16 @@ namespace Bangumi.Views
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class CollectionPage : Page
+    public sealed partial class CollectionPage : Page, IPageStatus
     {
         public CollectionViewModel ViewModel { get; } = new CollectionViewModel();
+
+        public bool IsLoading => ViewModel.IsLoading;
+
+        public async Task Refresh()
+        {
+            await ViewModel.LoadCollectionList();
+        }
 
         public CollectionPage()
         {
@@ -27,7 +35,11 @@ namespace Bangumi.Views
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.RefreshButton.Click += CollectionPageRefresh;
+            if (!BangumiApi.BgmOAuth.IsLogin)
+            {
+                MainPage.RootPage.Frame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
+                return;
+            }
             if (ViewModel.SubjectCollection.Count == 0 && !ViewModel.IsLoading)
             {
                 ViewModel.LoadCollectionList();
@@ -36,7 +48,6 @@ namespace Bangumi.Views
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.RefreshButton.Click -= CollectionPageRefresh;
         }
 
         private void CollectionPageRefresh(object sender, RoutedEventArgs e)
@@ -44,7 +55,7 @@ namespace Bangumi.Views
             if (sender is AppBarButton button)
             {
                 var tag = button.Tag;
-                if (tag.Equals("收藏"))
+                if (tag.Equals("collection"))
                 {
                     ViewModel.LoadCollectionList();
                 }
@@ -59,7 +70,7 @@ namespace Bangumi.Views
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var selectedItem = (SubjectBaseE)e.ClickedItem;
-            MainPage.RootFrame.Navigate(typeof(DetailsPage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
+            this.Frame.Navigate(typeof(DetailsPage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
         }
 
         // 更新条目收藏状态

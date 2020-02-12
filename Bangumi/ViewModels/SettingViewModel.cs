@@ -22,6 +22,7 @@ namespace Bangumi.ViewModels
             new Url {Uri="https://github.com/bangumi-data/bangumi-data", Desc="bangumi-data(https://github.com/bangumi-data/bangumi-data)"},
             new Url {Uri="https://flurl.dev", Desc="Flurl(https://flurl.dev)"},
             new Url {Uri="https://github.com/Tlaster/WeiPo", Desc="WeiPo(https://github.com/Tlaster/WeiPo)"},
+            new Url {Uri="https://github.com/tobiichiamane/pixivfs-uwp", Desc="pixivfs-uwp(https://github.com/tobiichiamane/pixivfs-uwp)"},
         };
 
         public string Version

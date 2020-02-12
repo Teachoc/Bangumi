@@ -25,7 +25,6 @@ namespace Bangumi.Views
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.MyCommandBar.Visibility = Visibility.Collapsed;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -43,7 +42,7 @@ namespace Bangumi.Views
             try
             {
                 await OAuthHelper.Authorize();
-                MainPage.RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
+                this.Frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
             }
             catch (Exception ex)
             {
@@ -55,7 +54,7 @@ namespace Bangumi.Views
 
         private void EnterButton_Click(object sender, RoutedEventArgs e)
         {
-            MainPage.RootFrame.Navigate(typeof(HomePage), null, new DrillInNavigationTransitionInfo());
+            this.Frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
         }
 
     }

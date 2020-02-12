@@ -64,7 +64,8 @@
         </Grid>-->
 
         <local2:TitleBarEx Grid.ColumnSpan="2"
-                           Text="Bangumi"/>
+                           Text="Bangumi"
+                           IsBackEnabled="False"/>
 
         <Image Name="WelcomeImage"
                Grid.Row="2"

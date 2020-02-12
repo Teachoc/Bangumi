@@ -328,18 +328,8 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <local2:TitleBarEx Text="{x:Bind common:Converters.ConcatStrings(ViewModel.NameCn, ' (', ViewModel.SubjectId, ')'), Mode=OneWay}"
-                           IsLoading="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
-                           LoadingText="加载中..."
-                           IsBackEnabled="True"/>
-
-        <Pivot Name="MyPivot"
-               Grid.Row="1">
+        <Pivot Name="MyPivot" >
             <PivotItem Header="章节"
                        Margin="0"
                        AccessKey="Z">
@@ -539,6 +529,28 @@
             </PivotItem>
 
         </Pivot>
+        
+        <CommandBar VerticalAlignment="Bottom"
+                    RequestedTheme="Dark"
+                    Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}"
+                    AccessKey="M">
+            <AppBarButton IsEnabled="{x:Bind ViewModel.IsStatusLoaded, Mode=OneWay}"
+                          Label="{x:Bind ViewModel.CollectionStatusText, Mode=OneWay}"
+                          ToolTipService.ToolTip="{x:Bind ViewModel.CollectionStatusText, Mode=OneWay}"
+                          Click="{x:Bind ViewModel.EditCollectionStatus}"
+                          AccessKey="C">
+                <FontIcon x:Name="CollectionAppBarButtonFontIcon" 
+                          FontFamily="Segoe MDL2 Assets" 
+                          Glyph="{x:Bind ViewModel.CollectionStatusIcon, Mode=OneWay}"/>
+            </AppBarButton>
+            <AppBarButton Label="访问网页"
+                          ToolTipService.ToolTip="访问网页"
+                          Click="LaunchWebPage_Click"
+                          AccessKey="U">
+                <FontIcon FontFamily="Segoe MDL2 Assets" 
+                          Glyph="&#xE12A;" />
+            </AppBarButton>
+        </CommandBar>
 
     </Grid>
 </Page>

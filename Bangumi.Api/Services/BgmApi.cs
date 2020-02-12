@@ -47,6 +47,27 @@ namespace Bangumi.Api.Services
         }
 
         /// <summary>
+        /// 当前登录用户信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<User> User()
+        {
+            return await User(_bgmOAuth.MyToken.UserId);
+        }
+
+        /// <summary>
+        /// 用户信息
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        public async Task<User> User(string username)
+        {
+            return await $"{HOST}/user/{username}"
+                .GetAsync()
+                .ReceiveJson<User>();
+        }
+
+        /// <summary>
         /// 获取用户收视列表。
         /// </summary>
         /// <returns></returns>

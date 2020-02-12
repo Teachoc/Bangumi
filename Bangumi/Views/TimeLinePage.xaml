@@ -184,7 +184,7 @@
             <SemanticZoom.ZoomedInView>
                 <controls:AdaptiveGridView Name="MyGridView"
                                            ItemsSource="{x:Bind cvsGroups.View}"
-                                           Padding="12,0,12,48"
+                                           Padding="12,0,12,8"
                                            ScrollViewer.IsHorizontalScrollChainingEnabled="False"
                                            ShowsScrollingPlaceholders="False"
                                            IsItemClickEnabled="True"

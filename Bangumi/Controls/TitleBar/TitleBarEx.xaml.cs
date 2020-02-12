@@ -49,37 +49,43 @@ namespace Bangumi.Controls.TitleBar
         public bool IsBackEnabled
         {
             get => (bool)GetValue(IsBackEnabledProperty);
-            set => SetValue(IsBackEnabledProperty, value);
+            set
+            {
+                SetValue(IsBackEnabledProperty, value);
+                if (value)
+                {
+                    SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+                    LeftPaddingColumn.Width = new GridLength(48);
+                }
+                else
+                {
+                    SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+                    LeftPaddingColumn.Width = new GridLength(0);
+                }
+            }
         }
-
-        private static bool _firstInit = true;
 
         public TitleBarEx()
         {
             InitializeComponent();
             Window.Current.CoreWindow.Activated += CoreWindow_Activated;
-            if (_firstInit)
+            // 将内容拓展到标题栏
+            var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            if (!coreTitleBar.ExtendViewIntoTitleBar)
             {
-                // 将内容拓展到标题栏
-                var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-                if (!coreTitleBar.ExtendViewIntoTitleBar)
-                {
-                    coreTitleBar.ExtendViewIntoTitleBar = true;
-                }
-
-                // 设置标题栏系统按钮颜色
-                var appTitleBar = ApplicationView.GetForCurrentView().TitleBar;
-                appTitleBar.ButtonBackgroundColor = Colors.Transparent;
-                appTitleBar.ButtonForegroundColor = Colors.White;
-                appTitleBar.ButtonHoverBackgroundColor = Color.FromArgb(0x2e, 0xff, 0xff, 0xff);
-                appTitleBar.ButtonHoverForegroundColor = Colors.White;
-                appTitleBar.ButtonPressedBackgroundColor = Color.FromArgb(0x55, 0xff, 0xff, 0xff);
-                appTitleBar.ButtonPressedForegroundColor = Colors.White;
-                appTitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-                appTitleBar.ButtonInactiveForegroundColor = Colors.White;
-
-                _firstInit = false;
+                coreTitleBar.ExtendViewIntoTitleBar = true;
             }
+
+            // 设置标题栏系统按钮颜色
+            var appTitleBar = ApplicationView.GetForCurrentView().TitleBar;
+            appTitleBar.ButtonBackgroundColor = Colors.Transparent;
+            appTitleBar.ButtonForegroundColor = Colors.White;
+            appTitleBar.ButtonHoverBackgroundColor = Color.FromArgb(0x2e, 0xff, 0xff, 0xff);
+            appTitleBar.ButtonHoverForegroundColor = Colors.White;
+            appTitleBar.ButtonPressedBackgroundColor = Color.FromArgb(0x55, 0xff, 0xff, 0xff);
+            appTitleBar.ButtonPressedForegroundColor = Colors.White;
+            appTitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+            appTitleBar.ButtonInactiveForegroundColor = Colors.White;
         }
 
         /// <summary>
@@ -121,18 +127,6 @@ namespace Bangumi.Controls.TitleBar
         {
             // 设置标题栏可拖动区域
             Window.Current.SetTitleBar(AppTitleBar);
-
-            if (IsBackEnabled)
-            {
-                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
-                LeftPaddingColumn.Width = new GridLength(48);
-            }
-            else
-            {
-                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-                LeftPaddingColumn.Width = new GridLength(0);
-            }
         }
-
     }
 }

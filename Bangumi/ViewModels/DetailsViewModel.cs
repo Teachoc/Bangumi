@@ -25,7 +25,11 @@ namespace Bangumi.ViewModels
         public bool IsLoading
         {
             get => _isLoading;
-            set => Set(ref _isLoading, value);
+            private set
+            {
+                Set(ref _isLoading, value);
+                MainPage.RootPage.PageStatusChanged();
+            }
         }
 
         private bool _isDetailLoading;
@@ -337,7 +341,6 @@ namespace Bangumi.ViewModels
                 IsDetailLoading = true;
                 IsProgressLoading = true;
                 IsStatusLoaded = false;
-                MainPage.RootPage.RefreshButton.IsEnabled = false;
 
                 var subject = BangumiApi.BgmApi.Subject(SubjectId);
                 ProcessSubject(BangumiApi.BgmCache.Subject(SubjectId));
@@ -386,7 +389,6 @@ namespace Bangumi.ViewModels
                 IsDetailLoading = false;
                 IsProgressLoading = false;
                 IsStatusLoaded = true;
-                MainPage.RootPage.RefreshButton.IsEnabled = true;
             }
         }
 

@@ -25,9 +25,16 @@ namespace Bangumi.Views
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class DetailsPage : Page
+    public sealed partial class DetailsPage : Page, IPageStatus
     {
         public DetailsViewModel ViewModel { get; private set; } = new DetailsViewModel();
+
+        public bool IsLoading => ViewModel.IsLoading;
+
+        public async Task Refresh()
+        {
+            await ViewModel.LoadDetails();
+        }
 
         public DetailsPage()
         {
@@ -36,6 +43,9 @@ namespace Bangumi.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            base.OnNavigatedTo(e);
+            (((Frame.Parent as Microsoft.UI.Xaml.Controls.NavigationView)?.Parent as Grid).Parent as MainPage)?.SelectPlaceholderItem("详情");
+
             if (e.Parameter?.GetType() == typeof(int))
             {
                 ViewModel.SubjectId = e.Parameter.ToString();
@@ -49,59 +59,8 @@ namespace Bangumi.Views
             ViewModel.LoadDetails();
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            // 设置收藏按钮隐藏以及解除事件绑定
-            MainPage.RootPage.CollectionAppBarButton.Visibility = Visibility.Collapsed;
-            MainPage.RootPage.CollectionAppBarButton.Click -= CollectionAppBarButton_Click;
-            // 设置刷新按钮隐藏以及解除事件绑定
-            MainPage.RootPage.RefreshButton.Click -= DetailPageRefresh_Click;
-            // 设置访问网页按钮隐藏以及解除事件绑定
-            MainPage.RootPage.WebPageAppBarButton.Visibility = Visibility.Collapsed;
-            MainPage.RootPage.WebPageAppBarButton.Click -= LaunchWebPage_Click;
-            MainPage.RootPage.MyCommandBar.IsDynamicOverflowEnabled = false;
-            MainPage.RootPage.MyCommandBar.IsDynamicOverflowEnabled = true;
-        }
-
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // 设置刷新按钮可见以及事件绑定
-            MainPage.RootPage.MyCommandBar.Visibility = Visibility.Visible;
-            MainPage.RootPage.RefreshButton.Click += DetailPageRefresh_Click;
-
-            // 设置访问网页按钮可见以及事件绑定
-            MainPage.RootPage.WebPageAppBarButton.Visibility = Visibility.Visible;
-            MainPage.RootPage.WebPageAppBarButton.Click += LaunchWebPage_Click;
-
-            // 设置收藏按钮可见以及属性绑定、事件绑定
-            if (BangumiApi.BgmOAuth.IsLogin)
-            {
-                // 标签文本描述
-                Binding labelBinding = new Binding
-                {
-                    Source = ViewModel,
-                    Path = new PropertyPath("CollectionStatusText")
-                };
-                MainPage.RootPage.CollectionAppBarButton.SetBinding(AppBarButton.LabelProperty, labelBinding);
-                MainPage.RootPage.CollectionAppBarButton.SetBinding(ToolTipService.ToolTipProperty, labelBinding);
-                // 图标
-                Binding glyphBinding = new Binding
-                {
-                    Source = ViewModel,
-                    Path = new PropertyPath("CollectionStatusIcon")
-                };
-                MainPage.RootPage.CollectionAppBarButtonFontIcon.SetBinding(FontIcon.GlyphProperty, glyphBinding);
-                // 是否启用
-                Binding isEnabledBinding = new Binding
-                {
-                    Source = ViewModel,
-                    Path = new PropertyPath("IsStatusLoaded")
-                };
-                MainPage.RootPage.CollectionAppBarButton.SetBinding(IsEnabledProperty, isEnabledBinding);
-                MainPage.RootPage.CollectionAppBarButton.Click += CollectionAppBarButton_Click;
-                MainPage.RootPage.CollectionAppBarButton.Visibility = Visibility.Visible;
-            }
-
             if (SettingHelper.UseBangumiDataAirSites)
             {
                 InitAirSites();
@@ -180,19 +139,6 @@ namespace Bangumi.Views
             {
                 EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
-        }
-
-        /// <summary>
-        /// 编辑评分和吐槽。
-        /// </summary>
-        private void CollectionAppBarButton_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.EditCollectionStatus();
-        }
-
-        private void DetailPageRefresh_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.LoadDetails();
         }
 
         private async void LaunchWebPage_Click(object sender, RoutedEventArgs e)

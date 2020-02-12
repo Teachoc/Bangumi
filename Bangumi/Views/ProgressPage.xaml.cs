@@ -21,9 +21,16 @@ namespace Bangumi.Views
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class ProgressPage : Page
+    public sealed partial class ProgressPage : Page, IPageStatus
     {
         public ProgressViewModel ViewModel { get; } = new ProgressViewModel();
+
+        public bool IsLoading => ViewModel.IsLoading;
+
+        public async Task Refresh()
+        {
+            await ViewModel.PopulateWatchingListAsync();
+        }
 
         public ProgressPage()
         {
@@ -32,13 +39,17 @@ namespace Bangumi.Views
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.RefreshButton.Click += ProgressPageRefresh;
-            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsLoading)
+            if (!BangumiApi.BgmOAuth.IsLogin)
+            {
+                MainPage.RootPage.Frame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
+                return;
+            }
+            if (!ViewModel.IsLoading)
             {
                 if (ViewModel.WatchingCollection.Count == 0)
                 {
                     ViewModel.PopulateWatchingListFromCache();
-                    if(!BangumiApi.BgmCache.IsUpdatedToday)
+                    if (!BangumiApi.BgmCache.IsUpdatedToday)
                     {
                         try
                         {
@@ -47,7 +58,7 @@ namespace Bangumi.Views
                         catch (BgmUnauthorizedException)
                         {
                             // 授权过期，返回登录界面
-                            MainPage.RootFrame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
+                            (Window.Current.Content as Frame).Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
                         }
                     }
                     await ViewModel.PopulateWatchingListAsync();
@@ -61,7 +72,6 @@ namespace Bangumi.Views
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            MainPage.RootPage.RefreshButton.Click -= ProgressPageRefresh;
         }
 
         private async void ProgressPageRefresh(object sender, RoutedEventArgs e)
@@ -69,7 +79,7 @@ namespace Bangumi.Views
             if (sender is AppBarButton button)
             {
                 var tag = button.Tag;
-                if (tag.Equals("进度"))
+                if (tag.Equals("progress"))
                 {
                     await ViewModel.PopulateWatchingListAsync();
                 }
@@ -79,7 +89,7 @@ namespace Bangumi.Views
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var selectedItem = (WatchStatus)e.ClickedItem;
-            MainPage.RootFrame.Navigate(typeof(DetailsPage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
+            this.Frame.Navigate(typeof(DetailsPage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
         }
 
         /// <summary>

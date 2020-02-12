@@ -3,98 +3,100 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Bangumi"
+    xmlns:local2="using:Bangumi.Controls.TitleBar"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:common="using:Bangumi.Common"
     mc:Ignorable="d"
     NavigationCacheMode="Enabled"
     Loaded="Page_Loaded"
+    Loading="Page_Loading"
     Background="{ThemeResource SystemChromeLowColor}">
-    
-    <Grid>
-        <Frame x:Name="MyFrame" />
 
-        <CommandBar x:Name="MyCommandBar"
-                    x:FieldModifier="public"
-                    VerticalAlignment="Bottom"
-                    RequestedTheme="Dark"
-                    Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}"
-                    AccessKey="M">
-            <AppBarButton x:Name="OfflineAppBarButton"
-                          Label="离线模式"
-                          ToolTipService.ToolTip="点击检测网络"
-                          Visibility="{x:Bind IsOffline, Mode=OneWay}"
-                          AccessKey="N">
-                <FontIcon FontFamily="Segoe MDL2 Assets" 
-                          Glyph="&#xE7BA;" />
-            </AppBarButton>
-            <AppBarSeparator Visibility="{Binding ElementName=OfflineAppBarButton,Path=Visibility}" />
-            <AppBarButton x:Name="CollectionAppBarButton"
-                          x:FieldModifier="public"
-                          IsEnabled="{Binding ElementName=RefreshAppBarButton,Path=IsEnabled}"
-                          Label="收藏"
-                          ToolTipService.ToolTip="收藏"
-                          Visibility="Collapsed"
-                          AccessKey="C">
-                <FontIcon x:Name="CollectionAppBarButtonFontIcon" 
-                          x:FieldModifier="public"
-                          FontFamily="Segoe MDL2 Assets" 
-                          Glyph="&#xE006;"/>
-            </AppBarButton>
-            <AppBarButton x:Name="WebPageAppBarButton"
-                          x:FieldModifier="public"
-                          Label="访问网页"
-                          ToolTipService.ToolTip="访问网页"
-                          Visibility="Collapsed"
-                          AccessKey="U">
-                <FontIcon FontFamily="Segoe MDL2 Assets" 
-                          Glyph="&#xE12A;" />
-            </AppBarButton>
-            <AppBarSeparator Visibility="{Binding ElementName=WebPageAppBarButton,Path=Visibility}" />
-            <AppBarButton x:Name="SearchButton" 
-                          Icon="Find" 
-                          Label="搜索"
-                          ToolTipService.ToolTip="搜索 (Ctrl+Q)"
-                          AccessKey="Q">
-                <AppBarButton.KeyboardAccelerators>
-                    <KeyboardAccelerator Modifiers="Control"
-                                         Key="Q"/>
-                </AppBarButton.KeyboardAccelerators>
-            </AppBarButton>
-            <AppBarButton x:Name="RefreshButton" 
-                          x:FieldModifier="public"
-                          Icon="Refresh" 
-                          Label="刷新"
-                          ToolTipService.ToolTip="刷新 (F5)"
-                          AccessKey="R">
-                <AppBarButton.KeyboardAccelerators>
-                    <KeyboardAccelerator Modifiers="None"
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <local2:TitleBarEx Name="TitleBar" 
+                           Text="Bangumi"
+                           IsBackEnabled="{x:Bind CanGoBack, Mode=OneWay}"
+                           ImageVisibility="{x:Bind common:Converters.CollapsedIf(CanGoBack), Mode=OneWay}"/>
+
+        <muxc:NavigationView Name="NavView"
+                             Grid.Row="1"
+                             PaneDisplayMode="Top" 
+                             IsSettingsVisible="False"
+                             IsBackButtonVisible="Collapsed"
+                             ItemInvoked="NavView_ItemInvoked">
+            <muxc:NavigationView.MenuItems>
+                <muxc:NavigationViewItem Tag="progress" Content="进度" />
+                <muxc:NavigationViewItem Tag="collection" Content="收藏" />
+                <muxc:NavigationViewItem Tag="calendar" Content="时间表" />
+                <muxc:NavigationViewItemSeparator Visibility="{x:Bind PlaceholderItem.Visibility, Mode=OneWay}"/>
+                <muxc:NavigationViewItem Name="PlaceholderItem" 
+                                         Tag="others" />
+            </muxc:NavigationView.MenuItems>
+            <muxc:NavigationView.PaneFooter>
+                <StackPanel Orientation="Horizontal">
+                    <AppBarButton x:Name="RefreshButton" 
+                                  Width="48" 
+                                  Visibility="{x:Bind IsRefreshable, Mode=OneWay}"
+                                  IsEnabled="{x:Bind common:Converters.Not(IsLoading), Mode=OneWay}"
+                                  ToolTipService.ToolTip="刷新 (F5)" >
+                        <AppBarButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="None"
                                          Key="F5"/>
-                </AppBarButton.KeyboardAccelerators>
-            </AppBarButton>
-            <AppBarButton x:Name="SettingButton"
-                          Icon="Setting" 
-                          Label="设置"
-                          ToolTipService.ToolTip="设置"
-                          AccessKey="I">
-            </AppBarButton>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton x:Name="LoginButton"
-                              Label="登录"
-                              Click="LoginButton_Click"
-                              AccessKey="L">
-                    <AppBarButton.Icon>
-                        <FontIcon x:Name="UserIcon" 
-                                  FontFamily="Segoe MDL2 Assets" 
-                                  Glyph="&#xEE57;"/>
-                    </AppBarButton.Icon>
-                </AppBarButton>
-            </CommandBar.SecondaryCommands>
-        </CommandBar>
+                        </AppBarButton.KeyboardAccelerators>
+                        <Grid>
+                            <ProgressRing Visibility="{x:Bind IsLoading, Mode=OneWay}"
+                                          IsActive="True"/>
+                            <FontIcon Visibility="{x:Bind common:Converters.CollapsedIf(IsLoading), Mode=OneWay}"
+                                      FontFamily="Segoe MDL2 Assets"
+                                      Glyph="&#xE72C;"/>
+                        </Grid>
+                    </AppBarButton>
+                    <AppBarButton x:Name="SearchButton" 
+                                  Width="48" 
+                                  Icon="Find" 
+                                  ToolTipService.ToolTip="搜索 (Ctrl+Q)"
+                                  AccessKey="Q">
+                        <AppBarButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="Control" Key="Q"/>
+                        </AppBarButton.KeyboardAccelerators>
+                    </AppBarButton>
+                    <AppBarButton Width="48"
+                                  Click="LoginButton_Click">
+                        <Grid Padding="-8">
+                            <ProgressRing Height="40" Width="40"
+                                          Visibility="Visible"
+                                          IsActive="True"/>
+                            <Ellipse VerticalAlignment="Center" Height="48" Width="48">
+                                <Ellipse.Fill>
+                                    <ImageBrush x:Name="AvaterImage" ImageSource="ms-appx:///Assets/resource/akkarin.jpg" Stretch="UniformToFill"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                        </Grid>
+                    </AppBarButton>
+                    <AppBarButton x:Name="SettingButton"
+                                  Width="48" 
+                                  Icon="Setting" 
+                                  ToolTipService.ToolTip="设置">
+                    </AppBarButton>
+                </StackPanel>
+            </muxc:NavigationView.PaneFooter>
+            <Frame x:Name="ContentFrame"
+                   Navigated="ContentFrame_Navigated"/>
+        </muxc:NavigationView>
+
+
 
         <controls:InAppNotification x:Name="ToastInAppNotification"
                                     x:FieldModifier="public"
+                                    Grid.Row="1"
                                     ShowDismissButton="False"
                                     AnimationDuration="00:00:00.1000000"
                                     Margin="0,16,0,0"
@@ -110,6 +112,7 @@
 
         <controls:InAppNotification x:Name="ErrorInAppNotification"
                                     x:FieldModifier="public"
+                                    Grid.Row="1"
                                     ShowDismissButton="False"
                                     AnimationDuration="00:00:00.1000000"
                                     Margin="0,16,0,0"

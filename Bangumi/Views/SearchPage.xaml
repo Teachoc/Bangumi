@@ -319,15 +319,11 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <local2:TitleBarEx Text="搜索"
-                           IsBackEnabled="True"/>
-
         <AutoSuggestBox Name="SearchBox" 
-                        Grid.Row="1"
+                        Grid.Row="0"
                         Text="{x:Bind ViewModel.SearchText, Mode=TwoWay}"
                         PlaceholderText="关键字|Subject ID"
                         QueryIcon="Find"
@@ -338,7 +334,7 @@
 
         <Pivot Name="TypePivot" 
                SelectedIndex="{x:Bind ViewModel.SelectedIndex, Mode=TwoWay}"
-               Grid.Row="2"
+               Grid.Row="1"
                SelectionChanged="TypePivot_SelectionChanged">
             <PivotItem Margin="0">
                 <PivotItem.Header>

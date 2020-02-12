@@ -27,11 +27,10 @@ namespace Bangumi.ViewModels
         public bool IsLoading
         {
             get => _isLoading;
-            set
+            private set
             {
                 Set(ref _isLoading, value);
-                HomePage.homePage.IsLoading = value;
-                MainPage.RootPage.RefreshButton.IsEnabled = !value;
+                MainPage.RootPage.PageStatusChanged();
             }
         }
 
@@ -59,16 +58,9 @@ namespace Bangumi.ViewModels
         {
             try
             {
+                IsLoading = true;
                 var subjectType = GetSubjectType();
-                if (BangumiApi.BgmOAuth.IsLogin)
-                {
-                    IsLoading = true;
-                    await PopulateSubjectCollectionAsync(SubjectCollection, subjectType);
-                }
-                else
-                {
-                    //Message = "请先登录！";
-                }
+                await PopulateSubjectCollectionAsync(SubjectCollection, subjectType);
             }
             catch (Exception e)
             {
@@ -188,21 +180,15 @@ namespace Bangumi.ViewModels
         /// <returns></returns>
         private SubjectType GetSubjectType()
         {
-            switch (SelectedIndex)
+            return SelectedIndex switch
             {
-                case 0:
-                    return SubjectType.Anime;
-                case 1:
-                    return SubjectType.Book;
-                case 2:
-                    return SubjectType.Music;
-                case 3:
-                    return SubjectType.Game;
-                case 4:
-                    return SubjectType.Real;
-                default:
-                    return SubjectType.Anime;
-            }
+                0 => SubjectType.Anime,
+                1 => SubjectType.Book,
+                2 => SubjectType.Music,
+                3 => SubjectType.Game,
+                4 => SubjectType.Real,
+                _ => SubjectType.Anime,
+            };
         }
 
 

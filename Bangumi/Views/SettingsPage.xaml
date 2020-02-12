@@ -14,15 +14,7 @@
     Background="{ThemeResource SystemChromeLowColor}">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <local2:TitleBarEx Text="设置"
-                           IsBackEnabled="True"/>
-
-        <Pivot Grid.Row="1">
+        <Pivot>
             <PivotItem Header="设置"
                        Margin="0"
                        AccessKey="I">

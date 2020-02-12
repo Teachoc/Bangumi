@@ -6,6 +6,8 @@ namespace Bangumi.Api.Services
 {
     public interface IBgmApi
     {
+        Task<User> User();
+        Task<User> User(string username);
         Task<List<Watching>> Watching();
         Task<CollectionE> Collections(SubjectType subjectType);
         Task<SubjectLarge> Subject(string subjectId);
