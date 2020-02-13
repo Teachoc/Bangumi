@@ -19,23 +19,6 @@
 
     <Page.Resources>
         <ResourceDictionary>
-            <MenuFlyout x:Name="EpMenuFlyout">
-                <MenuFlyoutItem Click="UpdateEpStatusMenuFlyoutItem_Click" 
-                                Text="看过"
-                                Tag="Watched"/>
-                <MenuFlyoutItem Click="UpdateEpStatusMenuFlyoutItem_Click" 
-                                Text="看到"
-                                Tag="WatchedTo"/>
-                <MenuFlyoutItem Click="UpdateEpStatusMenuFlyoutItem_Click" 
-                                Text="想看"
-                                Tag="Queue"/>
-                <MenuFlyoutItem Click="UpdateEpStatusMenuFlyoutItem_Click" 
-                                Text="抛弃"
-                                Tag="Drop"/>
-                <MenuFlyoutItem Click="UpdateEpStatusMenuFlyoutItem_Click" 
-                                Text="未看"
-                                Tag="Remove"/>
-            </MenuFlyout>
 
             <DataTemplate x:Name="RateTemplate" x:DataType="data2:SimpleRate">
                 <Grid>
@@ -59,38 +42,63 @@
                                HorizontalAlignment="Center"/>
                 </Grid>
             </DataTemplate>
+            
+            <CollectionViewSource x:Name="EpsCVS" Source="{x:Bind ViewModel.GroupedEps}" IsSourceGrouped="True"/>
 
-            <DataTemplate x:Name="EpTemplate" x:DataType="data:Episode">
-                <RelativePanel Tapped="Eps_Tapped" 
-                               RightTapped="Eps_RightTapped"
-                               Holding="Eps_Holding"
-                               Padding="5" 
-                               Height="68"
-                               Background="Transparent"
-                               CornerRadius="2"
-                               BorderThickness="0.75"
-                               BorderBrush="{ThemeResource SystemControlBackgroundListMediumBrush}">
-                    <TextBlock Name="SortTextBlock"
-                               Text="{x:Bind common:Converters.GetEpSortDesc(Sort,Type)}" 
-                               RelativePanel.AlignLeftWithPanel="True"
-                               RelativePanel.AlignTopWithPanel="True"
-                               FontSize="14" />
-                    <TextBlock Grid.Column="1"
-                               Text="{x:Bind Status,Mode=OneWay}" 
-                               x:Phase="2"
-                               RelativePanel.AlignRightWithPanel="True"
-                               RelativePanel.AlignTopWithPanel="True"
-                               FontSize="12" 
-                               Foreground="{StaticResource BangumiPinkBrush}"/>
-                    <TextBlock Grid.Row="1"
-                               Text="{x:Bind NameCn,Mode=OneWay}" 
-                               x:Phase="1"
-                               RelativePanel.AlignLeftWithPanel="True"
-                               RelativePanel.Below="SortTextBlock"
-                               FontSize="14" 
-                               TextWrapping="Wrap"
-                               TextTrimming="CharacterEllipsis"/>
-                </RelativePanel>
+            <DataTemplate x:Name="EpTemplate" x:DataType="data2:EpisodeWithEpStatus">
+                <Button Style="{StaticResource EpButtonStyle}" 
+                        Content="{x:Bind Sort}" 
+                        Foreground="{x:Bind common:Converters.GetEpForeground(Status, EpStatus), Mode=OneWay}"
+                        Background="{x:Bind common:Converters.GetEpBackground(Status, EpStatus), Mode=OneWay}"
+                        BorderBrush="{x:Bind common:Converters.GetEpBorder(Status, EpStatus), Mode=OneWay}"
+                        BorderThickness="2"
+                        Height="40"
+                        Width="40"
+                        Padding="0">
+                    <Button.Flyout>
+                        <Flyout Opened="EpFlyout_Opened">
+                            <StackPanel MaxWidth="280" MinWidth="160">
+                                <TextBlock TextWrapping="Wrap"
+                                            Foreground="{StaticResource BangumiPinkBrush}"
+                                            FontSize="16">
+                                    <Run Text="ep."/><Run Text="{x:Bind Sort}"/>
+                                    <Run Text="{x:Bind Name}"/>
+                                </TextBlock>
+                                <MenuFlyoutSeparator Padding="0,6"
+                                                        Visibility="{Binding ElementName=EpStatusStackPanel, Path=Visibility}"/>
+                                <StackPanel x:Name="EpStatusStackPanel"
+                                            CornerRadius="5" 
+                                            Background="{StaticResource SystemControlAltHighAcrylicElementBrush}"
+                                            Orientation="Horizontal"
+                                            HorizontalAlignment="Left">
+                                </StackPanel>
+                                <MenuFlyoutSeparator Padding="0,6" 
+                                                        Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(AirDate)}"/>
+                                <TextBlock TextWrapping="Wrap"
+                                            Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(NameCn)}">
+                                    <Run Text="中文标题："/><Run Text="{x:Bind NameCn}"/>
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap"
+                                            Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(AirDate)}">
+                                    <Run Text="首播："/><Run Text="{x:Bind AirDate}"/>
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap"
+                                            Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(Duration)}">
+                                    <Run Text="时长："/><Run Text="{x:Bind Duration}"/>
+                                </TextBlock>
+                                <MenuFlyoutSeparator Padding="0,6"/>
+                                <HyperlinkButton NavigateUri="{x:Bind Url}"
+                                                    Padding="0">
+                                    <TextBlock>
+                                        <Run Text="讨论"/>
+                                        <Run Text="(+" Foreground="Red"/><Run Text="{x:Bind Comment}"
+                                                Foreground="Red"/><Run Text=")" Foreground="Red"/>
+                                    </TextBlock>
+                                </HyperlinkButton>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
             </DataTemplate>
 
             <DataTemplate x:Name="CrtTemplate" x:DataType="data:Character">
@@ -334,14 +342,14 @@
                        Margin="0"
                        AccessKey="Z">
                 <Grid>
-                    <controls:AdaptiveGridView Name="EpsGridView" 
-                                               ItemsSource="{x:Bind ViewModel.Eps}" 
-                                               DesiredWidth="300"
-                                               Padding="10,5,10,45"
-                                               SelectionMode="None"
-                                               IsItemClickEnabled="True" 
-                                               ShowsScrollingPlaceholders="False"
-                                               ItemTemplate="{StaticResource EpTemplate}">
+                    <GridView Name="EpsGridView"
+                              ItemContainerStyle="{StaticResource GridViewItemContainerStyle1}"
+                              ItemsSource="{x:Bind EpsCVS.View}" 
+                              Padding="10,5,10,45"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True" 
+                              ShowsScrollingPlaceholders="False"
+                              ItemTemplate="{StaticResource EpTemplate}">
                         <GridView.Header>
                             <RelativePanel Margin="0,0,10,10">
                                 <controls:ImageEx x:Name="BangumiImage" 
@@ -420,16 +428,28 @@
                                         <MenuFlyout x:Name="SitesMenuFlyout"/>
                                     </muxc:SplitButton.Flyout>
                                 </muxc:SplitButton>
-
-
                             </RelativePanel>
                         </GridView.Header>
+                        <GridView.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Background="{StaticResource BangumiPinkBrush}"
+                                                    Width="8"
+                                                    Margin="-12,0,10,0"/>
+                                            <TextBlock Text="{Binding Key}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </GridView.GroupStyle>
                         <GridView.ItemContainerTransitions>
                             <TransitionCollection>
                                 <RepositionThemeTransition IsStaggeringEnabled="False" />
                             </TransitionCollection>
                         </GridView.ItemContainerTransitions>
-                    </controls:AdaptiveGridView>
+                    </GridView>
 
                     <ProgressBar Name="MyProgressBar"
                                  Visibility="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
@@ -535,7 +555,7 @@
                     Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}"
                     DefaultLabelPosition="Right"
                     AccessKey="M">
-            <AppBarButton IsEnabled="{x:Bind ViewModel.IsStatusLoaded, Mode=OneWay}"
+            <AppBarButton IsEnabled="{x:Bind common:Converters.Not(ViewModel.IsStatusLoading), Mode=OneWay}"
                           Label="{x:Bind ViewModel.CollectionStatusText, Mode=OneWay}"
                           ToolTipService.ToolTip="{x:Bind ViewModel.CollectionStatusText, Mode=OneWay}"
                           Click="{x:Bind ViewModel.EditCollectionStatus}"

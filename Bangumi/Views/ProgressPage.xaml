@@ -217,7 +217,6 @@
             <GridView.ItemContainerTransitions>
                 <TransitionCollection>
                     <RepositionThemeTransition IsStaggeringEnabled="False" />
-                    <EntranceThemeTransition IsStaggeringEnabled="True" />
                 </TransitionCollection>
             </GridView.ItemContainerTransitions>
         </controls:AdaptiveGridView>

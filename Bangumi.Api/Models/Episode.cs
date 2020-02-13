@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Bangumi.Api.Models
 {
-    public class Episode : INotifyPropertyChanged
+    public class Episode
     {
         /// <summary>
         /// 章节 ID
@@ -70,27 +70,15 @@ namespace Bangumi.Api.Models
         [JsonProperty("desc")]
         public string Desc { get; set; }
 
-        private string _status { get; set; }
-
         /// <summary>
         /// 放送状态
+        /// <br/>Air
+        /// <br/>Today
+        /// <br/>NA
         /// </summary>
         [JsonProperty("status")]
-        public string Status
-        {
-            get { return _status; }
-            set
-            {
-                _status = value;
-                OnPropertyChanged();
-            }
-        }
+        public string Status { get; set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName]string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         // override object.Equals
         public override bool Equals(object obj)

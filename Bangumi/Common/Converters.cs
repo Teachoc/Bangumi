@@ -226,6 +226,61 @@ namespace Bangumi.Common
         }
 
         /// <summary>
+        /// 根据章节放送状态和章节状态类型返回对应颜色
+        /// </summary>
+        /// <param name="sort"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static SolidColorBrush GetEpBackground(string status, EpStatusType type)
+        {
+            return type switch
+            {
+                EpStatusType.watched => (SolidColorBrush)Application.Current.Resources["EpWatchedBackground"],
+                EpStatusType.queue => (SolidColorBrush)Application.Current.Resources["EpQueueBackground"],
+                EpStatusType.drop => (SolidColorBrush)Application.Current.Resources["EpDropBackground"],
+                _ => status switch
+                {
+                    "Air" => (SolidColorBrush)Application.Current.Resources["EpAirBackground"],
+                    "Today" => (SolidColorBrush)Application.Current.Resources["EpTodayBackground"],
+                    "NA" => (SolidColorBrush)Application.Current.Resources["EpNABackground"],
+                    _ => (SolidColorBrush)Application.Current.Resources["EpBackground"]
+                },
+            };
+        }
+        public static SolidColorBrush GetEpForeground(string status, EpStatusType type)
+        {
+            return type switch
+            {
+                EpStatusType.watched => (SolidColorBrush)Application.Current.Resources["EpWatchedForeground"],
+                EpStatusType.queue => (SolidColorBrush)Application.Current.Resources["EpQueueForeground"],
+                EpStatusType.drop => (SolidColorBrush)Application.Current.Resources["EpDropForeground"],
+                _ => status switch
+                {
+                    "Air" => (SolidColorBrush)Application.Current.Resources["EpAirForeground"],
+                    "Today" => (SolidColorBrush)Application.Current.Resources["EpTodayForeground"],
+                    "NA" => (SolidColorBrush)Application.Current.Resources["EpNAForeground"],
+                    _ => (SolidColorBrush)Application.Current.Resources["EpForeground"]
+                },
+            };
+        }
+        public static SolidColorBrush GetEpBorder(string status, EpStatusType type)
+        {
+            return type switch
+            {
+                EpStatusType.watched => (SolidColorBrush)Application.Current.Resources["EpWatchedBorder"],
+                EpStatusType.queue => (SolidColorBrush)Application.Current.Resources["EpQueueBorder"],
+                EpStatusType.drop => (SolidColorBrush)Application.Current.Resources["EpDropBorder"],
+                _ => status switch
+                {
+                    "Air" => (SolidColorBrush)Application.Current.Resources["EpAirBorder"],
+                    "Today" => (SolidColorBrush)Application.Current.Resources["EpTodayBorder"],
+                    "NA" => (SolidColorBrush)Application.Current.Resources["EpNABorder"],
+                    _ => (SolidColorBrush)Application.Current.Resources["EpBorder"]
+                },
+            };
+        }
+
+        /// <summary>
         /// 根据next_ep和eps返回非正片章节相应描述
         /// </summary>
         /// <param name="nextEp"></param>

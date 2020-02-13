@@ -9,7 +9,9 @@ using Microsoft.Toolkit.Uwp.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
@@ -19,7 +21,7 @@ namespace Bangumi.ViewModels
     public class DetailsViewModel : ViewModelBase
     {
         #region 属性
-        public ObservableCollection<Episode> Eps { get; private set; } = new ObservableCollection<Episode>();
+        public ObservableCollection<GroupedEpisode> GroupedEps { get; private set; } = new ObservableCollection<GroupedEpisode>();
 
         private bool _isLoading;
         public bool IsLoading
@@ -46,11 +48,11 @@ namespace Bangumi.ViewModels
             set => Set(ref _isProgressLoading, value);
         }
 
-        private bool _isStatusLoaded;
-        public bool IsStatusLoaded
+        private bool _isStatusLoading;
+        public bool IsStatusLoading
         {
-            get => _isStatusLoaded;
-            set => Set(ref _isStatusLoaded, value);
+            get => _isStatusLoading;
+            set => Set(ref _isStatusLoading, value);
         }
 
         private bool _isUpdating;
@@ -157,23 +159,14 @@ namespace Bangumi.ViewModels
             OnPropertyChanged(nameof(CollectionStatusIcon));
         }
 
-        public string CollectionStatusText
-        {
-            get => _collectionStatus?.GetDesc(SubjectType) ?? "收藏";
-        }
+        public string CollectionStatusText => _collectionStatus?.GetDesc(SubjectType) ?? "收藏";
 
-        public string CollectionStatusIcon
+        public string CollectionStatusIcon => _collectionStatus switch
         {
-            get
-            {
-                return _collectionStatus switch
-                {
-                    CollectionStatusType.Dropped => "\uE007",
-                    null => "\uE006",
-                    _ => "\uE00B",
-                };
-            }
-        }
+            CollectionStatusType.Dropped => "\uE007",
+            null => "\uE006",
+            _ => "\uE00B",
+        };
         #endregion
 
         public DetailsViewModel()
@@ -202,7 +195,7 @@ namespace Bangumi.ViewModels
             SetCollectionStatus(null);
             Blogs.Clear();
             Topics.Clear();
-            Eps.Clear();
+            GroupedEps.Clear();
         }
 
 
@@ -226,7 +219,7 @@ namespace Bangumi.ViewModels
                 collectionEditContentDialog.CollectionStatus != null)
             {
                 IsUpdating = true;
-                IsStatusLoaded = false;
+                IsStatusLoading = true;
                 if (await BangumiFacade.UpdateCollectionStatusAsync(SubjectId,
                     collectionEditContentDialog.CollectionStatus.Value, collectionEditContentDialog.Comment,
                     collectionEditContentDialog.Rate.ToString(), collectionEditContentDialog.Privacy ? "1" : "0"))
@@ -235,14 +228,14 @@ namespace Bangumi.ViewModels
                     // 若状态修改为看过，且设置启用，则批量修改正片章节状态为看过
                     if (_collectionStatus == CollectionStatusType.Collect && SettingHelper.EpsBatch)
                     {
-                        var selectedEps = Eps.Where(ep => ep.Type == 0 && Regex.IsMatch(ep.Status, "(Air|Today|NA)"));
+                        var selectedEps = GroupedEps.SelectMany(g => g.Where(ep => ep.Type == EpisodeType.本篇 && ep.EpStatus == EpStatusType.remove));
                         int epId = selectedEps.LastOrDefault()?.Id ?? 0;
                         string epsId = string.Join(',', selectedEps.Select(it => it.Id));
                         if (!string.IsNullOrEmpty(epsId) && await BangumiFacade.UpdateProgressBatchAsync(epId, epsId))
                         {
                             foreach (var episode in selectedEps)
                             {
-                                episode.Status = "看过";
+                                episode.EpStatus = EpStatusType.watched;
                             }
                         }
                         else
@@ -251,7 +244,7 @@ namespace Bangumi.ViewModels
                         }
                     }
                 }
-                IsStatusLoaded = true;
+                IsStatusLoading = false;
                 IsUpdating = false;
             }
             MainPage.RootPage.HasDialog = false;
@@ -262,21 +255,14 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="ep"></param>
         /// <param name="status">状态</param>
-        public async Task UpdateEpStatus(Episode ep, EpStatusType status)
+        public async Task UpdateEpStatus(EpisodeWithEpStatus ep, EpStatusType status)
         {
             if (ep != null)
             {
                 IsUpdating = true;
                 if (await BangumiFacade.UpdateProgressAsync(ep.Id.ToString(), status))
                 {
-                    if (!string.IsNullOrEmpty(status.GetCnName()))
-                    {
-                        ep.Status = status.GetCnName();
-                    }
-                    else
-                    {
-                        ep.Status = DateTime.Parse(ep.AirDate) < DateTime.Now ? "Air" : "NA";
-                    }
+                    ep.EpStatus = status;
                 }
                 IsUpdating = false;
             }
@@ -286,7 +272,7 @@ namespace Bangumi.ViewModels
         /// 批量更新章节状态为看过
         /// </summary>
         /// <param name="ep"></param>
-        public async Task UpdateEpStatusBatch(Episode ep)
+        public async Task UpdateEpStatusBatch(EpisodeWithEpStatus ep)
         {
             if (ep == null)
             {
@@ -299,7 +285,7 @@ namespace Bangumi.ViewModels
             {
                 foreach (var episode in selectedEps)
                 {
-                    episode.Status = "看过";
+                    episode.EpStatus = EpStatusType.watched;
                 }
             }
             else
@@ -309,11 +295,11 @@ namespace Bangumi.ViewModels
             IsUpdating = false;
 
             // 获取点击看到章节及之前所有未标记的章节
-            IEnumerable<Episode> GetSelectedEps()
+            IEnumerable<EpisodeWithEpStatus> GetSelectedEps()
             {
-                foreach (var episode in Eps)
+                foreach (var episode in GroupedEps.SelectMany(g => g.Where(e => e.Type == ep.Type)))
                 {
-                    if (Regex.IsMatch(episode.Status, "(Air|Today|NA)"))
+                    if (episode.EpStatus == EpStatusType.remove)
                     {
                         yield return episode;
                     }
@@ -340,7 +326,7 @@ namespace Bangumi.ViewModels
                 IsLoading = true;
                 IsDetailLoading = true;
                 IsProgressLoading = true;
-                IsStatusLoaded = false;
+                IsStatusLoading = true;
 
                 var subject = BangumiApi.BgmApi.Subject(SubjectId);
                 ProcessSubject(BangumiApi.BgmCache.Subject(SubjectId));
@@ -349,33 +335,19 @@ namespace Bangumi.ViewModels
                 {
                     var progress = BangumiApi.BgmApi.Progress(SubjectId);
                     var status = BangumiApi.BgmApi.Status(SubjectId);
-                    ProcessProgress(BangumiApi.BgmCache.Subject(SubjectId), BangumiApi.BgmCache.Progress(SubjectId));
+                    ProcessProgress(BangumiApi.BgmCache.Progress(SubjectId));
                     SetCollectionStatus(BangumiApi.BgmCache.Status(SubjectId)?.Status?.Id);
-                    await subject.ContinueWith(async t =>
-                    {
-                        await DispatcherHelper.ExecuteOnUIThreadAsync(() =>
-                        {
-                            ProcessSubject(t.Result);
-                            IsDetailLoading = false;
-                        });
-                        await progress.ContinueWith(t2 =>
-                            DispatcherHelper.ExecuteOnUIThreadAsync(() =>
-                            {
-                                ProcessProgress(t.Result, t2.Result);
-                                IsProgressLoading = false;
-                            })).Unwrap();
-                        await status.ContinueWith(t3 =>
-                            DispatcherHelper.ExecuteOnUIThreadAsync(() =>
-                            {
-                                SetCollectionStatus(t3.Result?.Status?.Id);
-                                IsStatusLoaded = true;
-                            })).Unwrap();
-                    }).Unwrap();
+                    ProcessSubject(await subject);
+                    IsDetailLoading = false;
+                    ProcessProgress(await progress);
+                    IsProgressLoading = false;
+                    SetCollectionStatus((await status)?.Status?.Id);
+                    IsStatusLoading = false;
                 }
                 else
                 {
-                    await subject.ContinueWith(t =>
-                        DispatcherHelper.ExecuteOnUIThreadAsync(() => ProcessSubject(t.Result))).Unwrap();
+                    ProcessSubject(await subject);
+                    IsDetailLoading = false;
                 }
             }
             catch (Exception e)
@@ -388,7 +360,7 @@ namespace Bangumi.ViewModels
                 IsLoading = false;
                 IsDetailLoading = false;
                 IsProgressLoading = false;
-                IsStatusLoaded = true;
+                IsStatusLoading = false;
             }
         }
 
@@ -452,7 +424,7 @@ namespace Bangumi.ViewModels
             }
 
             // 条目类别
-            SubjectType = (SubjectType)subject.Type;
+            SubjectType = subject.Type;
             // 更多资料
             Name = subject.Name;
             MoreSummary = subject.Summary;
@@ -497,28 +469,22 @@ namespace Bangumi.ViewModels
                 }
             }
             // 章节
-            if (!subject.Eps.SequenceEqualExT(Eps))
+            if (subject.Eps != null)
             {
-                Eps.Clear();
-                if (subject.Eps != null)
+                var eps = new List<EpisodeWithEpStatus>();
+                foreach (var ep in subject.Eps)
                 {
-                    foreach (var ep in subject.Eps)
+                    eps.Add(EpisodeWithEpStatus.FromEpisode(ep));
+                }
+                var groupEps = eps.GroupBy(ep => ep.Type)
+                    .OrderBy(g => g.Key)
+                    .Select(g => new GroupedEpisode(g) { Key = g.Key.GetDesc() });
+                if (!groupEps.SequenceEqualExT(GroupedEps))
+                {
+                    GroupedEps.Clear();
+                    foreach (var item in groupEps)
                     {
-                        Episode newEp = new Episode
-                        {
-                            Id = ep.Id,
-                            Url = ep.Url,
-                            Type = ep.Type,
-                            Sort = ep.Sort,
-                            Name = ep.Name,
-                            NameCn = ep.NameCn,
-                            Duration = ep.Duration,
-                            AirDate = ep.AirDate,
-                            Comment = ep.Comment,
-                            Desc = ep.Desc,
-                            Status = ep.Status
-                        };
-                        Eps.Add(newEp);
+                        GroupedEps.Add(item);
                     }
                 }
             }
@@ -529,41 +495,89 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="progress"></param>
-        private void ProcessProgress(SubjectLarge subject, Progress progress)
+        private void ProcessProgress(Progress progress)
         {
             if (progress?.Eps == null || progress.SubjectId.ToString() != SubjectId)
             {
                 return;
             }
-            foreach (var ep in Eps) //用户观看状态
+            foreach (var group in GroupedEps) //用户观看状态
             {
-                var prog = progress.Eps?.Where(p => p.Id == ep.Id).FirstOrDefault();
-                if (prog != null)
+                foreach (EpisodeWithEpStatus ep in group)
                 {
-                    ep.Status = prog.Status.CnName;
-                }
-                else
-                {
-                    ep.Status = subject.Eps.FirstOrDefault(e => e.Id == ep.Id)?.Status;
+                    var prog = progress.Eps?.Where(p => p.Id == ep.Id).FirstOrDefault();
+                    ep.EpStatus = prog?.Status?.Id ?? EpStatusType.remove;
                 }
             }
         }
     }
 
-    public class SimpleRate : IComparable<SimpleRate>
+    public class EpisodeWithEpStatus : Episode, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName]string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
+        private EpStatusType _epStatus;
+        public EpStatusType EpStatus
+        {
+            get => _epStatus;
+            set
+            {
+                _epStatus = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public static EpisodeWithEpStatus FromEpisode(Episode ep) => new EpisodeWithEpStatus
+        {
+            Id = ep.Id,
+            Url = ep.Url,
+            Type = ep.Type,
+            Sort = ep.Sort,
+            Name = ep.Name,
+            NameCn = ep.NameCn,
+            Duration = ep.Duration,
+            AirDate = ep.AirDate,
+            Comment = ep.Comment,
+            Desc = ep.Desc,
+            Status = ep.Status
+        };
+    }
+
+    public class GroupedEpisode : List<EpisodeWithEpStatus>
+    {
+        public GroupedEpisode(IEnumerable<EpisodeWithEpStatus> items) : base(items)
+        {
+        }
+        public string Key { get; set; }
+
+        // override object.Equals
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            var g = (GroupedEpisode)obj;
+            return Key == g.Key &&
+                   this.SequenceEqualExT(g);
+        }
+
+        // override object.GetHashCode
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+    }
+
+    public class SimpleRate
+    {
         public int Count { get; set; }
         public int Score { get; set; }
         public double Ratio { get; set; }
-
-        public int CompareTo(SimpleRate other)
-        {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
-            return Count.CompareTo(other.Count);
-        }
     }
 }

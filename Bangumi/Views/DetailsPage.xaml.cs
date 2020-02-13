@@ -5,6 +5,7 @@ using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Devices.Input;
 using Windows.System;
@@ -70,74 +71,6 @@ namespace Bangumi.Views
                 SitesMenuFlyout.Items?.Clear();
                 SelectedTextBlock.Text = "";
                 SelectedTextBlock.DataContext = null;
-            }
-        }
-
-        /// <summary>
-        /// 修改章节状态。
-        /// </summary>
-        private void UpdateEpStatusMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuFlyoutItem item)
-            {
-                var ep = item.DataContext as Episode;
-                switch (item.Tag)
-                {
-                    case "Watched":
-                        ViewModel.UpdateEpStatus(ep, EpStatusType.watched);
-                        break;
-                    case "WatchedTo":
-                        ViewModel.UpdateEpStatusBatch(ep);
-                        break;
-                    case "Queue":
-                        ViewModel.UpdateEpStatus(ep, EpStatusType.queue);
-                        break;
-                    case "Drop":
-                        ViewModel.UpdateEpStatus(ep, EpStatusType.drop);
-                        break;
-                    case "Remove":
-                        ViewModel.UpdateEpStatus(ep, EpStatusType.remove);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 修改章节状态弹出菜单。
-        /// </summary>
-        private void Eps_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            if (BangumiApi.BgmOAuth.IsLogin && !ViewModel.IsProgressLoading && ((sender as RelativePanel)?.DataContext as Episode)?.Status != "NA")
-            {
-                EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-            }
-        }
-
-        /// <summary>
-        /// 鼠标右键修改章节状态弹出菜单，无视章节状态。
-        /// </summary>
-        private void Eps_RightTapped(object sender, RightTappedRoutedEventArgs e)
-        {
-            if (BangumiApi.BgmOAuth.IsLogin
-                && !ViewModel.IsProgressLoading
-                && e.PointerDeviceType == PointerDeviceType.Mouse)
-            {
-                EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
-            }
-        }
-
-        /// <summary>
-        /// 触摸长按修改章节状态弹出菜单，无视章节状态。
-        /// </summary>
-        private void Eps_Holding(object sender, HoldingRoutedEventArgs e)
-        {
-            if (BangumiApi.BgmOAuth.IsLogin
-                && !ViewModel.IsProgressLoading
-                && e.HoldingState == HoldingState.Started)
-            {
-                EpMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
         }
 
@@ -242,6 +175,97 @@ namespace Bangumi.Views
                 }
                 SelectedTextBlock.Text = airSites[0].SiteName;
                 SelectedTextBlock.DataContext = airSites[0].Url;
+            }
+        }
+
+        private void EpFlyout_Opened(object sender, object e)
+        {
+            if (!(sender is Flyout flyout))
+            {
+                return;
+            }
+            if ((flyout.Content as Panel)?.Children[2] is Panel panel)
+            {
+                if (!BangumiApi.BgmOAuth.IsLogin)
+                {
+                    panel.Visibility = Visibility.Collapsed;
+                    return;
+                }
+                panel.Visibility = Visibility.Visible;
+                panel.Children.Clear();
+                var buttons = new List<(string, string, string, bool)>();
+                if (flyout.Target.DataContext is EpisodeWithEpStatus episode)
+                {
+                    switch (episode.EpStatus)
+                    {
+                        case EpStatusType.watched:
+                            buttons.Add(("看过", "EpWatchedBackground", "Watched", true));
+                            buttons.Add(("想看", "EpQueueBackground", "Queue", false));
+                            buttons.Add(("抛弃", "EpDropBackground", "Drop", false));
+                            buttons.Add(("撤销", "EpBackground", "Remove", false));
+                            break;
+                        case EpStatusType.queue:
+                            buttons.Add(("看过", "EpWatchedBackground", "Watched", false));
+                            buttons.Add(("想看", "EpQueueBackground", "Queue", true));
+                            buttons.Add(("抛弃", "EpDropBackground", "Drop", false));
+                            buttons.Add(("撤销", "EpBackground", "Remove", false));
+                            break;
+                        case EpStatusType.drop:
+                            buttons.Add(("看过", "EpWatchedBackground", "Watched", false));
+                            buttons.Add(("想看", "EpQueueBackground", "Queue", false));
+                            buttons.Add(("抛弃", "EpDropBackground", "Drop", true));
+                            buttons.Add(("撤销", "EpBackground", "Remove", false));
+                            break;
+                        default:
+                            buttons.Add(("看过", "EpWatchedBackground", "Watched", false));
+                            buttons.Add(("看到", "EpWatchedBackground", "WatchedTo", false));
+                            buttons.Add(("想看", "EpQueueBackground", "Queue", false));
+                            buttons.Add(("抛弃", "EpDropBackground", "Drop", false));
+                            break;
+                    }
+                }
+                foreach (var item in buttons)
+                {
+                    var button = new RadioButton
+                    {
+                        Style = (Style)Application.Current.Resources["FilledRadioButtonStyle"],
+                        Content = item.Item1,
+                        Background = (SolidColorBrush)Application.Current.Resources[item.Item2],
+                        CornerRadius = new CornerRadius(5),
+                        Tag = item.Item3,
+                        IsChecked = item.Item4
+                    };
+                    button.Checked += EpStatusRadioButton_Checked;
+                    panel.Children.Add(button);
+                }
+            }
+        }
+
+        private void EpStatusRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (sender is RadioButton item)
+            {
+                var ep = item.DataContext as EpisodeWithEpStatus;
+                switch (item.Tag)
+                {
+                    case "Watched":
+                        ViewModel.UpdateEpStatus(ep, EpStatusType.watched);
+                        break;
+                    case "WatchedTo":
+                        ViewModel.UpdateEpStatusBatch(ep);
+                        break;
+                    case "Queue":
+                        ViewModel.UpdateEpStatus(ep, EpStatusType.queue);
+                        break;
+                    case "Drop":
+                        ViewModel.UpdateEpStatus(ep, EpStatusType.drop);
+                        break;
+                    case "Remove":
+                        ViewModel.UpdateEpStatus(ep, EpStatusType.remove);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
