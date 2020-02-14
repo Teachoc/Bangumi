@@ -18,8 +18,8 @@
         <ResourceDictionary>
             <!-- 右键放送站点菜单 -->
             <MenuFlyout x:Name="SitesMenuFlyout"/>
-        
-            <DataTemplate x:Key="ProgressSubjectTemplate" x:DataType="data:WatchStatus">
+
+            <DataTemplate x:Key="ProgressSubjectTemplate" x:DataType="data:WatchProgress">
                 <UserControl>
                     <RelativePanel Padding="5"
                                    RightTapped="RelativePanel_RightTapped"
@@ -110,12 +110,8 @@
                                    RelativePanel.RightOf="BangumiImage"
                                    RelativePanel.Below="AirWeekdayTextBlock"
                                    Foreground="{x:Bind common:Converters.ConvertBrushFromString(EpColor), Mode=OneWay}"
-                                   TextTrimming="CharacterEllipsis">
-                                <Run Text="{x:Bind common:Converters.GetWatchedEpsDesc(WatchedEps), Mode=OneWay}"/>
-                                <Run Text="/"/>
-                                <Run Text="{x:Bind common:Converters.GetUpdatedEpsDesc(UpdatedEps,Eps), Mode=OneWay}"/>
-                        </TextBlock>
-
+                                   Text="{x:Bind WatchedAndAirEpsCountDesc, Mode=OneWay}"
+                                   TextTrimming="CharacterEllipsis"/>
                         <Button x:Name="CollectionButton"
                                 Click="CollectionButton_Click"
                                 RelativePanel.RightOf="BangumiImage"
@@ -149,16 +145,16 @@
                                        VerticalAlignment="Center"
                                        HorizontalTextAlignment="Right"
                                        TextTrimming="CharacterEllipsis"
-                                       Text="{x:Bind common:Converters.GetEpNextSortDesc(NextEp,Eps), Mode=OneWay}">
+                                       Text="{x:Bind NextEpDesc, Mode=OneWay}">
                             </TextBlock>
                         </Button>
 
                         <ProgressBar Maximum="{x:Bind EpsCount, Mode=OneWay}"
-                                     Value="{x:Bind WatchedEps, Mode=OneWay}"
+                                     Value="{x:Bind WatchedEpsCount, Mode=OneWay}"
                                      Width="{Binding ElementName=BangumiImage, Path=Width}"
                                      RelativePanel.Below="BangumiImage"
                                      RelativePanel.AlignLeftWithPanel="True"
-                                     ToolTipService.ToolTip="{x:Bind common:Converters.Split(WatchedEps, EpsCount, ' / '), Mode=OneWay}"
+                                     ToolTipService.ToolTip="{x:Bind common:Converters.Split(WatchedEpsCount, EpsCount, ' / '), Mode=OneWay}"
                                      Margin="0,1,0,0"
                                      Background="{ThemeResource SystemChromeHighColor}"
                                      Foreground="{StaticResource BangumiPinkBrush}" />
@@ -205,9 +201,10 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        
+
         <controls:AdaptiveGridView Name="MyGridView" 
                                    Padding="12,0,12,8"
+                                   DesiredWidth="360"
                                    ItemsSource="{x:Bind ViewModel.WatchingCollection}" 
                                    ShowsScrollingPlaceholders="False"
                                    IsItemClickEnabled="True" 
@@ -217,6 +214,7 @@
             <GridView.ItemContainerTransitions>
                 <TransitionCollection>
                     <RepositionThemeTransition IsStaggeringEnabled="False" />
+                    <EntranceThemeTransition IsStaggeringEnabled="True"/>
                 </TransitionCollection>
             </GridView.ItemContainerTransitions>
         </controls:AdaptiveGridView>

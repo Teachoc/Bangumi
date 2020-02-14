@@ -152,85 +152,6 @@ namespace Bangumi.Common
         }
 
         /// <summary>
-        /// 获取星期的中文
-        /// </summary>
-        /// <param name="day"></param>
-        /// <returns></returns>
-        public static string GetWeekday(int day)
-        {
-            return day switch
-            {
-                1 => "星期一",
-                2 => "星期二",
-                3 => "星期三",
-                4 => "星期四",
-                5 => "星期五",
-                6 => "星期六",
-                7 => "星期日",
-                _ => string.Empty,
-            };
-        }
-
-        /// <summary>
-        /// 根据观看进度返回相应描述
-        /// </summary>
-        /// <param name="watchedEps"></param>
-        /// <returns></returns>
-        public static string GetWatchedEpsDesc(int watchedEps)
-        {
-            if (watchedEps == -1)
-            {
-                return string.Empty;
-            }
-            if (watchedEps == 0)
-            {
-                return "尚未观看";
-            }
-            return "看到" + watchedEps + "话";
-        }
-
-        /// <summary>
-        /// 根据更新进度返回相应描述
-        /// </summary>
-        /// <param name="updatedEps"></param>
-        /// <param name="eps"></param>
-        /// <returns></returns>
-        public static string GetUpdatedEpsDesc(int updatedEps, List<ViewModels.SimpleEp> eps)
-        {
-            if (updatedEps == -1)
-            {
-                return "无章节";
-            }
-            if (updatedEps == 0)
-            {
-                return "尚未放送";
-            }
-            if (eps != null)
-            {
-                return eps.Count(ep => ep.Type == 0) == updatedEps ? "全" + updatedEps + "话" : "更新到" + updatedEps + "话";
-            }
-            return "共" + updatedEps + "话";
-        }
-
-        /// <summary>
-        /// 根据sort和type返回章节相应描述
-        /// </summary>
-        /// <param name="sort"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static string GetEpSortDesc(double sort, EpisodeType type)
-        {
-            if (type == EpisodeType.本篇)
-            {
-                return "第 " + sort + " 话";
-            }
-            else
-            {
-                return type.GetDesc() + " " + sort;
-            }
-        }
-
-        /// <summary>
         /// 根据章节放送状态和章节状态类型返回对应颜色
         /// </summary>
         /// <param name="sort"></param>
@@ -286,37 +207,6 @@ namespace Bangumi.Common
         }
 
         /// <summary>
-        /// 根据next_ep和eps返回非正片章节相应描述
-        /// </summary>
-        /// <param name="nextEp"></param>
-        /// <param name="eps"></param>
-        /// <returns></returns>
-        public static string GetEpNextSortDesc(double nextEp, List<ViewModels.SimpleEp> eps)
-        {
-            if (nextEp == -1)
-            {
-                return "EP.";
-            }
-            var ep = eps?.Where(p => p.Sort == nextEp && Regex.IsMatch(p.Status, "(Air|Today|NA)")).FirstOrDefault();
-            if (ep == null)
-            {
-                return "EP.";
-            }
-            else if (ep.Type == 0)
-            {
-                return "EP." +
-                       nextEp.ToString() +
-                       (string.IsNullOrEmpty(ep.Name) ? string.Empty : " " + ep.Name);
-            }
-            else
-            {
-                return "EP." +
-                       ep.Type.GetDesc() + " " + nextEp +
-                       (string.IsNullOrEmpty(ep.Name) ? string.Empty : " " + ep.Name);
-            }
-        }
-
-        /// <summary>
         /// 返回 a{splitter}b 的形式字符串
         /// </summary>
         /// <param name="a"></param>
@@ -352,34 +242,6 @@ namespace Bangumi.Common
         {
             string[] descs = { string.Empty, "不忍直视", "很差", "差", "较差", "不过不失", "还行", "推荐", "力荐", "神作", "超神作 (请谨慎评价)" };
             return descs[(int)Math.Round(rate, 0, MidpointRounding.AwayFromZero)];
-        }
-
-        /// <summary>
-        /// 将演员列表转为string
-        /// </summary>
-        /// <param name="actors"></param>
-        /// <returns></returns>
-        public static string ActorListToString(List<Actor> actors)
-        {
-            if (actors != null && actors.Count != 0)
-            {
-                return "CV：" + string.Join('、', actors.Select(a => a.Name));
-            }
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// 将职责列表转为string
-        /// </summary>
-        /// <param name="jobs"></param>
-        /// <returns></returns>
-        public static string JobListToString(List<string> jobs)
-        {
-            if (jobs != null && jobs.Count != 0)
-            {
-                return string.Join('、', jobs);
-            }
-            return string.Empty;
         }
 
         /// <summary>

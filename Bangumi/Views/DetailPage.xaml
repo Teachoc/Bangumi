@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:common="using:Bangumi.Common"
+    xmlns:viewmodel="using:Bangumi.ViewModels"
     xmlns:data="using:Bangumi.Api.Models"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
@@ -52,7 +53,7 @@
                                RelativePanel.RightOf="CrtImage"
                                RelativePanel.Below="CrtNameTextBlock"/>
                     <TextBlock Name="ActorTextBlock"
-                               Text="{x:Bind common:Converters.ActorListToString(Actors)}"
+                               Text="{x:Bind viewmodel:DetailViewModel.ActorListToString(Actors)}"
                                TextWrapping="Wrap"
                                RelativePanel.RightOf="CrtImage"
                                RelativePanel.Below="RoleTextBlock"/>
@@ -92,7 +93,7 @@
                              FontSize="12"/>
                     </TextBlock>
                     <TextBlock Name="JobTextBlock"
-                               Text="{x:Bind common:Converters.JobListToString(Jobs)}"
+                               Text="{x:Bind viewmodel:DetailViewModel.JobListToString(Jobs)}"
                                TextWrapping="Wrap"
                                RelativePanel.RightOf="StaffImage"
                                RelativePanel.Below="StaffNameTextBlock"/>
@@ -192,7 +193,7 @@
             </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
-    
+
     <Grid>
         <ScrollViewer>
             <StackPanel Padding="12">

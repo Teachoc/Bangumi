@@ -8,9 +8,7 @@ using Bangumi.Helper;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 
@@ -341,7 +339,7 @@ namespace Bangumi.ViewModels
             ImageSource = subject.Images?.Common;
             // 放送日期
             AirDate = subject.AirDate;
-            AirTime = Converters.GetWeekday(subject.AirWeekday);
+            AirTime = subject.AirWeekdayCn;
             // 条目简介
             if (!string.IsNullOrEmpty(subject.Summary))
             {
@@ -386,9 +384,9 @@ namespace Bangumi.ViewModels
 
             SubjectType = subject.Type;
             // 详情
-            string info= "作品分类：" + subject.Type.GetDesc();
+            string info = "作品分类：" + subject.Type.GetDesc();
             info += subject.AirDate == "0000-00-00" ? "" : "\n放送开始：" + subject.AirDate;
-            info += subject.AirWeekday == 0 ? "" : "\n放送星期：" + Converters.GetWeekday(subject.AirWeekday);
+            info += subject.AirWeekday == 0 ? "" : "\n放送星期：" + subject.AirWeekdayCn;
             info += subject.Eps == null ? "" : "\n话数：" + subject.Eps.Count;
             Detail = new DetailViewModel
             {
@@ -443,41 +441,6 @@ namespace Bangumi.ViewModels
                 }
             }
         }
-    }
-
-    public class EpisodeWithEpStatus : Episode, INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName]string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private EpStatusType _epStatus;
-        public EpStatusType EpStatus
-        {
-            get => _epStatus;
-            set
-            {
-                _epStatus = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public static EpisodeWithEpStatus FromEpisode(Episode ep) => new EpisodeWithEpStatus
-        {
-            Id = ep.Id,
-            Url = ep.Url,
-            Type = ep.Type,
-            Sort = ep.Sort,
-            Name = ep.Name,
-            NameCn = ep.NameCn,
-            Duration = ep.Duration,
-            AirDate = ep.AirDate,
-            Comment = ep.Comment,
-            Desc = ep.Desc,
-            Status = ep.Status
-        };
     }
 
     public class GroupedEpisode : List<EpisodeWithEpStatus>

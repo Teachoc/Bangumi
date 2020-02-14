@@ -88,7 +88,7 @@ namespace Bangumi.Views
 
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var selectedItem = (WatchStatus)e.ClickedItem;
+            var selectedItem = (WatchProgress)e.ClickedItem;
             this.Frame.Navigate(typeof(EpisodePage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
         }
 
@@ -100,7 +100,7 @@ namespace Bangumi.Views
         private void NextEpButton_Click(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
-            var item = (WatchStatus)button.DataContext;
+            var item = (WatchProgress)button.DataContext;
             ViewModel.UpdateNextEpStatus(item);
         }
 
@@ -112,7 +112,7 @@ namespace Bangumi.Views
         private void CollectionButton_Click(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
-            var item = (WatchStatus)button.DataContext;
+            var item = (WatchProgress)button.DataContext;
             ViewModel.EditCollectionStatus(item);
         }
 
@@ -169,7 +169,7 @@ namespace Bangumi.Views
         /// <param name="point"></param>
         private async Task ShowSitesMenuFlyout(FrameworkElement sender, Point point)
         {
-            if (sender is RelativePanel panel && panel.DataContext is WatchStatus watch)
+            if (sender is RelativePanel panel && panel.DataContext is WatchProgress watch)
             {
                 await InitAirSites(watch.SubjectId.ToString());
                 SitesMenuFlyout.ShowAt(sender, point);

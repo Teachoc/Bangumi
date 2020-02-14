@@ -45,7 +45,7 @@
             
             <CollectionViewSource x:Name="EpsCVS" Source="{x:Bind ViewModel.GroupedEps}" IsSourceGrouped="True"/>
 
-            <DataTemplate x:Name="EpTemplate" x:DataType="data2:EpisodeWithEpStatus">
+            <DataTemplate x:Name="EpTemplate" x:DataType="data:EpisodeWithEpStatus">
                 <Button Style="{StaticResource EpButtonStyle}" 
                         Content="{x:Bind Sort}" 
                         Foreground="{x:Bind common:Converters.GetEpForeground(Status, EpStatus), Mode=OneWay}"

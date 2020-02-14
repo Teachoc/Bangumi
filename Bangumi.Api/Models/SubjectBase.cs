@@ -59,6 +59,17 @@ namespace Bangumi.Api.Models
         [JsonProperty("images")]
         public Images Images { get; set; }
 
+        public string AirWeekdayCn => AirWeekday switch
+        {
+            1 => "星期一",
+            2 => "星期二",
+            3 => "星期三",
+            4 => "星期四",
+            5 => "星期五",
+            6 => "星期六",
+            7 => "星期日",
+            _ => string.Empty,
+        };
 
         // override object.Equals
         public override bool Equals(object obj)
