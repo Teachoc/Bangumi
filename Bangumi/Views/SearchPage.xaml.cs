@@ -40,7 +40,7 @@ namespace Bangumi.Views
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var selectedItem = (SubjectForSearch)e.ClickedItem;
-            this.Frame.Navigate(typeof(DetailsPage), selectedItem.Id, new DrillInNavigationTransitionInfo());
+            this.Frame.Navigate(typeof(EpisodePage), selectedItem.Id, new DrillInNavigationTransitionInfo());
         }
 
         private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
@@ -74,7 +74,7 @@ namespace Bangumi.Views
                 int.TryParse(args.QueryText, out var result);
                 if (result > 0)
                 {
-                    Frame.Navigate(typeof(DetailsPage), result, new DrillInNavigationTransitionInfo());
+                    Frame.Navigate(typeof(EpisodePage), result, new DrillInNavigationTransitionInfo());
                 }
                 if (!ViewModel.CheckIfSearched())
                 {

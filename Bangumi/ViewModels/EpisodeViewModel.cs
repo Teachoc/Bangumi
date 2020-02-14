@@ -5,20 +5,18 @@ using Bangumi.Common;
 using Bangumi.ContentDialogs;
 using Bangumi.Facades;
 using Bangumi.Helper;
-using Microsoft.Toolkit.Uwp.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 
 namespace Bangumi.ViewModels
 {
-    public class DetailsViewModel : ViewModelBase
+    public class EpisodeViewModel : ViewModelBase
     {
         #region 属性
         public ObservableCollection<GroupedEpisode> GroupedEps { get; private set; } = new ObservableCollection<GroupedEpisode>();
@@ -122,33 +120,8 @@ namespace Bangumi.ViewModels
             set => Set(ref _othersCollection, value);
         }
 
-
-
-        // 更多资料用
-        public ObservableCollection<Character> Characters { get; private set; } = new ObservableCollection<Character>();
-        public ObservableCollection<Person> Staffs { get; private set; } = new ObservableCollection<Person>();
-        private string _name;
-        public string Name
-        {
-            get => _name;
-            set => Set(ref _name, value);
-        }
-        private string _moreInfo;
-        public string MoreInfo
-        {
-            get => _moreInfo;
-            set => Set(ref _moreInfo, value);
-        }
-        private string _moreSummary;
-        public string MoreSummary
-        {
-            get => _moreSummary;
-            set => Set(ref _moreSummary, value);
-        }
-
-        // 评论和讨论版
-        public ObservableCollection<Blog> Blogs { get; private set; } = new ObservableCollection<Blog>();
-        public ObservableCollection<Topic> Topics { get; private set; } = new ObservableCollection<Topic>();
+        // 详情
+        public DetailViewModel Detail { get; set; }
 
         // 收藏状态，评分，吐槽
         private CollectionStatusType? _collectionStatus;
@@ -169,10 +142,6 @@ namespace Bangumi.ViewModels
         };
         #endregion
 
-        public DetailsViewModel()
-        {
-            InitViewModel();
-        }
 
         public void InitViewModel()
         {
@@ -185,16 +154,8 @@ namespace Bangumi.ViewModels
             OthersRates.Clear();
             OthersCollection = "";
             Score = 0;
-            // 更多资料用
-            Characters.Clear();
-            Staffs.Clear();
-            Name = "";
-            MoreInfo = "";
-            MoreSummary = "";
             // 收藏状态，评分，吐槽
             SetCollectionStatus(null);
-            Blogs.Clear();
-            Topics.Clear();
             GroupedEps.Clear();
         }
 
@@ -423,51 +384,23 @@ namespace Bangumi.ViewModels
                                    subject.Collection.Dropped + "抛弃";
             }
 
-            // 条目类别
             SubjectType = subject.Type;
-            // 更多资料
-            Name = subject.Name;
-            MoreSummary = subject.Summary;
-            MoreInfo = "作品分类：" + SubjectType.GetDesc();
-            MoreInfo += subject.AirDate == "0000-00-00" ? "" : "\n放送开始：" + subject.AirDate;
-            MoreInfo += subject.AirWeekday == 0 ? "" : "\n放送星期：" + Converters.GetWeekday(subject.AirWeekday);
-            MoreInfo += subject.Eps == null ? "" : "\n话数：" + subject.Eps.Count;
-            // 角色
-            Characters.Clear();
-            if (subject.Characters != null)
+            // 详情
+            string info= "作品分类：" + subject.Type.GetDesc();
+            info += subject.AirDate == "0000-00-00" ? "" : "\n放送开始：" + subject.AirDate;
+            info += subject.AirWeekday == 0 ? "" : "\n放送星期：" + Converters.GetWeekday(subject.AirWeekday);
+            info += subject.Eps == null ? "" : "\n话数：" + subject.Eps.Count;
+            Detail = new DetailViewModel
             {
-                foreach (var crt in subject.Characters)
-                {
-                    Characters.Add(crt);
-                }
-            }
-            // 演职人员
-            Staffs.Clear();
-            if (subject.Staff != null)
-            {
-                foreach (var staff in subject.Staff)
-                {
-                    Staffs.Add(staff);
-                }
-            }
-            // 评论
-            Blogs.Clear();
-            if (subject.Blogs != null)
-            {
-                foreach (var blog in subject.Blogs)
-                {
-                    Blogs.Add(blog);
-                }
-            }
-            // 讨论版
-            Topics.Clear();
-            if (subject.Topics != null)
-            {
-                foreach (var topic in subject.Topics)
-                {
-                    Topics.Add(topic);
-                }
-            }
+                Name = subject.Name,
+                Summary = subject.Summary,
+                Info = info,
+                Characters = subject.Characters,
+                Staffs = subject.Staff,
+                Blogs = subject.Blogs,
+                Topics = subject.Topics
+            };
+
             // 章节
             if (subject.Eps != null)
             {

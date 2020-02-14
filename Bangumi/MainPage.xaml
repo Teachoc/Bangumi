@@ -63,8 +63,7 @@
                     <AppBarButton x:Name="SearchButton" 
                                   Width="48" 
                                   Icon="Find" 
-                                  ToolTipService.ToolTip="搜索 (Ctrl+Q)"
-                                  AccessKey="Q">
+                                  ToolTipService.ToolTip="搜索 (Ctrl+Q)">
                         <AppBarButton.KeyboardAccelerators>
                             <KeyboardAccelerator Modifiers="Control" Key="Q"/>
                         </AppBarButton.KeyboardAccelerators>

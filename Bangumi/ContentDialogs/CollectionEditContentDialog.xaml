@@ -40,8 +40,7 @@
                              HorizontalAlignment="Stretch"
                              CornerRadius="5"
                              GroupName="CollectionStatus" 
-                             Checked="StatusRadioButton_Checked" 
-                             AccessKey="A"/>
+                             Checked="StatusRadioButton_Checked"/>
                 <RadioButton Name="CollectRadio" 
                              Grid.Column="1" 
                              Background="{StaticResource CollectBackground}" 
@@ -51,8 +50,7 @@
                              HorizontalAlignment="Stretch"
                              CornerRadius="5"
                              GroupName="CollectionStatus" 
-                             Checked="StatusRadioButton_Checked" 
-                             AccessKey="S"/>
+                             Checked="StatusRadioButton_Checked"/>
                 <RadioButton Name="DoRadio" 
                              Grid.Column="2" 
                              Background="{StaticResource DoBackground}" 
@@ -62,8 +60,7 @@
                              HorizontalAlignment="Stretch"
                              CornerRadius="5"
                              GroupName="CollectionStatus" 
-                             Checked="StatusRadioButton_Checked"
-                             AccessKey="D"/>
+                             Checked="StatusRadioButton_Checked"/>
                 <RadioButton Name="OnHoldRadio" 
                              Grid.Column="3" 
                              Background="{StaticResource OnHoldBackground}" 
@@ -73,8 +70,7 @@
                              HorizontalAlignment="Stretch"
                              CornerRadius="5"
                              GroupName="CollectionStatus" 
-                             Checked="StatusRadioButton_Checked" 
-                             AccessKey="F"/>
+                             Checked="StatusRadioButton_Checked"/>
                 <RadioButton Name="DroppedRadio" 
                              Grid.Column="4" 
                              Background="{StaticResource DroppedBackground}" 
@@ -84,8 +80,7 @@
                              HorizontalAlignment="Stretch"
                              CornerRadius="5"
                              GroupName="CollectionStatus" 
-                             Checked="StatusRadioButton_Checked"
-                             AccessKey="G"/>
+                             Checked="StatusRadioButton_Checked"/>
             </Grid>
             <TextBlock Text="评分："
                        Margin="0,5,0,0">
@@ -98,19 +93,16 @@
                     Height="31"
                     Minimum="0"
                     Maximum="10"
-                    Value="{x:Bind Rate, Mode=TwoWay}"
-                    AccessKey="Z"/>
+                    Value="{x:Bind Rate, Mode=TwoWay}"/>
             <TextBlock Text="吐槽：" 
                        Margin="0,5,0,0"/>
             <TextBox Name="CommentTextBox"
                      Text="{x:Bind Comment, Mode=TwoWay}"
-                     TextWrapping="Wrap"
-                     AccessKey="X"/>
+                     TextWrapping="Wrap"/>
             <CheckBox Name="PrivacyCheckBox" 
                       Content="私密"
                       IsChecked="{x:Bind Privacy, Mode=TwoWay}"
-                      Margin="0,5,0,0"
-                      AccessKey="C"/>
+                      Margin="0,5,0,0"/>
         </StackPanel>
         <controls:Loading x:Name="LoadingControl" 
                           IsLoading="{x:Bind IsLoading, Mode=OneWay}">

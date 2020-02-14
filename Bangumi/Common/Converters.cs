@@ -60,6 +60,11 @@ namespace Bangumi.Common
         public static Visibility CollapsedIfNullOrEmpty(string value) =>
             string.IsNullOrEmpty(value) ? Visibility.Collapsed : Visibility.Visible;
 
+        public static Visibility CollapsedIfAllNullOrEmpty(string value, string value2, string value3) =>
+            (string.IsNullOrEmpty(value) && string.IsNullOrEmpty(value2) && string.IsNullOrEmpty(value3)) ?
+            Visibility.Collapsed :
+            Visibility.Visible;
+
         /// <summary>
         /// 将 string 转换为 Brush
         /// </summary>

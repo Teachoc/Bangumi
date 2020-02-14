@@ -1,19 +1,14 @@
 ﻿using Bangumi.Api;
 using Bangumi.Api.Models;
-using Bangumi.Common;
 using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Windows.Devices.Input;
 using Windows.System;
-using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using SplitButton = Microsoft.UI.Xaml.Controls.SplitButton;
@@ -26,9 +21,9 @@ namespace Bangumi.Views
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class DetailsPage : Page, IPageStatus
+    public sealed partial class EpisodePage : Page, IPageStatus
     {
-        public DetailsViewModel ViewModel { get; private set; } = new DetailsViewModel();
+        public EpisodeViewModel ViewModel { get; private set; } = new EpisodeViewModel();
 
         public bool IsLoading => ViewModel.IsLoading;
 
@@ -37,7 +32,7 @@ namespace Bangumi.Views
             await ViewModel.LoadDetails();
         }
 
-        public DetailsPage()
+        public EpisodePage()
         {
             InitializeComponent();
         }
@@ -45,9 +40,10 @@ namespace Bangumi.Views
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            (((Frame.Parent as Microsoft.UI.Xaml.Controls.NavigationView)?.Parent as Grid).Parent as MainPage)?.SelectPlaceholderItem("详情");
+            (((Frame.Parent as Microsoft.UI.Xaml.Controls.NavigationView)?.Parent as Grid).Parent as MainPage)?.SelectPlaceholderItem("章节");
 
-            if (e.Parameter?.GetType() == typeof(int))
+            if (e.Parameter?.GetType() == typeof(int) &&
+                (e.NavigationMode != NavigationMode.Back || ViewModel.SubjectId != e.Parameter.ToString()))
             {
                 ViewModel.SubjectId = e.Parameter.ToString();
             }
@@ -76,50 +72,7 @@ namespace Bangumi.Views
 
         private async void LaunchWebPage_Click(object sender, RoutedEventArgs e)
         {
-            // The URI to launch
-            var uriWebPage = new Uri("https://bgm.tv/subject/" + ViewModel.SubjectId);
-
-            // Launch the URI
-            await Launcher.LaunchUriAsync(uriWebPage);
-        }
-
-        private async void ItemsRepeater_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            if (sender is RelativePanel panel)
-            {
-                // The URI to launch
-                var uriWebPage = new Uri(panel.DataContext.ToString());
-
-                // Launch the URI
-                await Launcher.LaunchUriAsync(uriWebPage);
-            }
-        }
-
-        private void RelativePanel_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            if (sender is RelativePanel panel)
-            {
-                panel.Background = Resources["ListViewItemBackgroundPointerOver"] as SolidColorBrush;
-                Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 10);
-            }
-        }
-
-        private void RelativePanel_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            if (sender is RelativePanel panel)
-            {
-                panel.Background = Resources["ListViewItemBackgroundPressed"] as SolidColorBrush;
-                Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 10);
-            }
-        }
-
-        private void RelativePanel_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            if (sender is RelativePanel panel)
-            {
-                panel.Background = Converters.ConvertBrushFromString("Transparent");
-                Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 10);
-            }
+            await Launcher.LaunchUriAsync(new Uri($"https://bgm.tv/subject/{ViewModel.SubjectId}"));
         }
 
         /// <summary>
@@ -178,6 +131,11 @@ namespace Bangumi.Views
             }
         }
 
+        /// <summary>
+        /// 根据章节状态填充按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EpFlyout_Opened(object sender, object e)
         {
             if (!(sender is Flyout flyout))
@@ -267,6 +225,11 @@ namespace Bangumi.Views
                         break;
                 }
             }
+        }
+
+        private void NavigateToDetailPage_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(DetailPage), ViewModel.Detail);
         }
     }
 }

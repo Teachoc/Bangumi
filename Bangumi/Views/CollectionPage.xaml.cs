@@ -70,7 +70,7 @@ namespace Bangumi.Views
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var selectedItem = (SubjectBaseE)e.ClickedItem;
-            this.Frame.Navigate(typeof(DetailsPage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
+            this.Frame.Navigate(typeof(EpisodePage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
         }
 
         // 更新条目收藏状态
