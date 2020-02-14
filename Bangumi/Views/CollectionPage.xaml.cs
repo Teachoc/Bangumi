@@ -1,7 +1,6 @@
 ﻿using Bangumi.Api;
 using Bangumi.Api.Models;
 using Bangumi.ViewModels;
-using System;
 using System.Threading.Tasks;
 using Windows.Devices.Input;
 using Windows.UI.Input;
@@ -43,22 +42,6 @@ namespace Bangumi.Views
             if (ViewModel.SubjectCollection.Count == 0 && !ViewModel.IsLoading)
             {
                 ViewModel.LoadCollectionList();
-            }
-        }
-
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void CollectionPageRefresh(object sender, RoutedEventArgs e)
-        {
-            if (sender is AppBarButton button)
-            {
-                var tag = button.Tag;
-                if (tag.Equals("collection"))
-                {
-                    ViewModel.LoadCollectionList();
-                }
             }
         }
 
@@ -109,6 +92,7 @@ namespace Bangumi.Views
                 && !ViewModel.IsLoading
                 && e.PointerDeviceType == PointerDeviceType.Mouse)
             {
+                e.Handled = true;
                 SetMenuFlyoutByType();
                 CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }
@@ -121,6 +105,7 @@ namespace Bangumi.Views
                 && !ViewModel.IsLoading
                 && e.HoldingState == HoldingState.Started)
             {
+                e.Handled = true;
                 SetMenuFlyoutByType();
                 CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
             }

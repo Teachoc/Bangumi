@@ -11,7 +11,6 @@
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     NavigationCacheMode="Enabled"
     Loaded="Page_Loaded"
-    Unloaded="Page_Unloaded"
     mc:Ignorable="d"
     Background="{ThemeResource SystemChromeLowColor}">
 

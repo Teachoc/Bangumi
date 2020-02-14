@@ -70,50 +70,28 @@ namespace Bangumi.Views
             }
         }
 
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private async void ProgressPageRefresh(object sender, RoutedEventArgs e)
-        {
-            if (sender is AppBarButton button)
-            {
-                var tag = button.Tag;
-                if (tag.Equals("progress"))
-                {
-                    await ViewModel.PopulateWatchingListAsync();
-                }
-            }
-        }
-
-        private void GridView_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            var selectedItem = (WatchProgress)e.ClickedItem;
-            this.Frame.Navigate(typeof(EpisodePage), selectedItem.SubjectId, new DrillInNavigationTransitionInfo());
-        }
-
         /// <summary>
         /// 将下一话标记为看过
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void NextEpButton_Click(object sender, RoutedEventArgs e)
+        private void NextEpButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            var button = (Button)sender;
-            var item = (WatchProgress)button.DataContext;
-            ViewModel.UpdateNextEpStatus(item);
+            if (sender is Button button && button.DataContext is WatchProgress watch)
+            {
+                e.Handled = true;
+                ViewModel.MarkNextEpWatched(watch);
+            }
         }
 
         /// <summary>
         /// 修改收藏状态
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CollectionButton_Click(object sender, RoutedEventArgs e)
+        private void CollectionButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            var button = (Button)sender;
-            var item = (WatchProgress)button.DataContext;
-            ViewModel.EditCollectionStatus(item);
+            if (sender is Button button && button.DataContext is WatchProgress watch)
+            {
+                e.Handled = true;
+                ViewModel.EditCollectionStatus(watch);
+            }
         }
 
         /// <summary>
@@ -169,10 +147,19 @@ namespace Bangumi.Views
         /// <param name="point"></param>
         private async Task ShowSitesMenuFlyout(FrameworkElement sender, Point point)
         {
-            if (sender is RelativePanel panel && panel.DataContext is WatchProgress watch)
+            if (sender is Panel panel && panel.DataContext is WatchProgress watch)
             {
                 await InitAirSites(watch.SubjectId.ToString());
                 SitesMenuFlyout.ShowAt(sender, point);
+            }
+        }
+
+        private void RelativePanel_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (sender is Panel panel && panel.DataContext is WatchProgress watch)
+            {
+                e.Handled = true;
+                this.Frame.Navigate(typeof(EpisodePage), watch.SubjectId, new DrillInNavigationTransitionInfo());
             }
         }
 

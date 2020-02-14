@@ -1,17 +1,14 @@
 ﻿using Bangumi.Api;
 using Bangumi.Api.Common;
-using Bangumi.Api.Exceptions;
 using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.ContentDialogs;
 using Bangumi.Data;
 using Bangumi.Facades;
 using Bangumi.Helper;
-using Bangumi.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -42,8 +39,6 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 处理并显示用户收视进度列表。
         /// </summary>
-        /// <param name="watchingCollection"></param>
-        /// <returns></returns>
         public async Task PopulateWatchingListAsync()
         {
             try
@@ -51,7 +46,7 @@ namespace Bangumi.ViewModels
                 IsLoading = true;
                 // 加载缓存，后面获取新数据后比较需要使用
                 var cachedWatchings = BangumiApi.BgmCache.Watching();
-                var cachedWatchStatus = CachedWatchStatus().ToList();
+                var cachedWatchStatus = CachedWatchProgress().ToList();
 
                 // 加载新的收视进度
                 var newWatchStatus = new List<WatchProgress>();
@@ -102,8 +97,7 @@ namespace Bangumi.ViewModels
                     newWatchStatus.Add(item);
                 }
                 BangumiApi.BgmCache.IsUpdatedToday = true;
-
-                DiffListToObservableCollection(WatchingCollection, CollectionSorting(newWatchStatus));
+                DiffListToObservableCollection(WatchingCollection, SortWatchProgress(newWatchStatus).ToList());
             }
             catch (Exception e)
             {
@@ -118,36 +112,26 @@ namespace Bangumi.ViewModels
 
         public void PopulateWatchingListFromCache()
         {
-            DiffListToObservableCollection(WatchingCollection, CollectionSorting(CachedWatchStatus()));
+            DiffListToObservableCollection(WatchingCollection, SortWatchProgress(CachedWatchProgress()).ToList());
         }
 
         /// <summary>
         /// 更新收藏状态、评分、吐槽
         /// </summary>
-        /// <param name="status"></param>
-        public Task EditCollectionStatus(WatchProgress status)
+        public async Task EditCollectionStatus(WatchProgress item)
         {
-            if (status == null)
-            {
-                throw new ArgumentNullException(nameof(status));
-            }
-            return EditCollectionStatusInternal(status);
-        }
-
-        private async Task EditCollectionStatusInternal(WatchProgress status)
-        {
-            var subjectStatus = BangumiApi.BgmApi.Status(status.SubjectId.ToString());
+            var subjectStatus = BangumiApi.BgmApi.Status(item.SubjectId.ToString());
             CollectionEditContentDialog collectionEditContentDialog = new CollectionEditContentDialog(
-                status.Type, subjectStatus)
+                item.Type, subjectStatus)
             {
-                Title = status.NameCn,
+                Title = item.NameCn,
             };
             MainPage.RootPage.HasDialog = true;
             if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync() &&
                 collectionEditContentDialog.CollectionStatus != null)
             {
-                status.IsUpdating = true;
-                if (await BangumiFacade.UpdateCollectionStatusAsync(status.SubjectId.ToString(),
+                item.IsUpdating = true;
+                if (await BangumiFacade.UpdateCollectionStatusAsync(item.SubjectId.ToString(),
                                                                     collectionEditContentDialog.CollectionStatus.Value,
                                                                     collectionEditContentDialog.Comment,
                                                                     collectionEditContentDialog.Rate.ToString(),
@@ -155,9 +139,9 @@ namespace Bangumi.ViewModels
                     && collectionEditContentDialog.CollectionStatus != CollectionStatusType.Do)
                 {
                     // 若修改后状态不是在看，则从进度页面删除
-                    WatchingCollection.Remove(status);
+                    WatchingCollection.Remove(item);
                 }
-                status.IsUpdating = false;
+                item.IsUpdating = false;
             }
             MainPage.RootPage.HasDialog = false;
         }
@@ -165,8 +149,7 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 更新下一章章节状态为已看
         /// </summary>
-        /// <param name="item"></param>
-        public async Task UpdateNextEpStatus(WatchProgress item)
+        public async Task MarkNextEpWatched(WatchProgress item)
         {
             if (item == null || item.NextEp == null)
             {
@@ -177,7 +160,7 @@ namespace Bangumi.ViewModels
             if (color != item.EpColor)
             {
                 var oldIndex = WatchingCollection.IndexOf(item);
-                var newIndex = CollectionSorting(WatchingCollection).IndexOf(item);
+                var newIndex = SortWatchProgress(WatchingCollection).ToList().IndexOf(item);
                 if (newIndex != oldIndex)
                 {
                     WatchingCollection.Remove(item);
@@ -198,8 +181,7 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 缓存的收视进度
         /// </summary>
-        /// <returns></returns>
-        private IEnumerable<WatchProgress> CachedWatchStatus()
+        private IEnumerable<WatchProgress> CachedWatchProgress()
         {
             foreach (var watching in BangumiApi.BgmCache.Watching())
             {
@@ -223,7 +205,7 @@ namespace Bangumi.ViewModels
         /// <typeparam name="T"></typeparam>
         /// <param name="origin">显示的列表</param>
         /// <param name="dest">新的列表</param>
-        private void DiffListToObservableCollection<T>(ObservableCollection<T> origin, List<T> dest) where T : class
+        private void DiffListToObservableCollection<T>(ObservableCollection<T> origin, IList<T> dest) where T : class
         {
             if (!origin.SequenceEqualExT(dest))
             {
@@ -284,7 +266,7 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 对条目进行排序
         /// </summary>
-        private List<WatchProgress> CollectionSorting(IEnumerable<WatchProgress> watchingStatuses)
+        private IEnumerable<WatchProgress> SortWatchProgress(IEnumerable<WatchProgress> watchingStatuses)
         {
             return watchingStatuses.OrderBy(p => p.EpColor)
                 .ThenBy(p => p.WatchedEpsCount == 0)
@@ -302,8 +284,7 @@ namespace Bangumi.ViewModels
                         }
                     }
                     return airTime;
-                })
-                .ToList();
+                });
         }
 
         #endregion
@@ -433,7 +414,6 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 标记下一话为看过
         /// </summary>
-        /// <returns></returns>
         public async Task MarkNextEpWatched()
         {
             if (NextEp == null)
