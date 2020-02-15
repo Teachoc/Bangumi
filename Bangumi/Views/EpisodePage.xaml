@@ -296,6 +296,18 @@
                 <FontIcon FontFamily="Segoe MDL2 Assets" 
                           Glyph="&#xE12A;" />
             </AppBarButton>
+            <AppBarButton Label="分享"
+                          ToolTipService.ToolTip="分享">
+                <FontIcon FontFamily="Segoe MDL2 Assets" 
+                          Glyph="&#xE12A;" />
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="复制条目链接" Tag="link" Click="ShareMenuItem_Click"/>
+                        <MenuFlyoutItem Text="复制条目ID" Tag="id" Click="ShareMenuItem_Click"/>
+                        <MenuFlyoutItem Text="其它分享方式..." Tag="system" Click="ShareMenuItem_Click"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
             <AppBarSeparator Height="40" />
             <AppBarButton Label="详情"
                           ToolTipService.ToolTip="详情"

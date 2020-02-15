@@ -6,6 +6,7 @@ using Bangumi.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -230,6 +231,42 @@ namespace Bangumi.Views
         private void NavigateToDetailPage_Click(object sender, RoutedEventArgs e)
         {
             this.Frame.Navigate(typeof(DetailPage), ViewModel.Detail);
+        }
+
+        private void ShareMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem item)
+            {
+                DataPackage dataPackage = new DataPackage();
+                dataPackage.RequestedOperation = DataPackageOperation.Copy;
+                dataPackage.Properties.Title = ViewModel.Name;
+                dataPackage.Properties.Description = "——分享自 Bangumi UWP";
+                switch (item.Tag)
+                {
+                    case "link":
+                        dataPackage.SetText($"https://bgm.tv/subject/{ViewModel.SubjectId}");
+                        Clipboard.SetContent(dataPackage);
+                        NotificationHelper.Notify("条目链接已复制到剪贴板");
+                        break;
+                    case "id":
+                        dataPackage.SetText(ViewModel.SubjectId);
+                        Clipboard.SetContent(dataPackage);
+                        NotificationHelper.Notify("条目ID已复制到剪贴板");
+                        break;
+                    case "system":
+                        dataPackage.SetWebLink(new Uri($"https://bgm.tv/subject/{ViewModel.SubjectId}"));
+                        var dataTransferManager = DataTransferManager.GetForCurrentView();
+                        dataTransferManager.DataRequested += (s, args) =>
+                          {
+                              DataRequest request = args.Request;
+                              request.Data = dataPackage;
+                          };
+                        DataTransferManager.ShowShareUI();
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 }
