@@ -17,10 +17,10 @@ namespace Bangumi.Data
         private const string BangumiDataCDNUrl = "https://cdn.jsdelivr.net/npm/bangumi-data@0.3/dist/data.json";
         private static BangumiDataSet _dataSet;
         private static Dictionary<string, string> _seasonIdMap;
-        private static VersionInfo _info;
+        private static VersionInfo _info = new VersionInfo();
         private static string _folderPath;
         public static string LatestVersion { get; private set; }
-        public static string Version => _info?.Version;
+        public static string Version => _info.Version;
         private static bool _useBiliApp;
         public static bool UseBiliApp
         {
@@ -50,15 +50,17 @@ namespace Bangumi.Data
         }
         public static bool AutoCheck
         {
-            get => _info?.AutoCheck ?? false;
+            get => _info.AutoCheck;
             set
             {
                 if (_info.AutoCheck != value)
                 {
                     _info.AutoCheck = value;
+                    // 关闭自动检查更新后恢复默认设置
                     if (!value)
                     {
                         _info.AutoUpdate = false;
+                        _info.CheckInterval = 7;
                     }
                     SaveConfig();
                 }
@@ -67,7 +69,7 @@ namespace Bangumi.Data
 
         public static bool AutoUpdate
         {
-            get => _info?.AutoUpdate ?? false;
+            get => _info.AutoUpdate;
             set
             {
                 if (_info.AutoUpdate != value)
@@ -80,7 +82,7 @@ namespace Bangumi.Data
 
         public static int CheckInterval
         {
-            get => _info?.CheckInterval ?? 7;
+            get => _info.CheckInterval;
             set
             {
                 if (_info.CheckInterval != value && value >= 0 && value <= 90)
@@ -113,10 +115,7 @@ namespace Bangumi.Data
                     // 从老版本升级
                     if (File.Exists(AppFile.Version.GetFilePath(_folderPath)))
                     {
-                        _info = new VersionInfo
-                        {
-                            Version = await FileHelper.ReadTextAsync(AppFile.Version.GetFilePath(_folderPath))
-                        };
+                        _info.Version = await FileHelper.ReadTextAsync(AppFile.Version.GetFilePath(_folderPath));
                         await SaveConfig();
                         FileHelper.DeleteFile(AppFile.Version.GetFilePath(_folderPath));
                         return;
@@ -148,6 +147,11 @@ namespace Bangumi.Data
                         if (Version != await GetLatestVersion())
                         {
                             autoCheckCallback?.Invoke("发现新版本 bangumi-data，请前往设置手动更新！");
+                        }
+                        else
+                        {
+                            _info.LastUpdate = DateTimeOffset.UtcNow;
+                            await SaveConfig();
                         }
                     }
                 }
@@ -262,6 +266,8 @@ namespace Bangumi.Data
             // 已是最新版本
             if (_info.Version == LatestVersion)
             {
+                _info.LastUpdate = DateTimeOffset.UtcNow;
+                await SaveConfig();
                 return true;
             }
             startDownloadCallback?.Invoke();

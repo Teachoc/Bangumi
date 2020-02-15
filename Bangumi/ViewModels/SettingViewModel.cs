@@ -68,6 +68,10 @@ namespace Bangumi.ViewModels
                     BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
                                      SettingHelper.UseBiliApp);
                 }
+                else
+                {
+                    BangumiData.AutoCheck = false;
+                }
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(BangumiDataVersion));
                 OnPropertyChanged(nameof(UseBangumiDataAirSites));
