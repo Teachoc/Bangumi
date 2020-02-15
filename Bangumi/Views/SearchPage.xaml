@@ -271,7 +271,7 @@
                         <Run Text="{x:Bind ViewModel.ResultNumber[0], Mode=OneWay}"/>
                     </TextBlock>
                 </PivotItem.Header>
-                <controls:AdaptiveGridView Name="AllGridView"
+                <controls:AdaptiveGridView x:Name="AllGridView"
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
@@ -308,7 +308,7 @@
                         <Run Text="{x:Bind ViewModel.ResultNumber[1], Mode=OneWay}"/>
                     </TextBlock>
                 </PivotItem.Header>
-                <controls:AdaptiveGridView Name="AnimeGridView"
+                <controls:AdaptiveGridView x:Name="AnimeGridView"
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
@@ -345,7 +345,7 @@
                         <Run Text="{x:Bind ViewModel.ResultNumber[2], Mode=OneWay}"/>
                     </TextBlock>
                 </PivotItem.Header>
-                <controls:AdaptiveGridView Name="BookGridView"
+                <controls:AdaptiveGridView x:Name="BookGridView"
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
@@ -382,7 +382,7 @@
                         <Run Text="{x:Bind ViewModel.ResultNumber[3], Mode=OneWay}"/>
                     </TextBlock>
                 </PivotItem.Header>
-                <controls:AdaptiveGridView Name="MusicGridView"
+                <controls:AdaptiveGridView x:Name="MusicGridView"
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
@@ -419,7 +419,7 @@
                         <Run Text="{x:Bind ViewModel.ResultNumber[4], Mode=OneWay}"/>
                     </TextBlock>
                 </PivotItem.Header>
-                <controls:AdaptiveGridView Name="GameGridView"
+                <controls:AdaptiveGridView x:Name="GameGridView"
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
@@ -456,7 +456,7 @@
                         <Run Text="{x:Bind ViewModel.ResultNumber[5], Mode=OneWay}"/>
                     </TextBlock>
                 </PivotItem.Header>
-                <controls:AdaptiveGridView Name="RealGridView"
+                <controls:AdaptiveGridView x:Name="RealGridView"
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"

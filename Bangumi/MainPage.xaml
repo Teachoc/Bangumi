@@ -27,7 +27,7 @@
                            IsBackEnabled="{x:Bind CanGoBack, Mode=OneWay}"
                            ImageVisibility="{x:Bind common:Converters.CollapsedIf(CanGoBack), Mode=OneWay}"/>
 
-        <muxc:NavigationView Name="NavView"
+        <muxc:NavigationView x:Name="NavView"
                              Grid.Row="1"
                              PaneDisplayMode="Top" 
                              IsSettingsVisible="False"
@@ -38,7 +38,7 @@
                 <muxc:NavigationViewItem Tag="collection" Content="收藏" />
                 <muxc:NavigationViewItem Tag="calendar" Content="时间表" />
                 <muxc:NavigationViewItemSeparator Visibility="{x:Bind PlaceholderItem.Visibility, Mode=OneWay}"/>
-                <muxc:NavigationViewItem Name="PlaceholderItem" 
+                <muxc:NavigationViewItem x:Name="PlaceholderItem" 
                                          Tag="others" />
             </muxc:NavigationView.MenuItems>
             <muxc:NavigationView.PaneFooter>

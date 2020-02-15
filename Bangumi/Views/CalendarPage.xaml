@@ -197,7 +197,7 @@
 
         <SemanticZoom Name="TimeLineSemanticZoom" >
             <SemanticZoom.ZoomedInView>
-                <controls:AdaptiveGridView Name="MyGridView"
+                <controls:AdaptiveGridView x:Name="MyGridView"
                                            ItemsSource="{x:Bind cvsGroups.View}"
                                            Padding="12,0,12,8"
                                            ScrollViewer.IsHorizontalScrollChainingEnabled="False"

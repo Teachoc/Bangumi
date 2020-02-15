@@ -205,7 +205,7 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <controls:AdaptiveGridView Name="MyGridView" 
+        <controls:AdaptiveGridView x:Name="MyGridView" 
                                    Padding="12,0,12,8"
                                    DesiredWidth="360"
                                    ItemsSource="{x:Bind ViewModel.WatchingCollection}" 

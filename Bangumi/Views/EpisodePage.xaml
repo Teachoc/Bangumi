@@ -238,7 +238,7 @@
                                    Margin="0,2,0,0" >
                         </TextBlock>
 
-                        <muxc:SplitButton Name="SitesSplitButton" 
+                        <muxc:SplitButton x:Name="SitesSplitButton" 
                                           Click="SitesSplitButton_Click"
                                           Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(SelectedTextBlock.Text),Mode=OneWay}"
                                           RelativePanel.RightOf="BangumiImage"
