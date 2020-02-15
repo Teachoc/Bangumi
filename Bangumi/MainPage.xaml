@@ -52,10 +52,11 @@
                             <KeyboardAccelerator Modifiers="None"
                                          Key="F5"/>
                         </AppBarButton.KeyboardAccelerators>
-                        <Grid>
+                        <Grid Padding="-2">
                             <ProgressRing Visibility="{x:Bind IsLoading, Mode=OneWay}"
                                           IsActive="True"/>
                             <FontIcon Visibility="{x:Bind common:Converters.CollapsedIf(IsLoading), Mode=OneWay}"
+                                      Margin="2"
                                       FontFamily="Segoe MDL2 Assets"
                                       Glyph="&#xE72C;"/>
                         </Grid>
@@ -77,7 +78,7 @@
                                           IsActive="True"/>
                             <Ellipse VerticalAlignment="Center" Height="48" Width="48">
                                 <Ellipse.Fill>
-                                    <ImageBrush x:Name="AvaterImage" ImageSource="ms-appx:///Assets/resource/akkarin.jpg" Stretch="UniformToFill"/>
+                                    <ImageBrush x:Name="AvaterImage" Stretch="UniformToFill"/>
                                 </Ellipse.Fill>
                             </Ellipse>
                         </Grid>

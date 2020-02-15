@@ -48,6 +48,10 @@ namespace Bangumi.Views
 
         private void TypeCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!BangumiApi.BgmOAuth.IsLogin)
+            {
+                return;
+            }
             ViewModel.PopulateSubjectCollectionFromCache();
             ViewModel.PopulateSubjectCollectionAsync();
         }

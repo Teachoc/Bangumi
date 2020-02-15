@@ -62,9 +62,11 @@ namespace Bangumi.Api.Services
         /// <returns></returns>
         public async Task<User> User(string username)
         {
-            return await $"{HOST}/user/{username}"
+            var user = await $"{HOST}/user/{username}"
                 .GetAsync()
                 .ReceiveJson<User>();
+            user.Avatar?.ConvertImageHttpToHttps();
+            return user;
         }
 
         /// <summary>

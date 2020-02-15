@@ -297,9 +297,8 @@
                           Glyph="&#xE12A;" />
             </AppBarButton>
             <AppBarButton Label="分享"
-                          ToolTipService.ToolTip="分享">
-                <FontIcon FontFamily="Segoe MDL2 Assets" 
-                          Glyph="&#xE12A;" />
+                          ToolTipService.ToolTip="分享"
+                          Icon="Share">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
                         <MenuFlyoutItem Text="复制条目链接" Tag="link" Click="ShareMenuItem_Click"/>

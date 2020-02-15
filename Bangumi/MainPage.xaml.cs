@@ -1,4 +1,5 @@
 ﻿using Bangumi.Api;
+using Bangumi.Common;
 using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.Views;
@@ -207,11 +208,11 @@ namespace Bangumi
             if (BangumiApi.BgmOAuth.IsLogin)
             {
                 var user = await BangumiApi.BgmApi.User();
-                img = new BitmapImage(new Uri(user.Avatar.Medium));
+                img = new BitmapImage(new Uri(user.Avatar?.Medium ?? Constants.NoAvatarImgUri));
             }
             else
             {
-                img = new BitmapImage(new Uri("ms-appx:///Assets/resource/akkarin.jpg"));
+                img = new BitmapImage(new Uri(Constants.NoAvatarImgUri));
             }
             AvaterImage.ImageSource = img;
         }

@@ -61,11 +61,11 @@ namespace Bangumi.Api.Common
             {
                 throw new ArgumentNullException(nameof(image));
             }
-            image.Grid = image.Grid.ToHttps();
-            image.Small = image.Small.ToHttps();
-            image.Common = image.Common.ToHttps();
-            image.Medium = image.Medium.ToHttps();
-            image.Large = image.Large.ToHttps();
+            image.Grid = image.Grid?.ToHttps();
+            image.Small = image.Small?.ToHttps();
+            image.Common = image.Common?.ToHttps();
+            image.Medium = image.Medium?.ToHttps();
+            image.Large = image.Large?.ToHttps();
         }
 
         /// <summary>

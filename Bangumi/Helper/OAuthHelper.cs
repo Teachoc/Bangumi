@@ -41,7 +41,7 @@ namespace Bangumi.Helper
             }
             catch (Exception e)
             {
-                NotificationHelper.Notify("登录失败，请重试！", NotificationHelper.NotifyType.Error);
+                NotificationHelper.Notify($"登录失败，请重试！\n{e.Message}", NotificationHelper.NotifyType.Error);
                 Debug.WriteLine("换取Token失败。");
                 Debug.WriteLine(e.StackTrace);
             }
