@@ -120,30 +120,28 @@
                             <TextBlock x:Name="CollectionStatusTextBlock"
                                        Text="{x:Bind common:Converters.GetDesc(Status, model:SubjectType.Anime)}"
                                        x:Phase="1"
-                                       Foreground="White"
-                                       TextTrimming="CharacterEllipsis"/>
+                                       Foreground="White"/>
                         </Border>
                         <TextBlock x:Name="RankTextBlock"
                                    RelativePanel.AlignRightWithPanel="True"
                                    RelativePanel.AlignBottomWithPanel="True"
                                    Visibility="{x:Bind common:Converters.CollapsedIfZero(Rank)}"
                                    Foreground="Gray"
-                                   Margin="8,0,0,0"
-                                   TextTrimming="CharacterEllipsis">
+                                   Margin="8,0,0,0">
                             <Run Text="#"/><Run Text="{x:Bind Rank}"/>
                         </TextBlock>
                         <TextBlock x:Name="DoingTextBlock"
                                    RelativePanel.LeftOf="RankTextBlock"
                                    RelativePanel.AlignBottomWithPanel="True"
-                                   Foreground="Gray"
-                                   TextTrimming="CharacterEllipsis">
+                                   Visibility="{x:Bind common:Converters.CollapsedIfNull(Collection)}"
+                                   Foreground="Gray">
                             <Run Text="{x:Bind Collection.Doing}"/><Run Text="人在看"/>
                         </TextBlock>
                         <TextBlock x:Name="RateTextBlock"
                                    RelativePanel.AlignRightWithPanel="True"
                                    RelativePanel.Above="DoingTextBlock"
-                                   Foreground="{StaticResource BangumiPinkBrush}"
-                                   TextTrimming="CharacterEllipsis">
+                                   Visibility="{x:Bind common:Converters.CollapsedIfNull(Rating)}"
+                                   Foreground="{StaticResource BangumiPinkBrush}">
                             <Run Text="{x:Bind common:Converters.DoubleToString(Rating.Score, 1)}"/>
                             <ToolTipService.ToolTip>
                                 <TextBlock>
