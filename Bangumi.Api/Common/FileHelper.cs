@@ -19,11 +19,11 @@ namespace Bangumi.Api.Common
         #region 异步读写文件
 
         /// <summary>
-        /// 异步读文件
+        /// 异步读文件，文件不存在将返回空字符串
         /// </summary>
         /// <param name="filePath">文件路径全名</param>
         /// <returns></returns>
-        internal static async Task<string> ReadTextAsync(string filePath)
+        public static async Task<string> ReadTextAsync(string filePath)
         {
             if (File.Exists(filePath))
             {
@@ -41,7 +41,7 @@ namespace Bangumi.Api.Common
         /// <param name="filePath">文件路径全名</param>
         /// <param name="data">待写入文本</param>
         /// <returns></returns>
-        internal static async Task WriteTextAsync(string filePath, string data)
+        public static async Task WriteTextAsync(string filePath, string data)
         {
             using (var writer = File.CreateText(filePath))
             {
@@ -109,7 +109,7 @@ namespace Bangumi.Api.Common
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        internal static long GetFileLength(string filePath)
+        public static long GetFileLength(string filePath)
         {
             try
             {
@@ -133,7 +133,7 @@ namespace Bangumi.Api.Common
         /// 删除存在的文件
         /// </summary>
         /// <param name="filePath">文件完整路径</param>
-        internal static void DeleteFile(string filePath)
+        public static void DeleteFile(string filePath)
         {
             if (File.Exists(filePath))
             {

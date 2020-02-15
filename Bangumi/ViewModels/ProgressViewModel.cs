@@ -379,7 +379,7 @@ namespace Bangumi.ViewModels
             Url = w.Subject.Url,
             LastTouch = w.LastTouch, // 该条目上次修改时间
             AirTime = SettingHelper.UseBangumiDataAirTime
-                    ? BangumiData.GetAirTimeByBangumiId(w.SubjectId.ToString())?.ToString("yyyy-MM-dd HH:mm")
+                    ? BangumiData.GetAirTimeByBangumiId(w.SubjectId.ToString())?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
                     ?? w.Subject.AirDate
                     : w.Subject.AirDate,
             Type = w.Subject.Type,

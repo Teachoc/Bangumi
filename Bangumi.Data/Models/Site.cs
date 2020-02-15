@@ -2,6 +2,7 @@
 // http://www.xamasoft.com/json-class-generator
 
 using Newtonsoft.Json;
+using System;
 
 namespace Bangumi.Data.Models
 {
@@ -25,7 +26,7 @@ namespace Bangumi.Data.Models
         /// Examples: "2015-10-29T08:31:41Z", "2012-12-24T06:00:00Z", "1969-10-04T16:00:00Z", "1969-10-04T16:00:01Z", "2016-12-05T06:24:50Z"
         /// </summary>
         [JsonProperty("begin")]
-        public object Begin { get; set; }
+        public DateTimeOffset? Begin { get; set; }
 
         /// <summary>
         /// Examples: "", "港区可见", "分割为 TV 放送", "原始版本为剧场版但是 Netflix 目前将其做成 14 集 TV 分割形式放送"

@@ -21,6 +21,9 @@ namespace Bangumi.Data.Models
         /// </summary>
         [JsonProperty("items")]
         public IList<Item> Items { get; set; }
+
+        public static BangumiDataSet FromJson(string json) =>
+            JsonConvert.DeserializeObject<BangumiDataSet>(json);
     }
 
 }

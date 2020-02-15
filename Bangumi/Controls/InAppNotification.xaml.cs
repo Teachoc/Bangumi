@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Timers;
 using Microsoft.Toolkit.Uwp.Helpers;
+using System.Threading.Tasks;
 
 //https://go.microsoft.com/fwlink/?LinkId=234236 上介绍了“用户控件”项模板
 
@@ -46,7 +47,7 @@ namespace Bangumi.Controls
             }
         }
 
-        public void AddNotification(string msg, string color)
+        public async Task AddNotification(string msg, string color)
         {
             if (!_timer.Enabled)
             {
@@ -54,11 +55,14 @@ namespace Bangumi.Controls
                 _timer.Start();
             }
             var now = DateTime.Now;
-            Notifies.Add(new NotifyMessage
+            await DispatcherHelper.ExecuteOnUIThreadAsync(() =>
             {
-                Color = color,
-                Message = msg,
-                ExpiresIn = now - _lastMessage
+                Notifies.Add(new NotifyMessage
+                {
+                    Color = color,
+                    Message = msg,
+                    ExpiresIn = now - _lastMessage
+                });
             });
             _lastMessage = now;
         }

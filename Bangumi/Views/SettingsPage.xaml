@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:common="using:Bangumi.Common"
     xmlns:viewmodels="using:Bangumi.ViewModels"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     Loaded="{x:Bind ViewModel.Load}"
     mc:Ignorable="d"
     NavigationCacheMode="Enabled"
@@ -95,7 +96,7 @@
                                 </Grid.ColumnDefinitions>
                                 <Button Content="{x:Bind ViewModel.BangumiDataStatus, Mode=OneWay}"
                                         IsEnabled="{x:Bind common:Converters.Not(ViewModel.BangumiDataVersionChecking), Mode=OneWay}"
-                                        Click="{x:Bind ViewModel.UpdateOrDownloadBangumiData}"
+                                        Click="{x:Bind ViewModel.UpdateBangumiData}"
                                         Tag="Update"/>
                                 <ProgressRing Grid.Column="1"
                                               Visibility="{x:Bind ViewModel.BangumiDataVersionChecking, Mode=OneWay}"
@@ -103,6 +104,18 @@
                                               IsActive="True"
                                               Margin="10,0,0,0"/>
                             </Grid>
+                            <CheckBox Content="自动检查更新"
+                                      IsChecked="{x:Bind ViewModel.BangumiDataAutoCheck, Mode=TwoWay}"/>
+                            <CheckBox Content="自动下载更新"
+                                      Visibility="{x:Bind ViewModel.BangumiDataAutoCheck, Mode=OneWay}"
+                                      IsChecked="{x:Bind ViewModel.BangumiDataAutoUpdate, Mode=TwoWay}"/>
+                            <muxc:NumberBox x:Name="NumberBoxSpinButtonPlacementExample"
+                                            Header="检查更新间隔天数(0-90)：" 
+                                            Visibility="{x:Bind ViewModel.BangumiDataAutoCheck, Mode=OneWay}"
+                                            Value="{x:Bind ViewModel.BangumiDataCheckInterval, Mode=TwoWay}" 
+                                            SpinButtonPlacementMode="Inline" 
+                                            Width="180"
+                                            HorizontalAlignment="Left"/>
                             <!-- 显示番剧放送网站 -->
                             <ToggleSwitch IsOn="{x:Bind ViewModel.UseBangumiDataAirSites, Mode=TwoWay}" >
                                 <ToggleSwitch.Header>

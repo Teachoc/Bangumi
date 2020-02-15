@@ -45,13 +45,13 @@ namespace Bangumi.Data.Models
         /// Examples: "1960-01-15T16:00:00Z", "1968-01-03T16:00:00Z", "1968-03-30T16:00:00Z", "1968-07-21T16:00:00Z", "1968-09-03T13:15:00Z"
         /// </summary>
         [JsonProperty("begin")]
-        public DateTime Begin { get; set; }
+        public DateTimeOffset? Begin { get; set; }
 
         /// <summary>
         /// Examples: "1960-01-15T16:30:00Z", "1969-03-30T16:30:00Z", "1971-09-18T16:30:00Z", "1968-07-21T17:00:00Z", "1969-03-25T13:45:00Z"
         /// </summary>
         [JsonProperty("end")]
-        public object End { get; set; }
+        public DateTimeOffset? End { get; set; }
 
         /// <summary>
         /// Examples: ""

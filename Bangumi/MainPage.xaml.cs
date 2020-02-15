@@ -117,7 +117,8 @@ namespace Bangumi
             {
                 // 初始化 BangumiData 对象
                 BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
-                                 SettingHelper.UseBiliApp);
+                                 SettingHelper.UseBiliApp,
+                                 (message) => NotificationHelper.Notify(message));
             }
 
         }

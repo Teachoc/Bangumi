@@ -65,16 +65,49 @@ namespace Bangumi.ViewModels
                     // 获取数据版本
                     BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
                                      SettingHelper.UseBiliApp);
-                    BangumiDataVersion = string.IsNullOrEmpty(BangumiData.Version) ?
-                                         "无数据" :
-                                         BangumiData.Version;
                 }
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(UseBangumiDataAirSites));
                 OnPropertyChanged(nameof(UseBiliApp));
                 OnPropertyChanged(nameof(UseBangumiDataAirTime));
+                OnPropertyChanged(nameof(BangumiDataAutoCheck));
+                OnPropertyChanged(nameof(BangumiDataCheckInterval));
+                OnPropertyChanged(nameof(BangumiDataAutoUpdate));
             }
         }
+
+        public bool BangumiDataAutoCheck
+        {
+            get => BangumiData.AutoCheck;
+            set
+            {
+                BangumiData.AutoCheck = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(BangumiDataCheckInterval));
+                OnPropertyChanged(nameof(BangumiDataAutoUpdate));
+            }
+        }
+
+        public int BangumiDataCheckInterval
+        {
+            get => BangumiData.CheckInterval;
+            set
+            {
+                BangumiData.CheckInterval = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool BangumiDataAutoUpdate
+        {
+            get => BangumiData.AutoUpdate;
+            set
+            {
+                BangumiData.AutoUpdate = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         public bool UseBangumiDataAirSites
         {
@@ -150,7 +183,6 @@ namespace Bangumi.ViewModels
             set => Set(ref _bangumiDataVersionChecking, value);
         }
 
-        private string _bangumiDataVersion;
         public string BangumiDataVersion
         {
             get
@@ -158,11 +190,10 @@ namespace Bangumi.ViewModels
                 // 显示当前数据版本及更新后版本
                 return string.IsNullOrEmpty(BangumiData.Version) ?
                        "无数据" :
-                       (string.IsNullOrEmpty(_bangumiDataVersion) ?
+                       ((string.IsNullOrEmpty(BangumiData.LatestVersion) || BangumiData.Version == BangumiData.LatestVersion) ?
                        BangumiData.Version :
-                       $"{BangumiData.Version} -> {_bangumiDataVersion}");
+                       $"{BangumiData.Version} -> {BangumiData.LatestVersion}");
             }
-            set => Set(ref _bangumiDataVersion, value);
         }
 
         public async Task Load()
@@ -221,26 +252,21 @@ namespace Bangumi.ViewModels
         /// <summary>
         /// 检查更新并下载最新版本
         /// </summary>
-        public async Task UpdateOrDownloadBangumiData()
+        public async Task UpdateBangumiData()
         {
             BangumiDataStatus = "正在检查更新";
             BangumiDataVersionChecking = true;
-            var v = await BangumiData.GetLatestVersion();
-            if (!string.IsNullOrEmpty(v))
+            bool hasNew = false;
+            var startDownloadAction = new Action(() =>
             {
-                if (v != BangumiData.Version)
+                hasNew = true;
+                BangumiDataStatus = "正在下载数据";
+            });
+            if (await BangumiData.DownloadLatestBangumiData(startDownloadAction))
+            {
+                if (hasNew)
                 {
-                    BangumiDataVersion = v;
-                    BangumiDataStatus = "正在下载数据";
-                    if (await BangumiData.DownloadLatestBangumiData())
-                    {
-                        BangumiDataVersion = null;
-                        NotificationHelper.Notify("数据下载成功！");
-                    }
-                    else
-                    {
-                        NotificationHelper.Notify("数据下载失败，请重试或稍后再试！", NotificationHelper.NotifyType.Error);
-                    }
+                    NotificationHelper.Notify("数据下载成功！");
                 }
                 else
                 {
@@ -249,7 +275,14 @@ namespace Bangumi.ViewModels
             }
             else
             {
-                NotificationHelper.Notify("获取最新版本失败！", NotificationHelper.NotifyType.Error);
+                if (hasNew)
+                {
+                    NotificationHelper.Notify("数据下载失败，请重试或稍后再试！", NotificationHelper.NotifyType.Error);
+                }
+                else
+                {
+                    NotificationHelper.Notify("获取最新版本失败！", NotificationHelper.NotifyType.Error);
+                }
             }
             BangumiDataStatus = "检查更新";
             BangumiDataVersionChecking = false;
