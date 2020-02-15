@@ -87,15 +87,18 @@
                         <TextBlock x:Name="TitleTextBlock"
                                    RelativePanel.RightOf="BangumiImage"
                                    RelativePanel.AlignTopWithPanel="True"
-                                   Text="{x:Bind NameCn}" 
+                                   Text="{x:Bind common:Converters.StringOneOrTwo(NameCn, Name)}" 
                                    Foreground="{StaticResource BangumiPinkBrush}"
                                    TextTrimming="CharacterEllipsis">
                             <ToolTipService.ToolTip>
-                                <TextBlock>
-                                    <Run Text="{x:Bind NameCn}"/>
-                                    <LineBreak/>
-                                    <Run Text="{x:Bind Name}"/>
-                                </TextBlock>
+                                <StackPanel>
+                                    <TextBlock Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(NameCn)}">
+                                        <Run Text="中文名："/><Run Text="{x:Bind NameCn}"/>
+                                    </TextBlock>
+                                    <TextBlock Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(Name)}">
+                                        <Run Text="原名："/><Run Text="{x:Bind Name}"/>
+                                    </TextBlock>
+                                </StackPanel>
                             </ToolTipService.ToolTip>
                         </TextBlock>
                         <TextBlock x:Name="AirWeekdayTextBlock"

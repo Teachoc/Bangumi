@@ -85,8 +85,7 @@ namespace Bangumi.Api.Services
             foreach (var watching in result)
             {
                 watching.Subject.Name = System.Net.WebUtility.HtmlDecode(watching.Subject.Name);
-                watching.Subject.NameCn = watching.Subject.NameCn.IsNullOrEmpty() ?
-                    watching.Subject.Name : System.Net.WebUtility.HtmlDecode(watching.Subject.NameCn);
+                watching.Subject.NameCn = System.Net.WebUtility.HtmlDecode(watching.Subject.NameCn);
                 watching.Subject.Images?.ConvertImageHttpToHttps();
             }
             return _bgmCache.UpdateWatching(result);
@@ -114,8 +113,7 @@ namespace Bangumi.Api.Services
                 foreach (var item in type.Items)
                 {
                     item.Subject.Name = System.Net.WebUtility.HtmlDecode(item.Subject.Name);
-                    item.Subject.NameCn = item.Subject.NameCn.IsNullOrEmpty() ?
-                        item.Subject.Name : System.Net.WebUtility.HtmlDecode(item.Subject.NameCn);
+                    item.Subject.NameCn = System.Net.WebUtility.HtmlDecode(item.Subject.NameCn);
                     item.Subject.Images?.ConvertImageHttpToHttps();
                 }
             }
@@ -146,7 +144,7 @@ namespace Bangumi.Api.Services
                 foreach (var ep in result.Eps)
                 {
                     ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
-                    ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
+                    ep.NameCn = System.Net.WebUtility.HtmlDecode(ep.NameCn);
                 }
             }
             if (result.Blogs != null)
@@ -190,7 +188,7 @@ namespace Bangumi.Api.Services
                 foreach (var ep in result.Eps)
                 {
                     ep.Name = System.Net.WebUtility.HtmlDecode(ep.Name);
-                    ep.NameCn = ep.NameCn.IsNullOrEmpty() ? ep.Name : System.Net.WebUtility.HtmlDecode(ep.NameCn);
+                    ep.NameCn = System.Net.WebUtility.HtmlDecode(ep.NameCn);
                 }
             }
             return _bgmCache.UpdateSubjectEp(subjectId, result);
@@ -351,7 +349,7 @@ namespace Bangumi.Api.Services
                 foreach (var item in bangumiCalendar.Items)
                 {
                     item.Name = System.Net.WebUtility.HtmlDecode(item.Name);
-                    item.NameCn = item.NameCn.IsNullOrEmpty() ? item.Name : System.Net.WebUtility.HtmlDecode(item.NameCn);
+                    item.NameCn = System.Net.WebUtility.HtmlDecode(item.NameCn);
                     item.Images?.ConvertImageHttpToHttps();
                 }
             }
@@ -388,7 +386,7 @@ namespace Bangumi.Api.Services
             foreach (var item in result.Results)
             {
                 item.Name = System.Net.WebUtility.HtmlDecode(item.Name);
-                item.NameCn = item.NameCn.IsNullOrEmpty() ? item.Name : System.Net.WebUtility.HtmlDecode(item.NameCn);
+                item.NameCn = System.Net.WebUtility.HtmlDecode(item.NameCn);
                 item.Images?.ConvertImageHttpToHttps();
             }
             return result;

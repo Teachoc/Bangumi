@@ -198,7 +198,7 @@
 
 
                         <TextBlock Name="NameTextBlock" 
-                                   Text="{x:Bind ViewModel.NameCn, Mode=OneWay}"
+                                   Text="{x:Bind ViewModel.Name, Mode=OneWay}"
                                    RelativePanel.RightOf="BangumiImage"
                                    RelativePanel.AlignTopWithPanel="True"
                                    IsTextSelectionEnabled="True"

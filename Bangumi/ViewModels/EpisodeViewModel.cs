@@ -74,11 +74,11 @@ namespace Bangumi.ViewModels
             set => Set(ref _imageSource, value);
         }
 
-        private string _nameCn;
-        public string NameCn
+        private string _name;
+        public string Name
         {
-            get => _nameCn;
-            set => Set(ref _nameCn, value);
+            get => _name;
+            set => Set(ref _name, value);
         }
 
         private string _airDate;
@@ -145,7 +145,7 @@ namespace Bangumi.ViewModels
         {
             IsLoading = false;
             ImageSource = "";
-            NameCn = "";
+            Name = "";
             AirDate = "";
             AirTime = "";
             Summary = "";
@@ -171,7 +171,7 @@ namespace Bangumi.ViewModels
             CollectionEditContentDialog collectionEditContentDialog = new CollectionEditContentDialog(
                 this.SubjectType, subjectStatus)
             {
-                Title = this.NameCn,
+                Title = this.Name,
             };
             MainPage.RootPage.HasDialog = true;
             if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync() &&
@@ -334,7 +334,7 @@ namespace Bangumi.ViewModels
                 return;
             }
             // 条目标题
-            NameCn = string.IsNullOrEmpty(subject.NameCn) ? subject.Name : subject.NameCn;
+            Name = Converters.StringOneOrTwo(subject.NameCn, subject.Name);
             // 条目图片
             ImageSource = subject.Images?.Common;
             // 放送日期

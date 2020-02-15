@@ -258,5 +258,9 @@ namespace Bangumi.Common
             return string.Concat(str0, str1, str2, str3);
         }
 
+        public static string StringOneOrTwo(string str0, string str1)
+        {
+            return string.IsNullOrEmpty(str0) ? str1 : str0;
+        }
     }
 }

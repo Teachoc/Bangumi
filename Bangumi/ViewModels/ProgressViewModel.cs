@@ -124,7 +124,7 @@ namespace Bangumi.ViewModels
             CollectionEditContentDialog collectionEditContentDialog = new CollectionEditContentDialog(
                 item.Type, subjectStatus)
             {
-                Title = item.NameCn,
+                Title = Converters.StringOneOrTwo(item.NameCn, item.Name)
             };
             MainPage.RootPage.HasDialog = true;
             if (ContentDialogResult.Primary == await collectionEditContentDialog.ShowAsync() &&
@@ -367,7 +367,7 @@ namespace Bangumi.ViewModels
             }
         }
         public EpisodeForSort NextEp => Eps?.FirstOrDefault(ep => ep.Type == EpisodeType.本篇 && ep.EpStatus == EpStatusType.remove);
-        public string NextEpDesc => $"EP.{NextEp?.Sort} {(string.IsNullOrEmpty(NextEp?.NameCn) ? NextEp?.Name : NextEp?.NameCn)}";
+        public string NextEpDesc => $"EP.{NextEp?.Sort} {Converters.StringOneOrTwo(NextEp?.NameCn, NextEp?.Name)}";
         public string EpColor => (NextEp == null || NextEp.Status == "NA") ? "Gray" : "#d26585";
 
         public static WatchProgress FromWatching(Watching w) => new WatchProgress

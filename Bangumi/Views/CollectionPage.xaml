@@ -88,13 +88,14 @@
                                           x:Phase="2"
                                           Stretch="UniformToFill" />
                         <TextBlock x:Name="TitleTextBlock" 
-                                   Text="{x:Bind Subject.NameCn}" 
-                                   ToolTipService.ToolTip="{x:Bind Subject.NameCn}"
+                                   Text="{x:Bind common:Converters.StringOneOrTwo(Subject.NameCn, Subject.Name)}" 
+                                   ToolTipService.ToolTip="{x:Bind common:Converters.StringOneOrTwo(Subject.NameCn, Subject.Name)}"
                                    RelativePanel.RightOf="BangumiImage"
                                    RelativePanel.AlignTopWithPanel="True"
                                    Foreground="{StaticResource BangumiPinkBrush}"
                                    TextTrimming="CharacterEllipsis"/>
                         <TextBlock x:Name="SubtitleTextBlock"
+                                   Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(Subject.NameCn)}"
                                    Text="{x:Bind Subject.Name}" 
                                    ToolTipService.ToolTip="{x:Bind Subject.Name}"
                                    RelativePanel.RightOf="BangumiImage"
