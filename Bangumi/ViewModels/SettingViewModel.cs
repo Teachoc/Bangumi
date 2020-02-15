@@ -69,6 +69,7 @@ namespace Bangumi.ViewModels
                                      SettingHelper.UseBiliApp);
                 }
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(BangumiDataVersion));
                 OnPropertyChanged(nameof(UseBangumiDataAirSites));
                 OnPropertyChanged(nameof(UseBiliApp));
                 OnPropertyChanged(nameof(UseBangumiDataAirTime));
@@ -175,7 +176,11 @@ namespace Bangumi.ViewModels
         public string BangumiDataStatus
         {
             get => _bangumiDataStatus;
-            set => Set(ref _bangumiDataStatus, value);
+            set
+            {
+                Set(ref _bangumiDataStatus, value);
+                OnPropertyChanged(nameof(BangumiDataVersion));
+            }
         }
 
         private bool _bangumiDataVersionChecking;
@@ -190,11 +195,12 @@ namespace Bangumi.ViewModels
             get
             {
                 // 显示当前数据版本及更新后版本
-                return string.IsNullOrEmpty(BangumiData.Version) ?
-                       "无数据" :
-                       ((string.IsNullOrEmpty(BangumiData.LatestVersion) || BangumiData.Version == BangumiData.LatestVersion) ?
-                       BangumiData.Version :
-                       $"{BangumiData.Version} -> {BangumiData.LatestVersion}");
+                var version = string.IsNullOrEmpty(BangumiData.Version) ?
+                       "无数据" : BangumiData.Version;
+                version += ((string.IsNullOrEmpty(BangumiData.LatestVersion) || BangumiData.Version == BangumiData.LatestVersion) ?
+                       string.Empty :
+                       $" -> {BangumiData.LatestVersion}");
+                return version;
             }
         }
 

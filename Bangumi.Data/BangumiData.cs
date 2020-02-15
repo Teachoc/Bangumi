@@ -20,7 +20,7 @@ namespace Bangumi.Data
         private static VersionInfo _info;
         private static string _folderPath;
         public static string LatestVersion { get; private set; }
-        public static string Version => _info.Version;
+        public static string Version => _info?.Version;
         private static bool _useBiliApp;
         public static bool UseBiliApp
         {
@@ -50,7 +50,7 @@ namespace Bangumi.Data
         }
         public static bool AutoCheck
         {
-            get => _info.AutoCheck;
+            get => _info?.AutoCheck ?? false;
             set
             {
                 if (_info.AutoCheck != value)
@@ -67,7 +67,7 @@ namespace Bangumi.Data
 
         public static bool AutoUpdate
         {
-            get => _info.AutoUpdate;
+            get => _info?.AutoUpdate ?? false;
             set
             {
                 if (_info.AutoUpdate != value)
@@ -80,7 +80,7 @@ namespace Bangumi.Data
 
         public static int CheckInterval
         {
-            get => _info.CheckInterval;
+            get => _info?.CheckInterval ?? 7;
             set
             {
                 if (_info.CheckInterval != value && value >= 0 && value <= 90)
