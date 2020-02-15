@@ -97,7 +97,7 @@ namespace Bangumi.ViewModels
                     newWatchStatus.Add(item);
                 }
                 BangumiApi.BgmCache.IsUpdatedToday = true;
-                DiffListToObservableCollection(WatchingCollection, SortWatchProgress(newWatchStatus).ToList());
+                CollectionHelper.Differ(WatchingCollection, SortWatchProgress(newWatchStatus).ToList());
             }
             catch (Exception e)
             {
@@ -112,7 +112,7 @@ namespace Bangumi.ViewModels
 
         public void PopulateWatchingListFromCache()
         {
-            DiffListToObservableCollection(WatchingCollection, SortWatchProgress(CachedWatchProgress()).ToList());
+            CollectionHelper.Differ(WatchingCollection, SortWatchProgress(CachedWatchProgress()).ToList());
         }
 
         /// <summary>

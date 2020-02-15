@@ -77,12 +77,15 @@ namespace Bangumi
 
         public bool IsRefreshable => ContentFrame.Content is IPageStatus;
 
-        public static MainPage RootPage;
+        public static MainPage RootPage { get; private set; }
         public bool HasDialog = false;
 
         public MainPage()
         {
             this.InitializeComponent();
+#if DEBUG
+            TitleBar.Text += " (Debug)";
+#endif
             RootPage = this;
             // 设置窗口的最小大小
             ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(320, 200));
@@ -134,12 +137,12 @@ namespace Bangumi
             if (BangumiApi.BgmOAuth.IsLogin)
             {
                 NavigateToPage(typeof(ProgressPage), null, new SuppressNavigationTransitionInfo());
-                UpdateAvatar();
             }
             else
             {
-                NavigateToPage(typeof(TimeLinePage), null, new SuppressNavigationTransitionInfo());
+                NavigateToPage(typeof(CalendarPage), null, new SuppressNavigationTransitionInfo());
             }
+            UpdateAvatar();
         }
 
         /// <summary>
@@ -200,8 +203,16 @@ namespace Bangumi
         private async Task UpdateAvatar()
         {
             AvaterImage.ImageSource = null;
-            var user = await BangumiApi.BgmApi.User();
-            var img = new BitmapImage(new Uri(user.Avatar.Medium));
+            BitmapImage img;
+            if (BangumiApi.BgmOAuth.IsLogin)
+            {
+                var user = await BangumiApi.BgmApi.User();
+                img = new BitmapImage(new Uri(user.Avatar.Medium));
+            }
+            else
+            {
+                img = new BitmapImage(new Uri("ms-appx:///Assets/resource/akkarin.jpg"));
+            }
             AvaterImage.ImageSource = img;
         }
 
@@ -233,7 +244,7 @@ namespace Bangumi
             {
                 "progress" => typeof(ProgressPage),
                 "collection" => typeof(CollectionPage),
-                "calendar" => typeof(TimeLinePage),
+                "calendar" => typeof(CalendarPage),
                 _ => null
             };
             NavigateToPage(type, null, args.RecommendedNavigationTransitionInfo);
@@ -253,7 +264,7 @@ namespace Bangumi
                 NavView.SelectedItem = NavView.MenuItems[1];
                 HidePlaceholderItem();
             }
-            else if (e.SourcePageType == typeof(TimeLinePage))
+            else if (e.SourcePageType == typeof(CalendarPage))
             {
                 NavView.SelectedItem = NavView.MenuItems[2];
                 HidePlaceholderItem();
@@ -263,12 +274,6 @@ namespace Bangumi
                 NavView.SelectedItem = PlaceholderItem;
             }
         }
-    }
-    public class Category
-    {
-        public string Name { get; set; }
-        public string Tooltip { get; set; }
-        public Symbol Glyph { get; set; }
     }
 
 }

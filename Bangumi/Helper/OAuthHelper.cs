@@ -32,22 +32,18 @@ namespace Bangumi.Helper
                 }
                 else if (webAuthenticationResult.ResponseStatus == WebAuthenticationStatus.ErrorHttp)
                 {
-                    //OutputToken("HTTP Error returned by AuthenticateAsync() : " + WebAuthenticationResult.ResponseErrorDetail.ToString());
+                    NotificationHelper.Notify("HTTP Error: " + webAuthenticationResult.ResponseErrorDetail.ToString());
                 }
                 else
                 {
-                    //OutputToken("Error returned by AuthenticateAsync() : " + WebAuthenticationResult.ResponseStatus.ToString());
+                    NotificationHelper.Notify("Error: " + webAuthenticationResult.ResponseStatus.ToString());
                 }
             }
             catch (Exception e)
             {
+                NotificationHelper.Notify("登录失败，请重试！", NotificationHelper.NotifyType.Error);
                 Debug.WriteLine("换取Token失败。");
                 Debug.WriteLine(e.StackTrace);
-                throw;
-                //var msgDialog = new Windows.UI.Popups.MessageDialog("登录失败，请重试！\n" + e.Message) { Title = "登录失败！" };
-                //msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("确定"));
-                //await msgDialog.ShowAsync();
-                //rootPage.NotifyUser(Error.Message, NotifyType.ErrorMessage);
             }
         }
 

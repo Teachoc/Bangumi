@@ -25,14 +25,16 @@ namespace Bangumi.ViewModels
             new Url {Uri="https://github.com/tobiichiamane/pixivfs-uwp", Desc="pixivfs-uwp(https://github.com/tobiichiamane/pixivfs-uwp)"},
         };
 
-        public string Version
-        {
-            get
-            {
-                var version = Package.Current.Id.Version;
-                return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
-            }
-        }
+        public string Version => string.Format("版本：{0} v{1}.{2}.{3}.{4} {5}",
+                                    Package.Current.DisplayName,
+                                    Package.Current.Id.Version.Major,
+                                    Package.Current.Id.Version.Minor,
+                                    Package.Current.Id.Version.Build,
+                                    Package.Current.Id.Version.Revision,
+                                    Package.Current.Id.Architecture);
+
+        public string PackageName => string.Format("包名：{0}", Package.Current.Id.Name);
+        public string InstalledDate => string.Format("安装时间：{0}", Package.Current.InstalledDate.ToLocalTime().DateTime);
 
         public bool EpsBatch
         {

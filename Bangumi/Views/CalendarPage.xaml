@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="Bangumi.Views.TimeLinePage"
+    x:Class="Bangumi.Views.CalendarPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Bangumi.Views"
@@ -12,7 +12,6 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     Loaded="Page_Loaded"
-    Unloaded="Page_Unloaded"
     NavigationCacheMode="Enabled"
     mc:Ignorable="d"
     Background="{ThemeResource SystemChromeLowColor}">
@@ -37,7 +36,7 @@
                                 Tag="Dropped"/>
             </MenuFlyout>
 
-            <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModel.TimeLineCollection}" IsSourceGrouped="True" ItemsPath="Items"/>
+            <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModel.CalendarCollection}" IsSourceGrouped="True" ItemsPath="Items"/>
 
             <DataTemplate x:Key="ZoomedInTemplate" x:DataType="data:SubjectForCalendar">
                 <UserControl>
@@ -237,7 +236,7 @@
         <Image Name="EmptyImage"
                Width="200"
                Height="326"
-               Visibility="{x:Bind common:Converters.CollapsedIfNotZero(ViewModel.TimeLineCollection.Count),Mode=OneWay}"
+               Visibility="{x:Bind common:Converters.CollapsedIfNotZero(ViewModel.CalendarCollection.Count),Mode=OneWay}"
                Source="ms-appx:///Assets/resource/empty.png"
                Stretch="Uniform"/>
 

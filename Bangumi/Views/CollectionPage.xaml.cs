@@ -24,7 +24,7 @@ namespace Bangumi.Views
 
         public async Task Refresh()
         {
-            await ViewModel.LoadCollectionList();
+            await ViewModel.PopulateSubjectCollectionAsync();
         }
 
         public CollectionPage()
@@ -41,13 +41,15 @@ namespace Bangumi.Views
             }
             if (ViewModel.SubjectCollection.Count == 0 && !ViewModel.IsLoading)
             {
-                ViewModel.LoadCollectionList();
+                ViewModel.PopulateSubjectCollectionFromCache();
+                ViewModel.PopulateSubjectCollectionAsync();
             }
         }
 
         private void TypeCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ViewModel.LoadCollectionList();
+            ViewModel.PopulateSubjectCollectionFromCache();
+            ViewModel.PopulateSubjectCollectionAsync();
         }
 
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)

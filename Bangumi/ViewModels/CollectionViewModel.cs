@@ -4,7 +4,6 @@ using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.Facades;
 using Bangumi.Helper;
-using Bangumi.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -52,24 +51,61 @@ namespace Bangumi.ViewModels
         }
 
         /// <summary>
-        /// 刷新收藏列表，API限制每类最多25条。
+        /// 根据下拉框返回所选择的收藏类型
         /// </summary>
-        public async Task LoadCollectionList()
+        /// <returns></returns>
+        private SubjectType SubjectType => SelectedIndex switch
+        {
+            0 => SubjectType.Anime,
+            1 => SubjectType.Book,
+            2 => SubjectType.Music,
+            3 => SubjectType.Game,
+            4 => SubjectType.Real,
+            _ => throw new ArgumentOutOfRangeException("No such subject type.")
+        };
+
+        /// <summary>
+        /// 显示用户选定类别收藏信息，API限制每类最多25条。
+        /// </summary>
+        public async Task PopulateSubjectCollectionAsync()
         {
             try
             {
                 IsLoading = true;
-                var subjectType = GetSubjectType();
-                await PopulateSubjectCollectionAsync(SubjectCollection, subjectType);
+                CollectionE current = await BangumiApi.BgmApi.Collections(SubjectType);
+                if (!current.Collects.SequenceEqualExT(SubjectCollection))
+                {
+                    //清空原数据
+                    SubjectCollection.Clear();
+                    foreach (var status in current.Collects)
+                    {
+                        SubjectCollection.Add(status);
+                    }
+                }
             }
             catch (Exception e)
             {
                 NotificationHelper.Notify("获取用户收藏失败！\n" + e.Message.Replace("\r\n\r\n", "\r\n").TrimEnd('\n').TrimEnd('\r'),
                                           NotificationHelper.NotifyType.Error);
+                Debug.WriteLine(e.Message);
             }
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        public void PopulateSubjectCollectionFromCache()
+        {
+            CollectionE cache = BangumiApi.BgmCache.Collections(SubjectType);
+            if (cache != null && !cache.Collects.SequenceEqualExT(SubjectCollection.ToList()))
+            {
+                //清空原数据
+                SubjectCollection.Clear();
+                foreach (var status in cache.Collects)
+                {
+                    SubjectCollection.Add(status);
+                }
             }
         }
 
@@ -133,64 +169,6 @@ namespace Bangumi.ViewModels
             }
             IsUpdating = false;
         }
-
-        /// <summary>
-        /// 显示用户选定类别收藏信息。
-        /// </summary>
-        /// <param name="subjectCollection"></param>
-        /// <param name="subjectType"></param>
-        /// <returns></returns>
-        private async Task PopulateSubjectCollectionAsync(ObservableCollection<Collection> subjectCollection, SubjectType subjectType)
-        {
-            try
-            {
-                CollectionE cache = BangumiApi.BgmCache.Collections(subjectType);
-                if (cache != null && !cache.Collects.SequenceEqualExT(subjectCollection.ToList()))
-                {
-                    //清空原数据
-                    subjectCollection.Clear();
-                    foreach (var status in cache.Collects)
-                    {
-                        subjectCollection.Add(status);
-                    }
-                }
-
-                CollectionE current = await BangumiApi.BgmApi.Collections(subjectType);
-                if (!cache.EqualsExT(current))
-                {
-                    //清空原数据
-                    subjectCollection.Clear();
-                    foreach (var status in current.Collects)
-                    {
-                        subjectCollection.Add(status);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("显示用户选定类别收藏信息失败。");
-                Debug.WriteLine(e.Message);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 根据下拉框返回所选择的收藏类型
-        /// </summary>
-        /// <returns></returns>
-        private SubjectType GetSubjectType()
-        {
-            return SelectedIndex switch
-            {
-                0 => SubjectType.Anime,
-                1 => SubjectType.Book,
-                2 => SubjectType.Music,
-                3 => SubjectType.Game,
-                4 => SubjectType.Real,
-                _ => SubjectType.Anime,
-            };
-        }
-
 
 
     }

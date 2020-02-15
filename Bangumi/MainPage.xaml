@@ -22,7 +22,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <local2:TitleBarEx Name="TitleBar" 
+        <local2:TitleBarEx x:Name="TitleBar" 
                            Text="Bangumi"
                            IsBackEnabled="{x:Bind CanGoBack, Mode=OneWay}"
                            ImageVisibility="{x:Bind common:Converters.CollapsedIf(CanGoBack), Mode=OneWay}"/>

@@ -16,42 +16,38 @@ namespace Bangumi.Views
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class TimeLinePage : Page, IPageStatus
+    public sealed partial class CalendarPage : Page, IPageStatus
     {
-        public TimeLineViewModel ViewModel { get; } = new TimeLineViewModel();
+        public CalendarViewModel ViewModel { get; } = new CalendarViewModel();
 
         public bool IsLoading => ViewModel.IsLoading;
 
         public async Task Refresh()
         {
-            await ViewModel.LoadTimeLine();
+            await ViewModel.PopulateCalendarAsync();
         }
 
-        public TimeLinePage()
+        public CalendarPage()
         {
             InitializeComponent();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if (ViewModel.TimeLineCollection.Count == 0 && !ViewModel.IsLoading)
+            if (!ViewModel.IsLoading)
             {
-                ViewModel.LoadTimeLine();
-            }
-        }
-
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void TimeLinePageRefresh(object sender, RoutedEventArgs e)
-        {
-            if (sender is AppBarButton button)
-            {
-                var tag = button.Tag;
-                if (tag.Equals("calendar"))
+                if (ViewModel.CalendarCollection.Count == 0)
                 {
-                    ViewModel.LoadTimeLine();
+                    ViewModel.PopulateCalendarFromCache();
+                    ViewModel.PopulateCalendarAsync();
+                }
+                else
+                {
+                    ViewModel.PopulateCalendarFromCache();
+                    if (ViewModel.CalendarCollection.Count == 0)
+                    {
+                        ViewModel.PopulateCalendarAsync();
+                    }
                 }
             }
         }

@@ -39,15 +39,10 @@ namespace Bangumi.Views
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Wait, 10);
-            try
+            await OAuthHelper.Authorize();
+            if (BangumiApi.BgmOAuth.IsLogin)
             {
-                await OAuthHelper.Authorize();
                 this.Frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
-            }
-            catch (Exception ex)
-            {
-                NotificationHelper.Notify("登录失败，请重试！", NotificationHelper.NotifyType.Error);
-                Debug.WriteLine(ex.StackTrace);
             }
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 10);
         }

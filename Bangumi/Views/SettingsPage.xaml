@@ -164,8 +164,12 @@
                             <LineBreak/>
                             © 2019-2020 Teachoc
                             <LineBreak/>
-                            版本：
+                            <LineBreak/>
                             <Run Text="{x:Bind ViewModel.Version}"/>
+                            <LineBreak/>
+                            <Run Text="{x:Bind ViewModel.PackageName}"/>
+                            <LineBreak/>
+                            <Run Text="{x:Bind ViewModel.InstalledDate}"/>
                             <LineBreak/>
                         </TextBlock>
                         <TextBlock TextWrapping="Wrap">

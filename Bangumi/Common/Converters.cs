@@ -136,7 +136,7 @@ namespace Bangumi.Common
                 CollectionStatusType.Do => (SolidColorBrush)Application.Current.Resources["DoBackground"],
                 CollectionStatusType.OnHold => (SolidColorBrush)Application.Current.Resources["OnHoldBackground"],
                 CollectionStatusType.Dropped => (SolidColorBrush)Application.Current.Resources["DroppedBackground"],
-                _ => (SolidColorBrush)Application.Current.Resources["DoBackground"],
+                _ => new SolidColorBrush(Windows.UI.Colors.Transparent)
             };
         }
 

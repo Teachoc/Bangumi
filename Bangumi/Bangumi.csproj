@@ -134,6 +134,7 @@
       <DependentUpon>TitleBarEx.xaml</DependentUpon>
     </Compile>
     <Compile Include="Facades\BangumiFacade.cs" />
+    <Compile Include="Helper\CollectionHelper.cs" />
     <Compile Include="Helper\EncryptionHelper.cs" />
     <Compile Include="Helper\FileSizeHelper.cs" />
     <Compile Include="Helper\NotificationHelper.cs" />
@@ -149,7 +150,7 @@
     <Compile Include="ViewModels\ProgressViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
     <Compile Include="ViewModels\SettingViewModel.cs" />
-    <Compile Include="ViewModels\TimeLineViewModel.cs" />
+    <Compile Include="ViewModels\CalendarViewModel.cs" />
     <Compile Include="Views\CollectionPage.xaml.cs">
       <DependentUpon>CollectionPage.xaml</DependentUpon>
     </Compile>
@@ -172,8 +173,8 @@
     <Compile Include="Views\SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TimeLinePage.xaml.cs">
-      <DependentUpon>TimeLinePage.xaml</DependentUpon>
+    <Compile Include="Views\CalendarPage.xaml.cs">
+      <DependentUpon>CalendarPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -294,7 +295,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\TimeLinePage.xaml">
+    <Page Include="Views\CalendarPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
