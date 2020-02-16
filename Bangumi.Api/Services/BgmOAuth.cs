@@ -135,11 +135,6 @@ namespace Bangumi.Api.Services
                 {
                     await RefreshToken().ConfigureAwait(false);
                 }
-                else if (e.Call.HttpResponseMessage.StatusCode == HttpStatusCode.BadRequest
-                         && (await e.Call.HttpResponseMessage.Content.ReadAsStringAsync()).Contains("Invalid refresh token"))
-                {
-                    throw new BgmUnauthorizedException();
-                }
             }
             finally
             {
@@ -181,6 +176,14 @@ namespace Bangumi.Api.Services
                     MyToken.Expires = DateTime.Now.AddSeconds(MyToken.ExpiresIn).ToJsTick();
                     await SaveToken().ConfigureAwait(false);
                     break;
+                }
+                catch (FlurlHttpException e)
+                {
+                    if (e.Call.HttpResponseMessage.StatusCode == HttpStatusCode.BadRequest
+                        && (await e.Call.HttpResponseMessage.Content.ReadAsStringAsync()).Contains("Invalid refresh token"))
+                    {
+                        throw new BgmUnauthorizedException();
+                    }
                 }
                 catch (Exception e)
                 {
