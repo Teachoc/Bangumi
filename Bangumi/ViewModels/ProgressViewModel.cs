@@ -157,7 +157,7 @@ namespace Bangumi.ViewModels
             }
             var color = item.EpColor;
             await item.MarkNextEpWatched();
-            if (color != item.EpColor)
+            if (SettingHelper.OrderByAirTime && color != item.EpColor)
             {
                 var oldIndex = WatchingCollection.IndexOf(item);
                 var newIndex = SortWatchProgress(WatchingCollection).ToList().IndexOf(item);
@@ -193,7 +193,8 @@ namespace Bangumi.ViewModels
                 item.ProcessProgress(progress);
                 if (subject == null || progress == null)
                 {
-                    watching.LastTouch = 0;
+                    // 标记以重新加载
+                    watching.Subject.Eps = -1;
                 }
                 yield return item;
             }
@@ -268,23 +269,27 @@ namespace Bangumi.ViewModels
         /// </summary>
         private IEnumerable<WatchProgress> SortWatchProgress(IEnumerable<WatchProgress> watchingStatuses)
         {
-            return watchingStatuses.OrderBy(p => p.EpColor)
-                .ThenBy(p => p.WatchedEpsCount == 0)
-                .ThenBy(p => p.AirEpsCount - p.WatchedEpsCount)
-                .ThenBy(p => p.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate)
-                .ThenBy(p =>
-                {
-                    if (DateTime.TryParse(p.AirTime, out var airTime))
+            if (SettingHelper.OrderByAirTime)
+            {
+                return watchingStatuses.OrderBy(p => p.EpColor)
+                    .ThenBy(p => p.WatchedEpsCount == 0)
+                    .ThenBy(p => p.AirEpsCount - p.WatchedEpsCount)
+                    .ThenBy(p => p.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate)
+                    .ThenBy(p =>
                     {
-                        var first = p.Eps?.FirstOrDefault(ep => ep.Type == EpisodeType.本篇)?.AirDate;
-                        var last = p.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate;
-                        if (first != null && last != null)
+                        if (DateTime.TryParse(p.AirTime, out var airTime))
                         {
-                            return airTime.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks);
+                            var first = p.Eps?.FirstOrDefault(ep => ep.Type == EpisodeType.本篇)?.AirDate;
+                            var last = p.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate;
+                            if (first != null && last != null)
+                            {
+                                return airTime.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks);
+                            }
                         }
-                    }
-                    return airTime;
-                });
+                        return airTime;
+                    });
+            }
+            return watchingStatuses.OrderByDescending(w => w.LastTouch);
         }
 
         #endregion

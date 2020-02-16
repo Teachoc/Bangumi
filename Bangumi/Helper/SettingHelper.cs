@@ -29,6 +29,12 @@ namespace Bangumi.Helper
             get => Get();
         }
 
+        public static bool OrderByAirTime
+        {
+            set => Set(value);
+            get => Get();
+        }
+
         public static bool UseBangumiData
         {
             set => Set(value);

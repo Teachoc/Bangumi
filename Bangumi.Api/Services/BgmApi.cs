@@ -261,7 +261,8 @@ namespace Bangumi.Api.Services
                     subject_id
                 })
                 .GetAsync()
-                .ReceiveJson<Progress>();
+                .ReceiveJson<Progress>()
+                ?? new Progress();
             return _bgmCache.UpdateProgress(subject_id, result);
         }
 

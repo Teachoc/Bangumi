@@ -41,6 +41,16 @@
                             </ToggleSwitch.Header>
                         </ToggleSwitch>
 
+                        <!-- 按放送时间排序 -->
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.OrderByAirTime, Mode=TwoWay}" >
+                            <ToggleSwitch.Header>
+                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                           Text="按放送时间排序"
+                                           Margin="0,4,0,0"
+                                           TextWrapping="Wrap" />
+                            </ToggleSwitch.Header>
+                        </ToggleSwitch>
+
                         <!-- 用户数据缓存 -->
                         <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                    Text="用户数据缓存"

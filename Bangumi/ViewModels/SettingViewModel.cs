@@ -56,6 +56,16 @@ namespace Bangumi.ViewModels
             }
         }
 
+        public bool OrderByAirTime
+        {
+            get => SettingHelper.OrderByAirTime;
+            set
+            {
+                SettingHelper.OrderByAirTime = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool UseBangumiData
         {
             get => SettingHelper.UseBangumiData;
