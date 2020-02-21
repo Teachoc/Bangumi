@@ -230,7 +230,7 @@ namespace Bangumi.Api.Services
             {
                 // 找到已有进度，否则新建
                 _cache.Progress.TryGetValue(sub.Id.ToString(), out var pro);
-                if (pro != null)
+                if (pro?.Eps != null)
                 {
                     var ep = pro.Eps.FirstOrDefault(e => e.Id == epId);
                     if (status != EpStatusType.remove)
