@@ -43,10 +43,12 @@ namespace Bangumi.Api.Common
         /// <returns></returns>
         public static async Task WriteTextAsync(string filePath, string data)
         {
-            using (var writer = File.CreateText(filePath))
+            var tempFile = filePath + ".temp";
+            using (var writer = File.CreateText(tempFile))
             {
                 await writer.WriteAsync(data).ConfigureAwait(false);
             }
+            File.Replace(tempFile, filePath, null);
         }
 
         #endregion
@@ -63,10 +65,12 @@ namespace Bangumi.Api.Common
             try
             {
                 var encryptedData = await EncryptionAsync(data);
-                using (var writer = File.Create(filePath))
+                var tempFile = filePath + ".temp";
+                using (var writer = File.Create(tempFile))
                 {
                     await writer.WriteAsync(encryptedData, 0, encryptedData.Length).ConfigureAwait(false);
                 }
+                File.Replace(tempFile, filePath, null);
             }
             catch (Exception e)
             {

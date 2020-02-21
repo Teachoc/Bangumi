@@ -1,5 +1,6 @@
 ﻿using Bangumi.Api;
 using Bangumi.Api.Models;
+using Bangumi.Helper;
 using Bangumi.ViewModels;
 using System.Timers;
 using Windows.Devices.Input;
@@ -101,6 +102,11 @@ namespace Bangumi.Views
         /// </summary>
         private void Search()
         {
+            if (NetworkHelper.IsOffline)
+            {
+                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                return;
+            }
             if (string.IsNullOrEmpty(ViewModel.SearchText))
             {
                 return;
@@ -178,19 +184,19 @@ namespace Bangumi.Views
                 switch (item.Tag)
                 {
                     case "Wish":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Wish);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectForSearch, CollectionStatusType.Wish);
                         break;
                     case "Collect":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Collect);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectForSearch, CollectionStatusType.Collect);
                         break;
                     case "Doing":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Do);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectForSearch, CollectionStatusType.Do);
                         break;
                     case "OnHold":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.OnHold);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectForSearch, CollectionStatusType.OnHold);
                         break;
                     case "Dropped":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Dropped);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectForSearch, CollectionStatusType.Dropped);
                         break;
                     default:
                         break;

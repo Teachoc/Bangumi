@@ -2,7 +2,6 @@
 using Bangumi.Api.Common;
 using Bangumi.Api.Models;
 using Bangumi.Common;
-using Bangumi.Facades;
 using Bangumi.Helper;
 using System;
 using System.Collections.Generic;
@@ -69,6 +68,10 @@ namespace Bangumi.ViewModels
         /// </summary>
         public async Task PopulateSubjectCollectionAsync()
         {
+            if (NetworkHelper.IsOffline)
+            {
+                return;
+            }
             try
             {
                 IsLoading = true;
@@ -116,6 +119,11 @@ namespace Bangumi.ViewModels
         /// <param name="collectionStatus"></param>
         public async Task UpdateCollectionStatus(SubjectBaseE subject, CollectionStatusType collectionStatus)
         {
+            if (NetworkHelper.IsOffline)
+            {
+                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                return;
+            }
             if (subject == null)
             {
                 return;
@@ -129,7 +137,17 @@ namespace Bangumi.ViewModels
             var col = cols.FirstOrDefault(c => c.Status.Id != collectionStatus);
             IsUpdating = true;
             // 更新收藏状态成功后将条目从原类别中删除
-            if (await BangumiFacade.UpdateCollectionStatusAsync(subject.SubjectId.ToString(), collectionStatus)
+            CollectionStatusE collectionStatusE = null;
+            try
+            {
+                collectionStatusE = await BangumiApi.BgmApi.UpdateStatus(subject.SubjectId.ToString(), collectionStatus);
+            }
+            catch (Exception e)
+            {
+                NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
+                                          NotificationHelper.NotifyType.Error);
+            }
+            if (collectionStatusE is CollectionStatusE
                 && col != null)
             {
                 col.Items.Remove(subject);
@@ -142,7 +160,7 @@ namespace Bangumi.ViewModels
                 }
                 // 找到新所属类别，有则加入，无则新增
                 var newCol = SubjectCollection.FirstOrDefault(sub =>
-                    sub.Status.Id == collectionStatus);
+                    sub.Status.Id == collectionStatusE.Status.Id);
                 if (newCol != null)
                 {
                     newCol.Items.Insert(0, subject);
@@ -156,12 +174,7 @@ namespace Bangumi.ViewModels
                     newCol = new Collection
                     {
                         Items = new List<SubjectBaseE> { subject },
-                        Status = new CollectionStatus
-                        {
-                            Id = collectionStatus,
-                            Type = collectionStatus.GetValue(),
-                            Name = collectionStatus.GetDesc(subject.Subject.Type)
-                        },
+                        Status = collectionStatusE.Status,
                         Count = 1
                     };
                     SubjectCollection.Add(newCol);

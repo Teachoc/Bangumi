@@ -66,19 +66,19 @@ namespace Bangumi.Views
                 switch (item.Tag)
                 {
                     case "Wish":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Wish);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectForCalendar, CollectionStatusType.Wish);
                         break;
                     case "Collect":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Collect);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectForCalendar, CollectionStatusType.Collect);
                         break;
                     case "Doing":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Do);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectForCalendar, CollectionStatusType.Do);
                         break;
                     case "OnHold":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.OnHold);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectForCalendar, CollectionStatusType.OnHold);
                         break;
                     case "Dropped":
-                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectBase, CollectionStatusType.Dropped);
+                        ViewModel.UpdateCollectionStatus(item.DataContext as SubjectForCalendar, CollectionStatusType.Dropped);
                         break;
                     default:
                         break;

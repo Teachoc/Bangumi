@@ -61,6 +61,10 @@ namespace Bangumi.Views
                             MainPage.RootPage.Frame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
                             return;
                         }
+                        catch (Exception)
+                        {
+
+                        }
                     }
                     await ViewModel.PopulateWatchingListAsync();
                 }

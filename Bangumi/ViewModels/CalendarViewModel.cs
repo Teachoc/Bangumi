@@ -2,10 +2,7 @@
 using Bangumi.Api.Common;
 using Bangumi.Api.Models;
 using Bangumi.Common;
-using Bangumi.Facades;
 using Bangumi.Helper;
-using Bangumi.Views;
-using Microsoft.Toolkit.Uwp.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -50,12 +47,26 @@ namespace Bangumi.ViewModels
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="collectionStatus"></param>
-        public async Task UpdateCollectionStatus(SubjectBase subject, CollectionStatusType collectionStatus)
+        public async Task UpdateCollectionStatus(SubjectForCalendar subject, CollectionStatusType collectionStatus)
         {
+            if (NetworkHelper.IsOffline)
+            {
+                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                return;
+            }
             if (subject != null)
             {
                 IsUpdating = true;
-                await BangumiFacade.UpdateCollectionStatusAsync(subject.Id.ToString(), collectionStatus);
+                try
+                {
+                    var status = await BangumiApi.BgmApi.UpdateStatus(subject.Id.ToString(), collectionStatus);
+                    subject.Status = status.Status.Id;
+                }
+                catch (Exception e)
+                {
+                    NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
+                                              NotificationHelper.NotifyType.Error);
+                }
                 IsUpdating = false;
             }
         }
@@ -65,6 +76,10 @@ namespace Bangumi.ViewModels
         /// </summary>
         public async Task PopulateCalendarAsync()
         {
+            if (NetworkHelper.IsOffline)
+            {
+                return;
+            }
             try
             {
                 IsLoading = true;

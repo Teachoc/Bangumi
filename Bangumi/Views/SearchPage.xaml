@@ -116,12 +116,12 @@
                                    Foreground="Gray"
                                    TextTrimming="CharacterEllipsis"/>
                         <Border x:Name="CollectionStatusBorder"
-                                Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
-                                Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
+                                Background="{x:Bind common:Converters.GetSolidColorBrush(Status), Mode=OneWay}"
+                                Visibility="{x:Bind common:Converters.CollapsedIfNull(Status), Mode=OneWay}"
                                 RelativePanel.RightOf="BangumiImage"
                                 RelativePanel.Below="TypeTextBlock">
                             <TextBlock x:Name="CollectionStatusTextBlock"
-                                       Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
+                                       Text="{x:Bind common:Converters.GetDesc(Status, Type), Mode=OneWay}"
                                        x:Phase="1"
                                        Foreground="White"
                                        TextTrimming="CharacterEllipsis"/>
@@ -198,12 +198,12 @@
                                    Foreground="Gray"
                                    TextTrimming="CharacterEllipsis"/>
                         <Border x:Name="CollectionStatusBorder"
-                                Background="{x:Bind common:Converters.GetSolidColorBrush(Status)}"
-                                Visibility="{x:Bind common:Converters.CollapsedIfNull(Status)}"
+                                Background="{x:Bind common:Converters.GetSolidColorBrush(Status), Mode=OneWay}"
+                                Visibility="{x:Bind common:Converters.CollapsedIfNull(Status), Mode=OneWay}"
                                 RelativePanel.RightOf="BangumiImage"
                                 RelativePanel.Below="SubtitleTextBlock">
                             <TextBlock x:Name="CollectionStatusTextBlock"
-                                       Text="{x:Bind common:Converters.GetDesc(Status, Type)}"
+                                       Text="{x:Bind common:Converters.GetDesc(Status, Type), Mode=OneWay}"
                                        x:Phase="1"
                                        Foreground="White"
                                        TextTrimming="CharacterEllipsis"/>

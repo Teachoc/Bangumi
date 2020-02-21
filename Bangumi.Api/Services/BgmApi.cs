@@ -37,7 +37,7 @@ namespace Bangumi.Api.Services
                 client.Settings.OnErrorAsync = async call =>
                 {
                     // 若请求为未认证则检查Token
-                    if (call.HttpResponseMessage.StatusCode == HttpStatusCode.Unauthorized)
+                    if (call.HttpResponseMessage?.StatusCode == HttpStatusCode.Unauthorized)
                     {
                         await _bgmOAuth.CheckToken();
                         throw new BgmTokenRefreshedException("Token refreshed.");

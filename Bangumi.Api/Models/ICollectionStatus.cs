@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.ComponentModel;
 
 namespace Bangumi.Api.Models
 {
-    public interface ICollectionStatus
+    public interface ICollectionStatus : INotifyPropertyChanged
     {
         /// <summary>
         /// 用来保存当前用户的收藏状态

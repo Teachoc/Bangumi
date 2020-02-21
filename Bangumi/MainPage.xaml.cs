@@ -69,6 +69,8 @@ namespace Bangumi
             OnPropertyChanged(nameof(CanGoBack));
         }
 
+        public bool IsOffline => NetworkHelper.IsOffline;
+
         private bool _canGoBack;
         public bool CanGoBack
         {
@@ -110,6 +112,8 @@ namespace Bangumi
             RefreshButton.Click += (sender, e) => (ContentFrame.Content as IPageStatus)?.Refresh();
             SearchButton.Click += (sender, e) => NavigateToPage(typeof(SearchPage), null, new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromRight });
             SettingButton.Click += (sender, e) => NavigateToPage(typeof(SettingsPage), null, new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromRight });
+
+            NetworkHelper.NetworkChanged += (sender, e) => OnPropertyChanged(nameof(IsOffline));
 
             // 初始化 Api 对象
             BangumiApi.Init(ApplicationData.Current.LocalFolder.Path,
@@ -205,10 +209,17 @@ namespace Bangumi
         {
             AvaterImage.ImageSource = null;
             BitmapImage img;
-            if (BangumiApi.BgmOAuth.IsLogin)
+            if (BangumiApi.BgmOAuth.IsLogin && !NetworkHelper.IsOffline)
             {
-                var user = await BangumiApi.BgmApi.User();
-                img = new BitmapImage(new Uri(user.Avatar?.Medium ?? Constants.NoAvatarImgUri));
+                try
+                {
+                    var user = await BangumiApi.BgmApi.User();
+                    img = new BitmapImage(new Uri(user.Avatar.Small));
+                }
+                catch (Exception)
+                {
+                    img = new BitmapImage(new Uri(Constants.NoAvatarImgUri));
+                }
             }
             else
             {

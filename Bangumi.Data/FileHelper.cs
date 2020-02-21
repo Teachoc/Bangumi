@@ -30,10 +30,12 @@ namespace Bangumi.Data
         /// <returns></returns>
         public static async Task WriteTextAsync(string filePath, string data)
         {
-            using (var writer = File.CreateText(filePath))
+            var tempFile = filePath + ".temp";
+            using (var writer = File.CreateText(tempFile))
             {
                 await writer.WriteAsync(data).ConfigureAwait(false);
             }
+            File.Replace(tempFile, filePath, null);
         }
 
         /// <summary>

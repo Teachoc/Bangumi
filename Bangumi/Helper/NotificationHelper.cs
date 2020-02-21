@@ -13,7 +13,7 @@ namespace Bangumi.Helper
                     color = "#4caf50";
                     break;
                 case NotifyType.Warn:
-                    color = "#f44336";
+                    color = "#ffae22";
                     break;
                 case NotifyType.Error:
                     color = "#f44336";

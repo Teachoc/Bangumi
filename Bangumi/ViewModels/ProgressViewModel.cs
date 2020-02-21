@@ -4,7 +4,6 @@ using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.ContentDialogs;
 using Bangumi.Data;
-using Bangumi.Facades;
 using Bangumi.Helper;
 using System;
 using System.Collections.Generic;
@@ -41,6 +40,10 @@ namespace Bangumi.ViewModels
         /// </summary>
         public async Task PopulateWatchingListAsync()
         {
+            if (NetworkHelper.IsOffline)
+            {
+                return;
+            }
             try
             {
                 IsLoading = true;
@@ -101,7 +104,7 @@ namespace Bangumi.ViewModels
             }
             catch (Exception e)
             {
-                NotificationHelper.Notify("获取收视进度失败！\n" + e.Message + e.StackTrace,
+                NotificationHelper.Notify("获取收视进度失败！\n" + e.Message,
                                           NotificationHelper.NotifyType.Error);
             }
             finally
@@ -120,6 +123,11 @@ namespace Bangumi.ViewModels
         /// </summary>
         public async Task EditCollectionStatus(WatchProgress item)
         {
+            if (NetworkHelper.IsOffline)
+            {
+                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                return;
+            }
             var subjectStatus = BangumiApi.BgmApi.Status(item.SubjectId.ToString());
             CollectionEditContentDialog collectionEditContentDialog = new CollectionEditContentDialog(
                 item.Type, subjectStatus)
@@ -131,15 +139,23 @@ namespace Bangumi.ViewModels
                 collectionEditContentDialog.CollectionStatus != null)
             {
                 item.IsUpdating = true;
-                if (await BangumiFacade.UpdateCollectionStatusAsync(item.SubjectId.ToString(),
-                                                                    collectionEditContentDialog.CollectionStatus.Value,
-                                                                    collectionEditContentDialog.Comment,
-                                                                    collectionEditContentDialog.Rate.ToString(),
-                                                                    collectionEditContentDialog.Privacy ? "1" : "0")
-                    && collectionEditContentDialog.CollectionStatus != CollectionStatusType.Do)
+                try
                 {
-                    // 若修改后状态不是在看，则从进度页面删除
-                    WatchingCollection.Remove(item);
+                    var collectionStatusE = await BangumiApi.BgmApi.UpdateStatus(item.SubjectId.ToString(),
+                        collectionEditContentDialog.CollectionStatus.Value,
+                        collectionEditContentDialog.Comment,
+                        collectionEditContentDialog.Rate.ToString(),
+                        collectionEditContentDialog.Privacy ? "1" : "0");
+                    if (collectionStatusE.Status.Id != CollectionStatusType.Do)
+                    {
+                        // 若修改后状态不是在看，则从进度页面删除
+                        WatchingCollection.Remove(item);
+                    }
+                }
+                catch (Exception e)
+                {
+                    NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
+                                              NotificationHelper.NotifyType.Error);
                 }
                 item.IsUpdating = false;
             }
@@ -275,19 +291,7 @@ namespace Bangumi.ViewModels
                     .ThenBy(p => p.WatchedEpsCount == 0)
                     .ThenBy(p => p.AirEpsCount - p.WatchedEpsCount)
                     .ThenBy(p => p.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate)
-                    .ThenBy(p =>
-                    {
-                        if (DateTime.TryParse(p.AirTime, out var airTime))
-                        {
-                            var first = p.Eps?.FirstOrDefault(ep => ep.Type == EpisodeType.本篇)?.AirDate;
-                            var last = p.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate;
-                            if (first != null && last != null)
-                            {
-                                return airTime.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks);
-                            }
-                        }
-                        return airTime;
-                    });
+                    .ThenBy(p => p.AirTime);
             }
             return watchingStatuses.OrderByDescending(w => w.LastTouch);
         }
@@ -383,10 +387,7 @@ namespace Bangumi.ViewModels
             SubjectId = w.SubjectId,
             Url = w.Subject.Url,
             LastTouch = w.LastTouch, // 该条目上次修改时间
-            AirTime = SettingHelper.UseBangumiDataAirTime
-                    ? BangumiData.GetAirTimeByBangumiId(w.SubjectId.ToString())?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
-                    ?? w.Subject.AirDate
-                    : w.Subject.AirDate,
+            AirTime = w.Subject.AirDate,
             Type = w.Subject.Type,
             IsUpdating = false,
         };
@@ -399,6 +400,31 @@ namespace Bangumi.ViewModels
                 foreach (var ep in subject.Eps)
                 {
                     Eps.Add(EpisodeForSort.FromEpisode(ep));
+                }
+            }
+            var first = Eps?.FirstOrDefault(ep => ep.Type == EpisodeType.本篇)?.AirDate;
+            var last = Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate;
+            if (SettingHelper.UseBangumiDataAirTime &&
+                BangumiData.GetAirTimeByBangumiId(subject.Id.ToString())?.ToLocalTime() is DateTimeOffset date)
+            {
+                if (first != null && last != null)
+                {
+                    AirTime = date.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks).ToString("yyyy-MM-dd HH:mm");
+                }
+                else
+                {
+                    AirTime = date.ToString("yyyy-MM-dd HH:mm");
+                }
+            }
+            else if (DateTime.TryParse(AirTime, out var airDate))
+            {
+                if (first != null && last != null)
+                {
+                    AirTime = airDate.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks).ToString("yyyy-MM-dd");
+                }
+                else
+                {
+                    AirTime = airDate.ToString("yyyy-MM-dd");
                 }
             }
         }
@@ -421,18 +447,40 @@ namespace Bangumi.ViewModels
         /// </summary>
         public async Task MarkNextEpWatched()
         {
+            if (NetworkHelper.IsOffline)
+            {
+                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                return;
+            }
             if (NextEp == null)
             {
                 return;
             }
-            IsUpdating = true;
             var next = NextEp;
-            if (await BangumiFacade.UpdateProgressAsync(next.Id.ToString(), EpStatusType.watched))
+            try
             {
-                next.EpStatus = EpStatusType.watched;
-                LastTouch = DateTime.Now.ToJsTick();
+                IsUpdating = true;
+                if (await BangumiApi.BgmApi.UpdateProgress(next.Id.ToString(), EpStatusType.watched))
+                {
+                    next.EpStatus = EpStatusType.watched;
+                    LastTouch = DateTime.Now.ToJsTick();
+                    NotificationHelper.Notify($"标记 ep.{next.Sort} {Converters.StringOneOrTwo(next.NameCn, next.Name)} {EpStatusType.watched.GetCnName()}成功");
+                }
+                else
+                {
+                    NotificationHelper.Notify($"标记 ep.{next.Sort} {Converters.StringOneOrTwo(next.NameCn, next.Name)} {EpStatusType.watched.GetCnName()}失败，请重试！",
+                                              NotificationHelper.NotifyType.Warn);
+                }
             }
-            IsUpdating = false;
+            catch (Exception e)
+            {
+                NotificationHelper.Notify($"标记 ep.{next.Sort} {Converters.StringOneOrTwo(next.NameCn, next.Name)} {EpStatusType.watched.GetCnName()}失败！\n错误信息：{e.Message}",
+                                          NotificationHelper.NotifyType.Error);
+            }
+            finally
+            {
+                IsUpdating = false;
+            }
         }
 
 

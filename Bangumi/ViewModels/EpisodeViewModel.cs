@@ -3,7 +3,6 @@ using Bangumi.Api.Common;
 using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.ContentDialogs;
-using Bangumi.Facades;
 using Bangumi.Helper;
 using System;
 using System.Collections.Generic;
@@ -163,6 +162,11 @@ namespace Bangumi.ViewModels
         /// </summary>
         public async Task EditCollectionStatus()
         {
+            if (NetworkHelper.IsOffline)
+            {
+                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                return;
+            }
             if (!BangumiApi.BgmOAuth.IsLogin)
             {
                 return;
@@ -179,22 +183,36 @@ namespace Bangumi.ViewModels
             {
                 IsUpdating = true;
                 IsStatusLoading = true;
-                if (await BangumiFacade.UpdateCollectionStatusAsync(SubjectId,
-                    collectionEditContentDialog.CollectionStatus.Value, collectionEditContentDialog.Comment,
-                    collectionEditContentDialog.Rate.ToString(), collectionEditContentDialog.Privacy ? "1" : "0"))
+                try
                 {
-                    SetCollectionStatus(collectionEditContentDialog.CollectionStatus);
+                    var collectionStatusE = await BangumiApi.BgmApi.UpdateStatus(SubjectId,
+                        collectionEditContentDialog.CollectionStatus.Value,
+                        collectionEditContentDialog.Comment,
+                        collectionEditContentDialog.Rate.ToString(),
+                        collectionEditContentDialog.Privacy ? "1" : "0");
+                    SetCollectionStatus(collectionStatusE.Status.Id);
                     // 若状态修改为看过，且设置启用，则批量修改正片章节状态为看过
-                    if (_collectionStatus == CollectionStatusType.Collect && SettingHelper.EpsBatch)
+                    if (collectionStatusE.Status.Id == CollectionStatusType.Collect && SettingHelper.EpsBatch)
                     {
                         var selectedEps = GroupedEps.SelectMany(g => g.Where(ep => ep.Type == EpisodeType.本篇 && ep.EpStatus == EpStatusType.remove));
                         int epId = selectedEps.LastOrDefault()?.Id ?? 0;
                         string epsId = string.Join(',', selectedEps.Select(it => it.Id));
-                        if (!string.IsNullOrEmpty(epsId) && await BangumiFacade.UpdateProgressBatchAsync(epId, epsId))
+                        if (!string.IsNullOrEmpty(epsId))
                         {
-                            foreach (var episode in selectedEps)
+                            try
                             {
-                                episode.EpStatus = EpStatusType.watched;
+                                if (await BangumiApi.BgmApi.UpdateProgressBatch(epId, epsId))
+                                {
+                                    foreach (var episode in selectedEps)
+                                    {
+                                        episode.EpStatus = EpStatusType.watched;
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                NotificationHelper.Notify("批量标记章节状态失败！\n错误信息：" + e.Message,
+                                                          NotificationHelper.NotifyType.Error);
                             }
                         }
                         else
@@ -202,6 +220,11 @@ namespace Bangumi.ViewModels
                             NotificationHelper.Notify("无章节需要更新");
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
+                                              NotificationHelper.NotifyType.Error);
                 }
                 IsStatusLoading = false;
                 IsUpdating = false;
@@ -216,14 +239,36 @@ namespace Bangumi.ViewModels
         /// <param name="status">状态</param>
         public async Task UpdateEpStatus(EpisodeWithEpStatus ep, EpStatusType status)
         {
+            if (NetworkHelper.IsOffline)
+            {
+                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                return;
+            }
             if (ep != null)
             {
-                IsUpdating = true;
-                if (await BangumiFacade.UpdateProgressAsync(ep.Id.ToString(), status))
+                try
                 {
-                    ep.EpStatus = status;
+                    IsUpdating = true;
+                    if (await BangumiApi.BgmApi.UpdateProgress(ep.Id.ToString(), status))
+                    {
+                        ep.EpStatus = status;
+                        NotificationHelper.Notify($"标记 ep.{ep.Sort} {Converters.StringOneOrTwo(ep.NameCn, ep.Name)} {status.GetCnName()}成功");
+                    }
+                    else
+                    {
+                        NotificationHelper.Notify($"标记 ep.{ep.Sort} {Converters.StringOneOrTwo(ep.NameCn, ep.Name)} {status.GetCnName()}失败，请重试！",
+                                                  NotificationHelper.NotifyType.Warn);
+                    }
                 }
-                IsUpdating = false;
+                catch (Exception e)
+                {
+                    NotificationHelper.Notify($"标记 ep.{ep.Sort} {Converters.StringOneOrTwo(ep.NameCn, ep.Name)} {status.GetCnName()}失败！\n错误信息：{e.Message}",
+                                              NotificationHelper.NotifyType.Error);
+                }
+                finally
+                {
+                    IsUpdating = false;
+                }
             }
         }
 
@@ -233,6 +278,11 @@ namespace Bangumi.ViewModels
         /// <param name="ep"></param>
         public async Task UpdateEpStatusBatch(EpisodeWithEpStatus ep)
         {
+            if (NetworkHelper.IsOffline)
+            {
+                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                return;
+            }
             if (ep == null)
             {
                 return;
@@ -240,11 +290,22 @@ namespace Bangumi.ViewModels
             IsUpdating = true;
             var selectedEps = GetSelectedEps();
             string epsId = string.Join(',', selectedEps.Select(it => it.Id.ToString()));
-            if (!string.IsNullOrEmpty(epsId) && await BangumiFacade.UpdateProgressBatchAsync(ep.Id, epsId))
+            if (!string.IsNullOrEmpty(epsId))
             {
-                foreach (var episode in selectedEps)
+                try
                 {
-                    episode.EpStatus = EpStatusType.watched;
+                    if (await BangumiApi.BgmApi.UpdateProgressBatch(ep.Id, epsId))
+                    {
+                        foreach (var episode in selectedEps)
+                        {
+                            episode.EpStatus = EpStatusType.watched;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    NotificationHelper.Notify("批量标记章节状态失败！\n错误信息：" + e.Message,
+                                              NotificationHelper.NotifyType.Error);
                 }
             }
             else
@@ -276,6 +337,13 @@ namespace Bangumi.ViewModels
         /// </summary>
         public async Task LoadDetails()
         {
+            if (NetworkHelper.IsOffline)
+            {
+                ProcessSubject(BangumiApi.BgmCache.Subject(SubjectId));
+                ProcessProgress(BangumiApi.BgmCache.Progress(SubjectId));
+                SetCollectionStatus(BangumiApi.BgmCache.Status(SubjectId)?.Status?.Id);
+                return;
+            }
             if (IsLoading)
             {
                 return;

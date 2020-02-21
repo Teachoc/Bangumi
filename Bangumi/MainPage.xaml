@@ -43,6 +43,12 @@
             </muxc:NavigationView.MenuItems>
             <muxc:NavigationView.PaneFooter>
                 <StackPanel Orientation="Horizontal">
+                    <AppBarButton x:Name="NetworkErrorButton" 
+                                  Width="48" 
+                                  Visibility="{x:Bind IsOffline, Mode=OneWay}"
+                                  ToolTipService.ToolTip="网络异常">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7BA;" />
+                    </AppBarButton>
                     <AppBarButton x:Name="RefreshButton" 
                                   Width="48" 
                                   Visibility="{x:Bind IsRefreshable, Mode=OneWay}"
@@ -106,6 +112,7 @@
                         <AdaptiveTrigger MinWindowWidth="0"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
+                        <Setter Target="NetworkErrorButton.Width" Value="36"/>
                         <Setter Target="RefreshButton.Width" Value="36"/>
                         <Setter Target="SearchButton.Width" Value="36"/>
                         <Setter Target="LoginButton.Width" Value="36"/>
@@ -117,6 +124,7 @@
                         <AdaptiveTrigger MinWindowWidth="420"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
+                        <Setter Target="NetworkErrorButton.Width" Value="48"/>
                         <Setter Target="RefreshButton.Width" Value="48"/>
                         <Setter Target="SearchButton.Width" Value="48"/>
                         <Setter Target="LoginButton.Width" Value="48"/>
