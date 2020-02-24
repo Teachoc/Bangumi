@@ -38,10 +38,6 @@ namespace Bangumi.Api
                 _bgmOAuth = new BgmOAuth(localFolder, _bgmCache);
                 _bgmApi = new BgmApi(_bgmCache, _bgmOAuth);
             }
-            else
-            {
-                throw new InvalidOperationException("BangumiApi can't init twice!");
-            }
         }
     }
 }
