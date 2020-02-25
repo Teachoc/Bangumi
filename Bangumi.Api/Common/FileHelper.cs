@@ -68,6 +68,10 @@ namespace Bangumi.Api.Common
         {
             try
             {
+                if (!File.Exists(filePath))
+                {
+                    using var f = File.Create(filePath);
+                }
                 var encryptedData = await EncryptionAsync(data);
                 var tempFile = filePath + ".temp";
                 using (var writer = File.Create(tempFile))
