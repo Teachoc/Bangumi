@@ -1,4 +1,6 @@
-﻿namespace Bangumi.Api.Models
+﻿using System;
+
+namespace Bangumi.Api.Models
 {
     public static class SubjectTypeExtension
     {
@@ -30,6 +32,24 @@
                 SubjectType.Game => "game",
                 SubjectType.Real => "real",
                 _ => type.ToString().ToLower(),
+            };
+        }
+
+        /// <summary>
+        /// 条目类型枚举
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static SubjectType ToSubjectType(this string type)
+        {
+            return type switch
+            {
+                "book" => SubjectType.Book,
+                "anime" => SubjectType.Anime,
+                "music" => SubjectType.Music,
+                "game" => SubjectType.Game,
+                "real" => SubjectType.Real,
+                _ => throw new Exception("No such enum.")
             };
         }
     }

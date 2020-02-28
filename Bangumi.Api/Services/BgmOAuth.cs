@@ -13,10 +13,9 @@ namespace Bangumi.Api.Services
     public class BgmOAuth : IBgmOAuth
     {
         public const string OAuthHOST = "https://bgm.tv/oauth";
-        // 将自己申请的应用相关信息填入
-        public const string ClientId = "bgm8905c514a1b94ec1";
-        public const string ClientSecret = "b678c34dd896203627da308b6b453775";
-        public const string RedirectUrl = "BangumiGithubVersion";
+        public string ClientId { get; private set; }
+        public string ClientSecret { get; private set; }
+        public string RedirectUrl { get; private set; }
 
         private const int RetryCount = 3;
         private readonly string _localFolder;
@@ -41,10 +40,13 @@ namespace Bangumi.Api.Services
 
         public AccessToken MyToken { get; private set; }
 
-        public BgmOAuth(string localFolder, IBgmCache bgmCache)
+        public BgmOAuth(string localFolder, IBgmCache bgmCache, string clientId, string clientSecret, string redirectUrl)
         {
             _localFolder = localFolder ?? throw new ArgumentNullException(nameof(localFolder));
             _bgmCache = bgmCache ?? throw new ArgumentNullException(nameof(bgmCache));
+            ClientId = clientId;
+            ClientSecret = clientSecret;
+            RedirectUrl = redirectUrl;
 
             Task.Run(async () =>
             {

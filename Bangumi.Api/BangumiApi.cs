@@ -20,22 +20,41 @@ namespace Bangumi.Api
         /// <summary>
         /// 初始化 Api
         /// </summary>
+        /// <param name="clientId">App ID</param>
+        /// <param name="clientSecret">App Secret</param>
+        /// <param name="redirectUrl">回调地址</param>
         /// <param name="localFolder">本地文件夹</param>
         /// <param name="cacheFolder">缓存文件夹</param>
         /// <param name="encryptionDelegate">加密方法</param>
         /// <param name="decryptionDelegate">解密方法</param>
         public static void Init(
+            string clientId,
+            string clientSecret,
+            string redirectUrl,
             string localFolder,
             string cacheFolder,
             Func<string, Task<byte[]>> encryptionDelegate,
             Func<byte[], Task<string>> decryptionDelegate)
         {
+            if (string.IsNullOrEmpty(clientId))
+            {
+                throw new ArgumentNullException(nameof(clientId));
+            }
+            if (string.IsNullOrEmpty(clientSecret))
+            {
+                throw new ArgumentNullException(nameof(clientSecret));
+            }
+            if (string.IsNullOrEmpty(redirectUrl))
+            {
+                throw new ArgumentNullException(nameof(redirectUrl));
+            }
             FileHelper.EncryptionAsync = encryptionDelegate ?? throw new ArgumentNullException(nameof(encryptionDelegate));
             FileHelper.DecryptionAsync = decryptionDelegate ?? throw new ArgumentNullException(nameof(decryptionDelegate));
+
             if (_bgmCache == null && _bgmApi == null)
             {
                 _bgmCache = new BgmCache(cacheFolder);
-                _bgmOAuth = new BgmOAuth(localFolder, _bgmCache);
+                _bgmOAuth = new BgmOAuth(localFolder, _bgmCache, clientId, clientSecret, redirectUrl);
                 _bgmApi = new BgmApi(_bgmCache, _bgmOAuth);
             }
         }

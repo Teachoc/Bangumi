@@ -103,7 +103,7 @@ namespace Bangumi.Api.Services
             CollectionE result = (await $"{HOST}/user/{_bgmOAuth.MyToken.UserId}/collections/{subjectType.GetValue()}"
                 .SetQueryParams(new
                 {
-                    app_id = BgmOAuth.ClientId,
+                    app_id = _bgmOAuth.ClientId,
                     max_results = 25
                 })
                 .GetAsync()
@@ -149,6 +149,20 @@ namespace Bangumi.Api.Services
                     ep.NameCn = System.Net.WebUtility.HtmlDecode(ep.NameCn);
                 }
             }
+            if (result.Characters != null)
+            {
+                foreach (var crt in result.Characters)
+                {
+                    crt.Images?.ConvertImageHttpToHttps();
+                }
+            }
+            if (result.Staff != null)
+            {
+                foreach (var person in result.Staff)
+                {
+                    person.Images?.ConvertImageHttpToHttps();
+                }
+            }
             if (result.Blogs != null)
             {
                 // 将多个换行符替换为一个，并清除多余的空格
@@ -157,6 +171,7 @@ namespace Bangumi.Api.Services
                 {
                     blog.Title = System.Net.WebUtility.HtmlDecode(blog.Title);
                     blog.Summary = regex.Replace(System.Net.WebUtility.HtmlDecode(blog.Summary), Environment.NewLine).Trim();
+                    blog.User?.Avatar?.ConvertImageHttpToHttps();
                 }
             }
             if (result.Topics != null)
