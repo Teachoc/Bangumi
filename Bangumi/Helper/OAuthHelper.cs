@@ -17,33 +17,33 @@ namespace Bangumi.Helper
         {
             try
             {
-                string url = $"{BgmOAuth.OAuthHOST}/authorize?client_id={BgmOAuth.ClientId}&response_type=code";
+                string url = $"{BgmOAuth.OAuthHOST}/authorize?client_id={BangumiApi.BgmOAuth.ClientId}&response_type=code";
 
                 Uri startUri = new Uri(url);
                 // When using the desktop flow, the success code is displayed in the html title of this end uri
-                Uri endUri = new Uri($"{BgmOAuth.OAuthHOST}/{BgmOAuth.RedirectUrl}");
+                Uri endUri = new Uri($"{BgmOAuth.OAuthHOST}/{BangumiApi.BgmOAuth.RedirectUrl}");
 
                 //rootPage.NotifyUser("Navigating to: " + GoogleURL, NotifyType.StatusMessage);
 
                 WebAuthenticationResult webAuthenticationResult = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, startUri, endUri);
                 if (webAuthenticationResult.ResponseStatus == WebAuthenticationStatus.Success)
                 {
-                    await BangumiApi.BgmOAuth.GetToken(webAuthenticationResult.ResponseData.Replace($"{BgmOAuth.OAuthHOST}/{BgmOAuth.RedirectUrl}?code=", ""));
+                    await BangumiApi.BgmOAuth.GetToken(webAuthenticationResult.ResponseData.Replace($"{BgmOAuth.OAuthHOST}/{BangumiApi.BgmOAuth.RedirectUrl}?code=", ""));
                 }
                 else if (webAuthenticationResult.ResponseStatus == WebAuthenticationStatus.ErrorHttp)
                 {
-                    NotificationHelper.Notify("HTTP Error: " + webAuthenticationResult.ResponseErrorDetail.ToString());
+                    throw new Exception("HTTP Error: " + webAuthenticationResult.ResponseErrorDetail.ToString());
                 }
                 else
                 {
-                    NotificationHelper.Notify("Error: " + webAuthenticationResult.ResponseStatus.ToString());
+                    throw new Exception("Error: " + webAuthenticationResult.ResponseStatus.ToString());
                 }
             }
             catch (Exception e)
             {
-                NotificationHelper.Notify($"登录失败，请重试！\n{e.Message}", NotificationHelper.NotifyType.Error);
                 Debug.WriteLine("换取Token失败。");
                 Debug.WriteLine(e.StackTrace);
+                throw;
             }
         }
 

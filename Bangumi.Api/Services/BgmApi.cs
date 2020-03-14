@@ -1,6 +1,5 @@
 ﻿using Bangumi.Api.Common;
 using Bangumi.Api.Exceptions;
-using Bangumi.Api.Extensions;
 using Bangumi.Api.Models;
 using Flurl;
 using Flurl.Http;
@@ -316,8 +315,8 @@ namespace Bangumi.Api.Services
         {
             var result = await $"{HOST}/ep/{ep}/status/{status}"
                 .GetAsync()
-                .ReceiveJson();
-            bool success = result.error == "OK";
+                .ReceiveString();
+            bool success = result.Contains("\"error\":\"OK\"");
             if (success)
             {
                 _bgmCache.UpdateProgress(int.Parse(ep), status);
@@ -340,8 +339,8 @@ namespace Bangumi.Api.Services
                 {
                     ep_id
                 })
-                .ReceiveJson();
-            bool success = result.error == "OK";
+                .ReceiveString();
+            bool success = result.Contains("\"error\":\"OK\"");
             if (success)
             {
                 foreach (var item in ep_id.Split(','))

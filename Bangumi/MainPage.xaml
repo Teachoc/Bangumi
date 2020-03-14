@@ -8,7 +8,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:common="using:Bangumi.Common"
     mc:Ignorable="d"
     NavigationCacheMode="Enabled"
@@ -23,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <local2:TitleBarEx x:Name="TitleBar" 
-                           Text="Bangumi"
+                           Text="Bangumi 番组计划"
                            IsBackEnabled="{x:Bind CanGoBack, Mode=OneWay}"
                            ImageVisibility="{x:Bind common:Converters.CollapsedIf(CanGoBack), Mode=OneWay}"/>
 

@@ -1,4 +1,4 @@
-﻿# Bangumi UWP
+﻿# Bangumi 番组计划
 
 一个使用 [Bangumi API](https://github.com/bangumi/api) 开发的 [Bangumi 番组计划](https://bgm.tv) 第三方 Win10 客户端。
 

@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Bangumi.Views"
     xmlns:local2="using:Bangumi.Controls.TitleBar"
+    xmlns:local3="using:Bangumi.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -46,25 +47,9 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        
-        <!--<Grid Grid.Row="0" 
-              Grid.ColumnSpan="2"
-              Height="32"
-              Name="GridTitleBar"
-              Background="Transparent">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Text="Bangumi" 
-                       VerticalAlignment="Center"  
-                       FontSize="16"
-                       Margin="10,0"
-                       TextTrimming="CharacterEllipsis"/>
-        </Grid>-->
 
         <local2:TitleBarEx Grid.ColumnSpan="2"
-                           Text="Bangumi"
+                           Text="Bangumi 番组计划"
                            IsBackEnabled="False"/>
 
         <Image Name="WelcomeImage"
@@ -99,5 +84,7 @@
                 https://bgm.tv/
             </Hyperlink>
         </TextBlock>
+        <local3:InAppNotification x:Name="NotifyControl"
+                                  Grid.Row="1"/>
     </Grid>
 </Page>

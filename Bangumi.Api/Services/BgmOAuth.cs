@@ -181,8 +181,8 @@ namespace Bangumi.Api.Services
                 }
                 catch (FlurlHttpException e)
                 {
-                    if (e.Call.HttpResponseMessage.StatusCode == HttpStatusCode.BadRequest
-                        && (await e.Call.HttpResponseMessage.Content.ReadAsStringAsync()).Contains("Invalid refresh token"))
+                    // Refresh token has expired
+                    if (e.Call.HttpResponseMessage.StatusCode == HttpStatusCode.BadRequest)
                     {
                         throw new BgmUnauthorizedException();
                     }

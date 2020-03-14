@@ -9,7 +9,6 @@
     xmlns:wuxdata="using:Windows.UI.Xaml.Data"
     xmlns:common="using:Bangumi.Common"
     xmlns:model="using:Bangumi.Api.Models"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     Loaded="Page_Loaded"
     NavigationCacheMode="Enabled"
