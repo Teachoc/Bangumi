@@ -1,6 +1,7 @@
 ﻿using Bangumi.Api.Common;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace Bangumi.Helper
 {
@@ -66,11 +67,11 @@ namespace Bangumi.Helper
                         origin.Insert(i, dest[i]);
                     }
                 }
-                NotificationHelper.Notify($"{nameof(compareCount)}: {compareCount}", NotificationHelper.NotifyType.Debug);
+                Debug.WriteLine($"{nameof(compareCount)}: {compareCount}");
                 // 若通过以上步骤无法排好序，则重置列表
                 if (!origin.SequenceEqualExT(dest))
                 {
-                    NotificationHelper.Notify($"{nameof(compareCount)}: {compareCount}\n比较失败，重置列表！", NotificationHelper.NotifyType.Debug);
+                    Debug.WriteLine("比较失败，重置列表！");
                     origin.Clear();
                     foreach (var item in dest)
                     {

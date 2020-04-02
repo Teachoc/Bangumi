@@ -3,11 +3,13 @@ using Bangumi.Api.Common;
 using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.ContentDialogs;
+using Bangumi.Controls;
 using Bangumi.Data;
 using Bangumi.Helper;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -105,7 +107,7 @@ namespace Bangumi.ViewModels
             catch (Exception e)
             {
                 NotificationHelper.Notify("获取收视进度失败！\n" + e.Message,
-                                          NotificationHelper.NotifyType.Error);
+                                          NotifyType.Error);
             }
             finally
             {
@@ -125,7 +127,7 @@ namespace Bangumi.ViewModels
         {
             if (NetworkHelper.IsOffline)
             {
-                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                NotificationHelper.Notify("无网络连接！", NotifyType.Warn);
                 return;
             }
             var subjectStatus = BangumiApi.BgmApi.Status(item.SubjectId.ToString());
@@ -155,7 +157,7 @@ namespace Bangumi.ViewModels
                 catch (Exception e)
                 {
                     NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
-                                              NotificationHelper.NotifyType.Error);
+                                              NotifyType.Error);
                 }
                 item.IsUpdating = false;
             }
@@ -217,70 +219,6 @@ namespace Bangumi.ViewModels
         }
 
         /// <summary>
-        /// 以新列表为准，将老列表改为与新列表相同
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="origin">显示的列表</param>
-        /// <param name="dest">新的列表</param>
-        private void DiffListToObservableCollection<T>(ObservableCollection<T> origin, IList<T> dest) where T : class
-        {
-            if (!origin.SequenceEqualExT(dest))
-            {
-                int compareCount = 0;
-                for (int i = 0; i < dest.Count; i++)
-                {
-                    bool insert = true;
-                    for (int j = i; j < origin.Count; j++)
-                    {
-                        compareCount++;
-                        if (dest[i].EqualsExT(origin[j]))
-                        {
-                            if (j != i)
-                            {
-                                origin.RemoveAt(j);
-                                origin.Insert(i, dest[i]);
-                            }
-                            insert = false;
-                            break;
-                        }
-                        else
-                        {
-                            bool removed = true;
-                            for (int k = j; k < dest.Count; k++)
-                            {
-                                compareCount++;
-                                if (origin[j].EqualsExT(dest[k]))
-                                {
-                                    removed = false;
-                                    break;
-                                }
-                            }
-                            if (removed)
-                            {
-                                origin.RemoveAt(j--);
-                            }
-                        }
-                    }
-                    if (insert)
-                    {
-                        origin.Insert(i, dest[i]);
-                    }
-                }
-                NotificationHelper.Notify($"{nameof(compareCount)}: {compareCount}", NotificationHelper.NotifyType.Debug);
-                // 若通过以上步骤无法排好序，则重置列表
-                if (!origin.SequenceEqualExT(dest))
-                {
-                    NotificationHelper.Notify($"{nameof(compareCount)}: {compareCount}\n比较失败，重置列表！", NotificationHelper.NotifyType.Debug);
-                    origin.Clear();
-                    foreach (var item in dest)
-                    {
-                        origin.Add(item);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// 对条目进行排序
         /// </summary>
         private IEnumerable<WatchProgress> SortWatchProgress(IEnumerable<WatchProgress> watchingStatuses)
@@ -289,7 +227,7 @@ namespace Bangumi.ViewModels
             {
                 return watchingStatuses.OrderBy(p => p.EpColor)
                     .ThenBy(p => p.WatchedEpsCount == 0)
-                    .ThenBy(p => p.AirEpsCount - p.WatchedEpsCount)
+                    //.ThenBy(p => p.AirEpsCount - p.WatchedEpsCount) //尝试不依靠已放送章节数与已观看章节数之差排序
                     .ThenBy(p => p.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate)
                     .ThenBy(p => p.AirTime);
             }
@@ -449,7 +387,7 @@ namespace Bangumi.ViewModels
         {
             if (NetworkHelper.IsOffline)
             {
-                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                NotificationHelper.Notify("无网络连接！", NotifyType.Warn);
                 return;
             }
             if (NextEp == null)
@@ -469,13 +407,13 @@ namespace Bangumi.ViewModels
                 else
                 {
                     NotificationHelper.Notify($"标记 ep.{next.Sort} {Converters.StringOneOrTwo(next.NameCn, next.Name)} {EpStatusType.watched.GetCnName()}失败，请重试！",
-                                              NotificationHelper.NotifyType.Warn);
+                                              NotifyType.Warn);
                 }
             }
             catch (Exception e)
             {
                 NotificationHelper.Notify($"标记 ep.{next.Sort} {Converters.StringOneOrTwo(next.NameCn, next.Name)} {EpStatusType.watched.GetCnName()}失败！\n错误信息：{e.Message}",
-                                          NotificationHelper.NotifyType.Error);
+                                          NotifyType.Error);
             }
             finally
             {
@@ -498,7 +436,6 @@ namespace Bangumi.ViewModels
                    Type == w.Type &&
                    AirTime == w.AirTime &&
                    IsUpdating == w.IsUpdating &&
-                   AirEpsCount == w.AirEpsCount &&
                    Name.EqualsExT(w.Name) &&
                    NameCn.EqualsExT(w.NameCn) &&
                    Url.EqualsExT(w.Url) &&
@@ -509,7 +446,7 @@ namespace Bangumi.ViewModels
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return (int)(SubjectId + LastTouch % 1000000000) - AirEpsCount;
+            return base.GetHashCode();
         }
     }
 

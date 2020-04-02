@@ -2,6 +2,7 @@
 using Bangumi.Api.Common;
 using Bangumi.Api.Models;
 using Bangumi.Common;
+using Bangumi.Controls;
 using Bangumi.Helper;
 using System;
 using System.Collections.Generic;
@@ -51,7 +52,7 @@ namespace Bangumi.ViewModels
         {
             if (NetworkHelper.IsOffline)
             {
-                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                NotificationHelper.Notify("无网络连接！", NotifyType.Warn);
                 return;
             }
             if (subject != null)
@@ -65,7 +66,7 @@ namespace Bangumi.ViewModels
                 catch (Exception e)
                 {
                     NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
-                                              NotificationHelper.NotifyType.Error);
+                                              NotifyType.Error);
                 }
                 IsUpdating = false;
             }
@@ -97,7 +98,7 @@ namespace Bangumi.ViewModels
             catch (Exception e)
             {
                 NotificationHelper.Notify("获取时间表失败！\n" + e.Message.Replace("\r\n\r\n", "\r\n").TrimEnd('\n').TrimEnd('\r'),
-                                          NotificationHelper.NotifyType.Error);
+                                          NotifyType.Error);
                 Debug.WriteLine(e.Message);
             }
             finally

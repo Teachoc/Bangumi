@@ -1,7 +1,6 @@
 ﻿using Bangumi.Api;
 using Bangumi.Helper;
 using System;
-using System.Diagnostics;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -49,7 +48,8 @@ namespace Bangumi.Views
             }
             catch (Exception ex)
             {
-                NotificationHelper.Notify($"登录失败，请重试！\n{ex.Message}", NotificationHelper.NotifyType.Error);
+                await NotifyControl.AddNotification($"登录失败，请重试！\n{ex.Message}", Controls.NotifyType.Error);
+                //NotificationHelper.Notify($"登录失败，请重试！\n{ex.Message}", NotificationHelper.NotifyType.Error);
             }
             finally
             {

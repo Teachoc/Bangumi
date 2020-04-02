@@ -1,6 +1,7 @@
 ﻿using Bangumi.Api;
 using Bangumi.Api.Models;
 using Bangumi.Common;
+using Bangumi.Controls;
 using Bangumi.Helper;
 using Microsoft.Toolkit.Uwp.Helpers;
 using System;
@@ -167,7 +168,7 @@ namespace Bangumi.ViewModels
         {
             if (NetworkHelper.IsOffline)
             {
-                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                NotificationHelper.Notify("无网络连接！", NotifyType.Warn);
                 return;
             }
             if (subject != null)
@@ -181,7 +182,7 @@ namespace Bangumi.ViewModels
                 catch (Exception e)
                 {
                     NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
-                                              NotificationHelper.NotifyType.Error);
+                                              NotifyType.Error);
                 }
                 IsUpdating = false;
             }
@@ -259,7 +260,7 @@ namespace Bangumi.ViewModels
                     catch (Exception e)
                     {
                         NotificationHelper.Notify("获取搜索结果失败！\n" + e.Message.Replace("\r\n\r\n", "\r\n").TrimEnd('\n').TrimEnd('\r'),
-                                                  NotificationHelper.NotifyType.Error);
+                                                  NotifyType.Error);
                         offset = max;
                     }
                     finally

@@ -1,5 +1,6 @@
 ﻿using Bangumi.Api;
 using Bangumi.Common;
+using Bangumi.Controls;
 using Bangumi.Data;
 using Bangumi.Helper;
 using System;
@@ -299,11 +300,11 @@ namespace Bangumi.ViewModels
             {
                 if (hasNew)
                 {
-                    NotificationHelper.Notify("数据下载失败，请重试或稍后再试！", NotificationHelper.NotifyType.Error);
+                    NotificationHelper.Notify("数据下载失败，请重试或稍后再试！", NotifyType.Error);
                 }
                 else
                 {
-                    NotificationHelper.Notify("获取最新版本失败！", NotificationHelper.NotifyType.Error);
+                    NotificationHelper.Notify("获取最新版本失败！", NotifyType.Error);
                 }
             }
             BangumiDataStatus = "检查更新";

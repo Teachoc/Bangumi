@@ -3,6 +3,7 @@ using Bangumi.Api.Common;
 using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.ContentDialogs;
+using Bangumi.Controls;
 using Bangumi.Helper;
 using System;
 using System.Collections.Generic;
@@ -164,7 +165,7 @@ namespace Bangumi.ViewModels
         {
             if (NetworkHelper.IsOffline)
             {
-                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                NotificationHelper.Notify("无网络连接！", NotifyType.Warn);
                 return;
             }
             if (!BangumiApi.BgmOAuth.IsLogin)
@@ -212,7 +213,7 @@ namespace Bangumi.ViewModels
                             catch (Exception e)
                             {
                                 NotificationHelper.Notify("批量标记章节状态失败！\n错误信息：" + e.Message,
-                                                          NotificationHelper.NotifyType.Error);
+                                                          NotifyType.Error);
                             }
                         }
                         else
@@ -224,7 +225,7 @@ namespace Bangumi.ViewModels
                 catch (Exception e)
                 {
                     NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
-                                              NotificationHelper.NotifyType.Error);
+                                              NotifyType.Error);
                 }
                 IsStatusLoading = false;
                 IsUpdating = false;
@@ -241,7 +242,7 @@ namespace Bangumi.ViewModels
         {
             if (NetworkHelper.IsOffline)
             {
-                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                NotificationHelper.Notify("无网络连接！", NotifyType.Warn);
                 return;
             }
             if (ep != null)
@@ -257,13 +258,13 @@ namespace Bangumi.ViewModels
                     else
                     {
                         NotificationHelper.Notify($"标记 ep.{ep.Sort} {Converters.StringOneOrTwo(ep.NameCn, ep.Name)} {status.GetCnName()}失败，请重试！",
-                                                  NotificationHelper.NotifyType.Warn);
+                                                  NotifyType.Warn);
                     }
                 }
                 catch (Exception e)
                 {
                     NotificationHelper.Notify($"标记 ep.{ep.Sort} {Converters.StringOneOrTwo(ep.NameCn, ep.Name)} {status.GetCnName()}失败！\n错误信息：{e.Message}",
-                                              NotificationHelper.NotifyType.Error);
+                                              NotifyType.Error);
                 }
                 finally
                 {
@@ -280,7 +281,7 @@ namespace Bangumi.ViewModels
         {
             if (NetworkHelper.IsOffline)
             {
-                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                NotificationHelper.Notify("无网络连接！", NotifyType.Warn);
                 return;
             }
             if (ep == null)
@@ -305,7 +306,7 @@ namespace Bangumi.ViewModels
                 catch (Exception e)
                 {
                     NotificationHelper.Notify("批量标记章节状态失败！\n错误信息：" + e.Message,
-                                              NotificationHelper.NotifyType.Error);
+                                              NotifyType.Error);
                 }
             }
             else
@@ -380,7 +381,7 @@ namespace Bangumi.ViewModels
             catch (Exception e)
             {
                 NotificationHelper.Notify("加载详情失败！\n" + e.Message.Replace("\r\n\r\n", "\r\n").TrimEnd('\n').TrimEnd('\r'),
-                                          NotificationHelper.NotifyType.Error);
+                                          NotifyType.Error);
             }
             finally
             {

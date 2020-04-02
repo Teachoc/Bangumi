@@ -1,21 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Toolkit.Uwp.Helpers;
+using System;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using System.Timers;
-using Microsoft.Toolkit.Uwp.Helpers;
 using System.Threading.Tasks;
+using System.Timers;
+using Windows.UI.Xaml.Controls;
 
 //https://go.microsoft.com/fwlink/?LinkId=234236 上介绍了“用户控件”项模板
 
@@ -47,7 +35,7 @@ namespace Bangumi.Controls
             }
         }
 
-        public async Task AddNotification(string msg, string color)
+        public async Task AddNotification(string msg, NotifyType notifyType = NotifyType.Message)
         {
             if (!_timer.Enabled)
             {
@@ -59,12 +47,23 @@ namespace Bangumi.Controls
             {
                 Notifies.Add(new NotifyMessage
                 {
-                    Color = color,
+                    Color = GetColor(notifyType),
                     Message = msg,
                     ExpiresIn = now - _lastMessage
                 });
             });
             _lastMessage = now;
+
+            string GetColor(NotifyType notifyType)
+            {
+                return notifyType switch
+                {
+                    NotifyType.Message => "#4caf50",
+                    NotifyType.Warn => "#ffae22",
+                    NotifyType.Error => "#f44336",
+                    _ => "#4caf50",
+                };
+            }
         }
     }
 
@@ -74,4 +73,11 @@ namespace Bangumi.Controls
         public string Message { get; set; }
         public TimeSpan ExpiresIn { get; set; }
     }
+    public enum NotifyType
+    {
+        Message,
+        Warn,
+        Error,
+    }
+
 }

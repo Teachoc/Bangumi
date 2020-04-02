@@ -1,5 +1,6 @@
 ﻿using Bangumi.Api;
 using Bangumi.Api.Models;
+using Bangumi.Controls;
 using Bangumi.Helper;
 using Bangumi.ViewModels;
 using System.Timers;
@@ -104,7 +105,7 @@ namespace Bangumi.Views
         {
             if (NetworkHelper.IsOffline)
             {
-                NotificationHelper.Notify("无网络连接！", NotificationHelper.NotifyType.Warn);
+                NotificationHelper.Notify("无网络连接！", NotifyType.Warn);
                 return;
             }
             if (string.IsNullOrEmpty(ViewModel.SearchText))
