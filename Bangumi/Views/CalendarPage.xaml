@@ -61,6 +61,7 @@
                                         <Setter Target="RankTextBlock.FontSize" Value="12"/>
                                         <Setter Target="DoingTextBlock.FontSize" Value="12"/>
                                         <Setter Target="RateTextBlock.FontSize" Value="16"/>
+                                        <Setter Target="RatingCountTextBlock.FontSize" Value="12"/>
                                     </VisualState.Setters>
                                 </VisualState>
                                 <VisualState x:Name="Wide">
@@ -79,6 +80,7 @@
                                         <Setter Target="RankTextBlock.FontSize" Value="16"/>
                                         <Setter Target="DoingTextBlock.FontSize" Value="16"/>
                                         <Setter Target="RateTextBlock.FontSize" Value="20"/>
+                                        <Setter Target="RatingCountTextBlock.FontSize" Value="16"/>
                                     </VisualState.Setters>
                                 </VisualState>
                             </VisualStateGroup>
@@ -137,16 +139,18 @@
                             <Run Text="{x:Bind Collection.Doing}"/><Run Text="人在看"/>
                         </TextBlock>
                         <TextBlock x:Name="RateTextBlock"
+                                   RelativePanel.LeftOf="RatingCountTextBlock"
+                                   RelativePanel.Above="DoingTextBlock"
+                                   Text="{x:Bind common:Converters.DoubleToString(Rating.Score, 1)}"
+                                   Visibility="{x:Bind common:Converters.CollapsedIfNull(Rating)}"
+                                   Foreground="{StaticResource BangumiPinkBrush}">
+                        </TextBlock>
+                        <TextBlock x:Name="RatingCountTextBlock"
                                    RelativePanel.AlignRightWithPanel="True"
                                    RelativePanel.Above="DoingTextBlock"
                                    Visibility="{x:Bind common:Converters.CollapsedIfNull(Rating)}"
-                                   Foreground="{StaticResource BangumiPinkBrush}">
-                            <Run Text="{x:Bind common:Converters.DoubleToString(Rating.Score, 1)}"/>
-                            <ToolTipService.ToolTip>
-                                <TextBlock>
-                                    <Run Text="{x:Bind Rating.Total}"/><Run Text="人评价"/>                                    
-                                </TextBlock>
-                            </ToolTipService.ToolTip>
+                                   Foreground="Gray">
+                            <Run Text=" x"></Run><Run Text="{x:Bind Rating.Total}"/>
                         </TextBlock>
                     </RelativePanel>
                 </UserControl>

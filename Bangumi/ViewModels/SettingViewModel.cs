@@ -195,6 +195,7 @@ namespace Bangumi.ViewModels
             {
                 Set(ref _bangumiDataStatus, value);
                 OnPropertyChanged(nameof(BangumiDataVersion));
+                OnPropertyChanged(nameof(LastUpdate));
             }
         }
 
@@ -216,6 +217,18 @@ namespace Bangumi.ViewModels
                        string.Empty :
                        $" -> {BangumiData.LatestVersion}");
                 return version;
+            }
+        }
+
+        public string LastUpdate
+        {
+            get
+            {
+                if (BangumiData.LastUpdate == DateTimeOffset.MinValue)
+                {
+                    return "从未更新";
+                }
+                return BangumiData.LastUpdate.ToString("yyyy-MM-dd");
             }
         }
 

@@ -13,7 +13,8 @@
     PrimaryButtonText="确认"
     IsPrimaryButtonEnabled="{x:Bind common:Converters.Not(IsLoading), Mode=OneWay}"
     SecondaryButtonText="取消"
-    Background="{ThemeResource SystemChromeLowColor}">
+    Background="{ThemeResource SystemChromeLowColor}"
+    Style="{ThemeResource ContentDialogStyle1}">
 
     <ContentDialog.TitleTemplate>
         <DataTemplate>

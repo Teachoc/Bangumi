@@ -21,6 +21,7 @@ namespace Bangumi.Data
         private static string _folderPath;
         public static string LatestVersion { get; private set; }
         public static string Version => _info.Version;
+        public static DateTimeOffset LastUpdate => _info.LastUpdate;
         private static bool _useBiliApp;
         public static bool UseBiliApp
         {

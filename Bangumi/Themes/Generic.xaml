@@ -40,7 +40,29 @@
         <Setter Property="OffContent" Value="关闭"/>
         <Setter Property="FontSize" Value="16"/>
     </Style>
-    
+
+    <!-- 二级菜单不使用圆角 -->
+    <Style x:Key="CommandBarOverflowPresenterStyle1" TargetType="CommandBarOverflowPresenter">
+    </Style>
+
+    <Style x:Key="ContentDialogStyle1" TargetType="ContentDialog">
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="PrimaryButtonStyle">
+            <Setter.Value>
+                <Style TargetType="Button">
+                    <Setter Property="CornerRadius" Value="2"/>
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="SecondaryButtonStyle">
+            <Setter.Value>
+                <Style TargetType="Button">
+                    <Setter Property="CornerRadius" Value="2"/>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="GridViewItemContainerStyle1" TargetType="GridViewItem">
         <Setter Property="Template">
             <Setter.Value>

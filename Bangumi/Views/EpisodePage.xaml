@@ -119,9 +119,13 @@
                         <Setter Target="AirWeekdayTextBlock.FontSize" Value="14"/>
                         <Setter Target="CollectionTextBlock.FontSize" Value="12"/>
                         <Setter Target="RatingTextBlock.FontSize" Value="24"/>
-                        <Setter Target="RatingTextBlock.Margin" Value="10"/>
+                        <Setter Target="RatingTextBlock.Margin" Value="5,10"/>
                         <Setter Target="RatingTextBlockDesc.FontSize" Value="12"/>
+                        <Setter Target="RatingCountTextBlock.FontSize" Value="12"/>
+                        <Setter Target="RatingCountTextBlock.Margin" Value="0,0,0,29"/>
                         <Setter Target="RateItemsControl.Visibility" Value="Collapsed"/>
+                        <Setter Target="MyCommandBar.DefaultLabelPosition" Value="Bottom"/>
+                        <Setter Target="MyAppBarSeparator.Height" Value="Auto"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="Wide">
@@ -136,9 +140,13 @@
                         <Setter Target="AirWeekdayTextBlock.FontSize" Value="16"/>
                         <Setter Target="CollectionTextBlock.FontSize" Value="14"/>
                         <Setter Target="RatingTextBlock.FontSize" Value="48"/>
-                        <Setter Target="RatingTextBlock.Margin" Value="25,20"/>
+                        <Setter Target="RatingTextBlock.Margin" Value="5,20"/>
                         <Setter Target="RatingTextBlockDesc.FontSize" Value="18"/>
+                        <Setter Target="RatingCountTextBlock.FontSize" Value="18"/>
+                        <Setter Target="RatingCountTextBlock.Margin" Value="0,0,10,52"/>
                         <Setter Target="RateItemsControl.Visibility" Value="Collapsed"/>
+                        <Setter Target="MyCommandBar.DefaultLabelPosition" Value="Right"/>
+                        <Setter Target="MyAppBarSeparator.Height" Value="40"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="ExWide">
@@ -153,132 +161,143 @@
                         <Setter Target="AirWeekdayTextBlock.FontSize" Value="16"/>
                         <Setter Target="CollectionTextBlock.FontSize" Value="14"/>
                         <Setter Target="RatingTextBlock.FontSize" Value="48"/>
-                        <Setter Target="RatingTextBlock.Margin" Value="25,20"/>
+                        <Setter Target="RatingTextBlock.Margin" Value="5,20"/>
                         <Setter Target="RatingTextBlockDesc.FontSize" Value="18"/>
+                        <Setter Target="RatingCountTextBlock.FontSize" Value="18"/>
+                        <Setter Target="RatingCountTextBlock.Margin" Value="0,0,10,52"/>
                         <Setter Target="RateItemsControl.Visibility" Value="Visible"/>
+                        <Setter Target="MyCommandBar.DefaultLabelPosition" Value="Right"/>
+                        <Setter Target="MyAppBarSeparator.Height" Value="40"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <Grid>
-            <GridView Name="EpsGridView"
-                      ItemContainerStyle="{StaticResource GridViewItemContainerStyle1}"
-                      ItemsSource="{x:Bind EpsCVS.View}" 
-                      Padding="10,5,10,45"
-                      SelectionMode="None"
-                      IsItemClickEnabled="True" 
-                      ShowsScrollingPlaceholders="False"
-                      ItemTemplate="{StaticResource EpTemplate}">
-                <GridView.Header>
-                    <RelativePanel Margin="0,0,10,10">
-                        <controls:ImageEx x:Name="BangumiImage" 
-                                          IsCacheEnabled="True"
-                                          CacheMode="BitmapCache"
-                                          Source="{x:Bind ViewModel.ImageSource, Mode=OneWay}"
-                                          PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
-                                          PlaceholderStretch="UniformToFill"
-                                          CornerRadius="2"
-                                          RelativePanel.AlignLeftWithPanel="True"
-                                          RelativePanel.AlignTopWithPanel="True"
-                                          Margin="0,0,5,0"
-                                          Stretch="UniformToFill"/>
-                        <ItemsControl Name="RateItemsControl"
-                                      RelativePanel.Above="CollectionTextBlock"
-                                      RelativePanel.AlignRightWithPanel="True"
-                                      ItemTemplate="{StaticResource RateTemplate}"
-                                      ItemsSource="{x:Bind ViewModel.OthersRates}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <controls:WrapPanel HorizontalSpacing="8"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
+        <GridView Name="EpsGridView"
+                  ItemContainerStyle="{StaticResource GridViewItemContainerStyle1}"
+                  ItemsSource="{x:Bind EpsCVS.View}" 
+                  Padding="10,5,10,45"
+                  SelectionMode="None"
+                  IsItemClickEnabled="True"
+                  ShowsScrollingPlaceholders="False"
+                  ItemTemplate="{StaticResource EpTemplate}">
+            <GridView.Header>
+                <RelativePanel Margin="0,0,10,10">
+                    <controls:ImageEx x:Name="BangumiImage" 
+                                      IsCacheEnabled="True"
+                                      CacheMode="BitmapCache"
+                                      Source="{x:Bind ViewModel.ImageSource, Mode=OneWay}"
+                                      PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
+                                      PlaceholderStretch="UniformToFill"
+                                      CornerRadius="2"
+                                      RelativePanel.AlignLeftWithPanel="True"
+                                      RelativePanel.AlignTopWithPanel="True"
+                                      Margin="0,0,5,0"
+                                      Stretch="UniformToFill"/>
+                    <ItemsControl Name="RateItemsControl"
+                                  RelativePanel.Above="CollectionTextBlock"
+                                  RelativePanel.AlignRightWithPanel="True"
+                                  ItemTemplate="{StaticResource RateTemplate}"
+                                  ItemsSource="{x:Bind ViewModel.OthersRates}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <controls:WrapPanel HorizontalSpacing="8"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
 
 
-                        <TextBlock Name="NameTextBlock" 
-                                   Text="{x:Bind ViewModel.Name, Mode=OneWay}"
-                                   RelativePanel.RightOf="BangumiImage"
-                                   RelativePanel.AlignTopWithPanel="True"
-                                   IsTextSelectionEnabled="True"
-                                   TextWrapping="Wrap"
-                                   TextTrimming="CharacterEllipsis"
-                                   Foreground="{StaticResource BangumiPinkBrush}" />
-                        <TextBlock Name="AirDateTextBlock" 
-                                   Text="{x:Bind sys:String.Format('开播时间：{0}',ViewModel.AirDate), Mode=OneWay}" 
-                                   RelativePanel.RightOf="BangumiImage"
-                                   RelativePanel.Below="NameTextBlock"
-                                   Foreground="#666666" 
-                                   Margin="0,2,0,0" />
-                        <TextBlock Name="AirWeekdayTextBlock" 
-                                   Text="{x:Bind sys:String.Format('更新时间：{0}',ViewModel.AirTime), Mode=OneWay}" 
-                                   RelativePanel.RightOf="BangumiImage"
-                                   RelativePanel.Below="AirDateTextBlock"
-                                   Foreground="#666666" 
-                                   Margin="0,2,0,0" />
-                        <TextBlock Name="RatingTextBlock" 
-                                   HorizontalTextAlignment="Center"
-                                   RelativePanel.LeftOf="RateItemsControl"
-                                   RelativePanel.Above="CollectionTextBlock"
-                                   Foreground="{StaticResource BangumiPinkBrush}" >
-                            <Run Text="{x:Bind common:Converters.DoubleToString(ViewModel.Score,1), Mode=OneWay}"/>
-                            <LineBreak/>
-                            <Run x:Name="RatingTextBlockDesc" Text="{x:Bind common:Converters.GetRateDesc(ViewModel.Score), Mode=OneWay}"/>
-                        </TextBlock>
-                        <TextBlock Name="CollectionTextBlock" 
-                                   Text="{x:Bind ViewModel.OthersCollection,Mode=OneWay}" 
-                                   ToolTipService.ToolTip="{x:Bind ViewModel.OthersCollection,Mode=OneWay}"
-                                   RelativePanel.AlignRightWithPanel="True"
-                                   RelativePanel.AlignBottomWith="BangumiImage"
-                                   RelativePanel.RightOf="SitesSplitButton"
-                                   TextTrimming="CharacterEllipsis"
-                                   HorizontalAlignment="Right"
-                                   Foreground="#666666" 
-                                   Margin="0,2,0,0" >
-                        </TextBlock>
+                    <TextBlock Name="NameTextBlock" 
+                               Text="{x:Bind ViewModel.Name, Mode=OneWay}"
+                               RelativePanel.RightOf="BangumiImage"
+                               RelativePanel.AlignTopWithPanel="True"
+                               IsTextSelectionEnabled="True"
+                               TextWrapping="Wrap"
+                               TextTrimming="CharacterEllipsis"
+                               Foreground="{StaticResource BangumiPinkBrush}" />
+                    <TextBlock Name="AirDateTextBlock" 
+                               Text="{x:Bind sys:String.Format('开播时间：{0}',ViewModel.AirDate), Mode=OneWay}" 
+                               RelativePanel.RightOf="BangumiImage"
+                               RelativePanel.Below="NameTextBlock"
+                               Foreground="#666666" 
+                               Margin="0,2,0,0" />
+                    <TextBlock Name="AirWeekdayTextBlock" 
+                               Text="{x:Bind sys:String.Format('更新时间：{0}',ViewModel.AirTime), Mode=OneWay}" 
+                               RelativePanel.RightOf="BangumiImage"
+                               RelativePanel.Below="AirDateTextBlock"
+                               Foreground="#666666" 
+                               Margin="0,2,0,0" />
+                    <TextBlock Name="RatingTextBlock" 
+                               HorizontalTextAlignment="Center"
+                               RelativePanel.LeftOf="RatingCountTextBlock"
+                               RelativePanel.Above="CollectionTextBlock"
+                               Foreground="{StaticResource BangumiPinkBrush}" >
+                        <Run Text="{x:Bind common:Converters.DoubleToString(ViewModel.Score,1), Mode=OneWay}"/>
+                        <LineBreak/>
+                        <Run x:Name="RatingTextBlockDesc" Text="{x:Bind common:Converters.GetRateDesc(ViewModel.Score), Mode=OneWay}"/>
+                    </TextBlock>
+                    <TextBlock Name="RatingCountTextBlock" 
+                               Text="{x:Bind ViewModel.RatingCount, Mode=OneWay}" 
+                               HorizontalTextAlignment="Center"
+                               RelativePanel.LeftOf="RateItemsControl"
+                               RelativePanel.Above="CollectionTextBlock"
+                               Foreground="#666666" >
+                    </TextBlock>
+                    <TextBlock Name="CollectionTextBlock" 
+                               Text="{x:Bind ViewModel.OthersCollection,Mode=OneWay}" 
+                               ToolTipService.ToolTip="{x:Bind ViewModel.OthersCollection,Mode=OneWay}"
+                               RelativePanel.AlignRightWithPanel="True"
+                               RelativePanel.AlignBottomWith="BangumiImage"
+                               RelativePanel.RightOf="SitesSplitButton"
+                               TextTrimming="CharacterEllipsis"
+                               HorizontalAlignment="Right"
+                               Foreground="#666666" 
+                               Margin="0,2,0,0" >
+                    </TextBlock>
 
-                        <muxc:SplitButton x:Name="SitesSplitButton" 
-                                          Click="SitesSplitButton_Click"
-                                          Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(SelectedTextBlock.Text),Mode=OneWay}"
-                                          RelativePanel.RightOf="BangumiImage"
-                                          RelativePanel.AlignBottomWith="BangumiImage"
-                                          FontSize="14">
-                            <TextBlock Name="SelectedTextBlock"/>
-                            <muxc:SplitButton.Flyout>
-                                <MenuFlyout x:Name="SitesMenuFlyout"/>
-                            </muxc:SplitButton.Flyout>
-                        </muxc:SplitButton>
-                    </RelativePanel>
-                </GridView.Header>
-                <GridView.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Border Background="{StaticResource BangumiPinkBrush}"
-                                            Width="8"
-                                            Margin="-12,0,10,0"/>
-                                    <TextBlock Text="{Binding Key}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
-                    </GroupStyle>
-                </GridView.GroupStyle>
-                <GridView.ItemContainerTransitions>
-                    <TransitionCollection>
-                        <RepositionThemeTransition IsStaggeringEnabled="False" />
-                    </TransitionCollection>
-                </GridView.ItemContainerTransitions>
-            </GridView>
+                    <muxc:SplitButton x:Name="SitesSplitButton" 
+                                      Click="SitesSplitButton_Click"
+                                      Visibility="{x:Bind common:Converters.CollapsedIfNullOrEmpty(SelectedTextBlock.Text),Mode=OneWay}"
+                                      RelativePanel.RightOf="BangumiImage"
+                                      RelativePanel.AlignBottomWith="BangumiImage"
+                                      FontSize="14">
+                        <TextBlock Name="SelectedTextBlock"/>
+                        <muxc:SplitButton.Flyout>
+                            <MenuFlyout x:Name="SitesMenuFlyout"/>
+                        </muxc:SplitButton.Flyout>
+                    </muxc:SplitButton>
+                </RelativePanel>
+            </GridView.Header>
+            <GridView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Background="{StaticResource BangumiPinkBrush}"
+                                        Width="8"
+                                        Margin="-12,0,10,0"/>
+                                <TextBlock Text="{Binding Key}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </GridView.GroupStyle>
+            <GridView.ItemContainerTransitions>
+                <TransitionCollection>
+                    <RepositionThemeTransition IsStaggeringEnabled="False" />
+                </TransitionCollection>
+            </GridView.ItemContainerTransitions>
+        </GridView>
 
-            <ProgressBar Name="MyProgressBar"
-                         Visibility="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
-                         IsIndeterminate="True"
-                         VerticalAlignment="Top"/>
-        </Grid>
-
-        <CommandBar VerticalAlignment="Bottom"
+        <ProgressBar Name="MyProgressBar"
+                     Visibility="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
+                     IsIndeterminate="True"
+                     VerticalAlignment="Top"/>
+        
+        <CommandBar x:Name="MyCommandBar"
+                    VerticalAlignment="Bottom"
                     RequestedTheme="Dark"
+                    CommandBarOverflowPresenterStyle="{ThemeResource CommandBarOverflowPresenterStyle1}"
                     Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}"
                     DefaultLabelPosition="Right">
             <AppBarButton IsEnabled="{x:Bind common:Converters.Not(ViewModel.IsStatusLoading), Mode=OneWay}"
@@ -289,12 +308,14 @@
                           FontFamily="Segoe MDL2 Assets" 
                           Glyph="{x:Bind ViewModel.CollectionStatusIcon, Mode=OneWay}"/>
             </AppBarButton>
-            <AppBarButton Label="访问网页"
-                          ToolTipService.ToolTip="访问网页"
-                          Click="LaunchWebPage_Click">
+            <AppBarButton Label="详情"
+                          ToolTipService.ToolTip="详情"
+                          Click="NavigateToDetailPage_Click"
+                          IsEnabled="{x:Bind common:Converters.Not(ViewModel.IsDetailLoading), Mode=OneWay}">
                 <FontIcon FontFamily="Segoe MDL2 Assets" 
-                          Glyph="&#xE12A;" />
+                          Glyph="&#xE946;" />
             </AppBarButton>
+            <AppBarSeparator x:Name="MyAppBarSeparator" />
             <AppBarButton Label="分享"
                           ToolTipService.ToolTip="分享"
                           Icon="Share">
@@ -306,15 +327,12 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
-            <AppBarSeparator Height="40" />
-            <AppBarButton Label="详情"
-                          ToolTipService.ToolTip="详情"
-                          Click="NavigateToDetailPage_Click"
-                          IsEnabled="{x:Bind common:Converters.Not(ViewModel.IsDetailLoading), Mode=OneWay}">
+            <AppBarButton Label="访问网页"
+                          ToolTipService.ToolTip="访问网页"
+                          Click="LaunchWebPage_Click">
                 <FontIcon FontFamily="Segoe MDL2 Assets" 
-                          Glyph="&#xE946;" />
+                          Glyph="&#xE12A;" />
             </AppBarButton>
         </CommandBar>
-
     </Grid>
 </Page>

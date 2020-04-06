@@ -142,10 +142,11 @@ namespace Bangumi.ViewModels
             try
             {
                 collectionStatusE = await BangumiApi.BgmApi.UpdateStatus(subject.SubjectId.ToString(), collectionStatus);
+                NotificationHelper.Notify($"标记 {Converters.StringOneOrTwo(subject.Subject.NameCn, subject.Subject.Name)} {collectionStatusE.Status.Id.GetDesc(subject.Subject.Type)} 成功！");
             }
             catch (Exception e)
             {
-                NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
+                NotificationHelper.Notify($"标记 {Converters.StringOneOrTwo(subject.Subject.NameCn, subject.Subject.Name)} {collectionStatus.GetDesc(subject.Subject.Type)} 失败！\n" + e.Message,
                                           NotifyType.Error);
             }
             if (collectionStatusE is CollectionStatusE

@@ -98,6 +98,10 @@
                                 <Run Text="数据版本："/>
                                 <Run Text="{x:Bind ViewModel.BangumiDataVersion, Mode=OneWay}"/>
                             </TextBlock>
+                            <TextBlock Margin="0,0,0,0">
+                                <Run Text="上次更新日期："/>
+                                <Run Text="{x:Bind ViewModel.LastUpdate, Mode=OneWay}"/>
+                            </TextBlock>
                             <Grid Margin="0,4,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto"/>

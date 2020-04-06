@@ -1,11 +1,13 @@
 ﻿using Bangumi.Api;
 using Bangumi.Api.Common;
+using Bangumi.Api.Exceptions;
 using Bangumi.Api.Models;
 using Bangumi.Common;
 using Bangumi.ContentDialogs;
 using Bangumi.Controls;
 using Bangumi.Data;
 using Bangumi.Helper;
+using Bangumi.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -49,6 +51,21 @@ namespace Bangumi.ViewModels
             try
             {
                 IsLoading = true;
+                // 检查 token
+                try
+                {
+                    await BangumiApi.BgmOAuth.CheckToken();
+                }
+                catch (BgmUnauthorizedException)
+                {
+                    // 授权过期，返回登录界面
+                    MainPage.RootPage.Frame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
+                    return;
+                }
+                catch (Exception)
+                {
+                    return;
+                }
                 // 加载缓存，后面获取新数据后比较需要使用
                 var cachedWatchings = BangumiApi.BgmCache.Watching();
                 var cachedWatchStatus = CachedWatchProgress().ToList();
@@ -153,10 +170,11 @@ namespace Bangumi.ViewModels
                         // 若修改后状态不是在看，则从进度页面删除
                         WatchingCollection.Remove(item);
                     }
+                    NotificationHelper.Notify($"标记 {collectionEditContentDialog.Title} {collectionStatusE.Status.Id.GetDesc(item.Type)} 成功！");
                 }
                 catch (Exception e)
                 {
-                    NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
+                    NotificationHelper.Notify($"标记 {collectionEditContentDialog.Title} {collectionEditContentDialog.CollectionStatus?.GetDesc(item.Type)} 失败！\n" + e.Message,
                                               NotifyType.Error);
                 }
                 item.IsUpdating = false;
@@ -345,24 +363,26 @@ namespace Bangumi.ViewModels
             if (SettingHelper.UseBangumiDataAirTime &&
                 BangumiData.GetAirTimeByBangumiId(subject.Id.ToString())?.ToLocalTime() is DateTimeOffset date)
             {
-                if (first != null && last != null)
+                var dateFormat = "yyyy-MM-dd HH:mm";
+                if (first != null && first != DateTime.MinValue && last != null && last != DateTime.MinValue)
                 {
-                    AirTime = date.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks).ToString("yyyy-MM-dd HH:mm");
+                    AirTime = date.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks).ToString(dateFormat);
                 }
                 else
                 {
-                    AirTime = date.ToString("yyyy-MM-dd HH:mm");
+                    AirTime = date.ToString(dateFormat);
                 }
             }
             else if (DateTime.TryParse(AirTime, out var airDate))
             {
-                if (first != null && last != null)
+                var dateFormat = "yyyy-MM-dd";
+                if (first != null && first != DateTime.MinValue && last != null && last != DateTime.MinValue)
                 {
-                    AirTime = airDate.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks).ToString("yyyy-MM-dd");
+                    AirTime = airDate.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks).ToString(dateFormat);
                 }
                 else
                 {
-                    AirTime = airDate.ToString("yyyy-MM-dd");
+                    AirTime = airDate.ToString(dateFormat);
                 }
             }
         }

@@ -23,7 +23,6 @@
                     <RelativePanel Padding="5"
                                    RightTapped="RelativePanel_RightTapped"
                                    Holding="RelativePanel_Holding"
-                                   Tapped="RelativePanel_Tapped"
                                    Background="Transparent">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup>
@@ -116,7 +115,7 @@
                                    Text="{x:Bind WatchedAndAirEpsCountDesc, Mode=OneWay}"
                                    TextTrimming="CharacterEllipsis"/>
                         <Button x:Name="CollectionButton"
-                                Tapped="CollectionButton_Tapped"
+                                Click="CollectionButton_Click"
                                 RelativePanel.RightOf="BangumiImage"
                                 RelativePanel.AlignBottomWithPanel="True"
                                 ToolTipService.ToolTip="收藏"
@@ -134,7 +133,7 @@
                         </Button>
 
                         <Button x:Name="NextEpButton"
-                                Tapped="NextEpButton_Tapped"
+                                Click="NextEpButton_Click"
                                 Padding="8,3"
                                 RelativePanel.AlignRightWithPanel="True"
                                 RelativePanel.AlignBottomWithPanel="True"
@@ -211,6 +210,7 @@
                                    ItemsSource="{x:Bind ViewModel.WatchingCollection}" 
                                    ShowsScrollingPlaceholders="False"
                                    IsItemClickEnabled="True" 
+                                   ItemClick="GridView_ItemClick"
                                    SelectionMode="None"
                                    ItemTemplate="{StaticResource ProgressSubjectTemplate}">
             <GridView.ItemContainerTransitions>

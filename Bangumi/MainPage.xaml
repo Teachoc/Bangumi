@@ -7,7 +7,6 @@
     xmlns:local3="using:Bangumi.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:common="using:Bangumi.Common"
     mc:Ignorable="d"
     NavigationCacheMode="Enabled"
@@ -26,21 +25,21 @@
                            IsBackEnabled="{x:Bind CanGoBack, Mode=OneWay}"
                            ImageVisibility="{x:Bind common:Converters.CollapsedIf(CanGoBack), Mode=OneWay}"/>
 
-        <muxc:NavigationView x:Name="NavView"
-                             Grid.Row="1"
-                             PaneDisplayMode="Top" 
-                             IsSettingsVisible="False"
-                             IsBackButtonVisible="Collapsed"
-                             ItemInvoked="NavView_ItemInvoked">
-            <muxc:NavigationView.MenuItems>
-                <muxc:NavigationViewItem Tag="progress" Content="进度" />
-                <muxc:NavigationViewItem Tag="collection" Content="收藏" />
-                <muxc:NavigationViewItem Tag="calendar" Content="时间表" />
-                <muxc:NavigationViewItemSeparator Visibility="{x:Bind PlaceholderItem.Visibility, Mode=OneWay}"/>
-                <muxc:NavigationViewItem x:Name="PlaceholderItem" 
-                                         Tag="others" />
-            </muxc:NavigationView.MenuItems>
-            <muxc:NavigationView.PaneFooter>
+        <NavigationView x:Name="NavView"
+                        Grid.Row="1"
+                        PaneDisplayMode="Top" 
+                        IsSettingsVisible="False"
+                        IsBackButtonVisible="Collapsed"
+                        ItemInvoked="NavView_ItemInvoked">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Tag="progress" Content="进度" />
+                <NavigationViewItem Tag="collection" Content="收藏" />
+                <NavigationViewItem Tag="calendar" Content="时间表" />
+                <NavigationViewItemSeparator Visibility="{x:Bind PlaceholderItem.Visibility, Mode=OneWay}"/>
+                <NavigationViewItem x:Name="PlaceholderItem" 
+                                    Tag="others" />
+            </NavigationView.MenuItems>
+            <NavigationView.PaneFooter>
                 <StackPanel Orientation="Horizontal">
                     <AppBarButton x:Name="NetworkErrorButton" 
                                   Width="48" 
@@ -54,8 +53,7 @@
                                   IsEnabled="{x:Bind common:Converters.Not(IsLoading), Mode=OneWay}"
                                   ToolTipService.ToolTip="刷新 (F5)" >
                         <AppBarButton.KeyboardAccelerators>
-                            <KeyboardAccelerator Modifiers="None"
-                                         Key="F5"/>
+                            <KeyboardAccelerator Modifiers="None" Key="F5"/>
                         </AppBarButton.KeyboardAccelerators>
                         <Grid Padding="-2">
                             <ProgressRing Visibility="{x:Bind IsLoading, Mode=OneWay}"
@@ -94,10 +92,10 @@
                                   ToolTipService.ToolTip="设置">
                     </AppBarButton>
                 </StackPanel>
-            </muxc:NavigationView.PaneFooter>
+            </NavigationView.PaneFooter>
             <Frame x:Name="ContentFrame"
                    Navigated="ContentFrame_Navigated"/>
-        </muxc:NavigationView>
+        </NavigationView>
 
 
         <local3:InAppNotification x:Name="NotifyControl"
@@ -120,7 +118,7 @@
                 </VisualState>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="420"/>
+                        <AdaptiveTrigger MinWindowWidth="500"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="NetworkErrorButton.Width" Value="48"/>

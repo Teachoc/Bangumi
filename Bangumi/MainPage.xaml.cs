@@ -15,7 +15,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
-using mxuc = Microsoft.UI.Xaml.Controls;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 
@@ -255,7 +254,7 @@ namespace Bangumi
             PlaceholderItem.Visibility = Visibility.Collapsed;
         }
 
-        private void NavView_ItemInvoked(mxuc.NavigationView sender, mxuc.NavigationViewItemInvokedEventArgs args)
+        private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
             Type type = args.InvokedItemContainer.Tag switch
             {
@@ -291,6 +290,7 @@ namespace Bangumi
                 NavView.SelectedItem = PlaceholderItem;
             }
         }
+
     }
 
 }

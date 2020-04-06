@@ -109,6 +109,13 @@ namespace Bangumi.ViewModels
             set => Set(ref _score, value);
         }
 
+        private string _ratingCount;
+        public string RatingCount
+        {
+            get => _ratingCount;
+            set => Set(ref _ratingCount, value);
+        }
+
         public ObservableCollection<SimpleRate> OthersRates { get; private set; } = new ObservableCollection<SimpleRate>();
 
         private string _othersCollection;
@@ -144,14 +151,15 @@ namespace Bangumi.ViewModels
         public void InitViewModel()
         {
             IsLoading = false;
-            ImageSource = "";
-            Name = "";
-            AirDate = "";
-            AirTime = "";
-            Summary = "";
+            ImageSource = string.Empty;
+            Name = string.Empty;
+            AirDate = string.Empty;
+            AirTime = string.Empty;
+            Summary = string.Empty;
             OthersRates.Clear();
-            OthersCollection = "";
+            OthersCollection = string.Empty;
             Score = 0;
+            RatingCount = string.Empty;
             // 收藏状态，评分，吐槽
             SetCollectionStatus(null);
             GroupedEps.Clear();
@@ -184,47 +192,49 @@ namespace Bangumi.ViewModels
             {
                 IsUpdating = true;
                 IsStatusLoading = true;
+                // 若状态修改为看过，且设置启用，则批量修改正片章节状态为看过
+                if (collectionEditContentDialog.CollectionStatus.Value == CollectionStatusType.Collect && SettingHelper.EpsBatch)
+                {
+                    var selectedEps = GroupedEps.SelectMany(g => g.Where(ep => ep.Type == EpisodeType.本篇 && ep.EpStatus == EpStatusType.remove));
+                    int epId = selectedEps.LastOrDefault()?.Id ?? 0;
+                    string epsId = string.Join(',', selectedEps.Select(it => it.Id));
+                    if (!string.IsNullOrEmpty(epsId))
+                    {
+                        try
+                        {
+                            if (await BangumiApi.BgmApi.UpdateProgressBatch(epId, epsId))
+                            {
+                                foreach (var episode in selectedEps)
+                                {
+                                    episode.EpStatus = EpStatusType.watched;
+                                }
+                                NotificationHelper.Notify("批量标记章节看过成功！");
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            NotificationHelper.Notify("批量标记章节看过失败！\n错误信息：" + e.Message,
+                                                      NotifyType.Error);
+                        }
+                    }
+                    else
+                    {
+                        NotificationHelper.Notify("无章节需要标记！");
+                    }
+                }
                 try
                 {
                     var collectionStatusE = await BangumiApi.BgmApi.UpdateStatus(SubjectId,
-                        collectionEditContentDialog.CollectionStatus.Value,
-                        collectionEditContentDialog.Comment,
-                        collectionEditContentDialog.Rate.ToString(),
-                        collectionEditContentDialog.Privacy ? "1" : "0");
+                       collectionEditContentDialog.CollectionStatus.Value,
+                       collectionEditContentDialog.Comment,
+                       collectionEditContentDialog.Rate.ToString(),
+                       collectionEditContentDialog.Privacy ? "1" : "0");
                     SetCollectionStatus(collectionStatusE.Status.Id);
-                    // 若状态修改为看过，且设置启用，则批量修改正片章节状态为看过
-                    if (collectionStatusE.Status.Id == CollectionStatusType.Collect && SettingHelper.EpsBatch)
-                    {
-                        var selectedEps = GroupedEps.SelectMany(g => g.Where(ep => ep.Type == EpisodeType.本篇 && ep.EpStatus == EpStatusType.remove));
-                        int epId = selectedEps.LastOrDefault()?.Id ?? 0;
-                        string epsId = string.Join(',', selectedEps.Select(it => it.Id));
-                        if (!string.IsNullOrEmpty(epsId))
-                        {
-                            try
-                            {
-                                if (await BangumiApi.BgmApi.UpdateProgressBatch(epId, epsId))
-                                {
-                                    foreach (var episode in selectedEps)
-                                    {
-                                        episode.EpStatus = EpStatusType.watched;
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                NotificationHelper.Notify("批量标记章节状态失败！\n错误信息：" + e.Message,
-                                                          NotifyType.Error);
-                            }
-                        }
-                        else
-                        {
-                            NotificationHelper.Notify("无章节需要更新");
-                        }
-                    }
+                    NotificationHelper.Notify($"标记 {collectionEditContentDialog.Title} {collectionStatusE.Status.Id.GetDesc(this.SubjectType)} 成功！");
                 }
                 catch (Exception e)
                 {
-                    NotificationHelper.Notify("更新条目状态失败！\n" + e.Message,
+                    NotificationHelper.Notify($"标记 {collectionEditContentDialog.Title} {collectionEditContentDialog.CollectionStatus?.GetDesc(this.SubjectType)} 失败！\n" + e.Message,
                                               NotifyType.Error);
                 }
                 IsStatusLoading = false;
@@ -301,17 +311,18 @@ namespace Bangumi.ViewModels
                         {
                             episode.EpStatus = EpStatusType.watched;
                         }
+                        NotificationHelper.Notify("批量标记章节看过成功！");
                     }
                 }
                 catch (Exception e)
                 {
-                    NotificationHelper.Notify("批量标记章节状态失败！\n错误信息：" + e.Message,
+                    NotificationHelper.Notify("批量标记章节看过失败！\n错误信息：" + e.Message,
                                               NotifyType.Error);
                 }
             }
             else
             {
-                NotificationHelper.Notify("无章节需要更新");
+                NotificationHelper.Notify("无章节需要标记！");
             }
             IsUpdating = false;
 
@@ -434,7 +445,8 @@ namespace Bangumi.ViewModels
                     new SimpleRate {Count = subject.Rating.Count._2, Score = 2},
                     new SimpleRate {Count = subject.Rating.Count._1, Score = 1}
                 };
-                double sumCount = simpleRates.Sum(s => s.Count);
+                int sumCount = simpleRates.Sum(s => s.Count);
+                RatingCount = "x" + sumCount.ToString();
                 OthersRates.Clear();
                 foreach (var item in simpleRates)
                 {

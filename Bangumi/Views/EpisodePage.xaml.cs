@@ -41,7 +41,7 @@ namespace Bangumi.Views
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            (((Frame.Parent as Microsoft.UI.Xaml.Controls.NavigationView)?.Parent as Grid).Parent as MainPage)?.SelectPlaceholderItem("章节");
+            (((Frame.Parent as NavigationView)?.Parent as Grid).Parent as MainPage)?.SelectPlaceholderItem("章节");
 
             if (e.Parameter?.GetType() == typeof(int) &&
                 (e.NavigationMode != NavigationMode.Back || ViewModel.SubjectId != e.Parameter.ToString()))

@@ -36,7 +36,7 @@ namespace Bangumi.Views
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            (((Frame.Parent as Microsoft.UI.Xaml.Controls.NavigationView)?.Parent as Grid).Parent as MainPage)?.SelectPlaceholderItem("搜索");
+            (((Frame.Parent as NavigationView)?.Parent as Grid).Parent as MainPage)?.SelectPlaceholderItem("搜索");
         }
 
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)

@@ -258,6 +258,12 @@ namespace Bangumi.Common
             return string.Concat(str0, str1, str2, str3);
         }
 
+        /// <summary>
+        /// 若第一个字符串为空，则返回第二个字符串
+        /// </summary>
+        /// <param name="str0"></param>
+        /// <param name="str1"></param>
+        /// <returns></returns>
         public static string StringOneOrTwo(string str0, string str1)
         {
             return string.IsNullOrEmpty(str0) ? str1 : str0;
