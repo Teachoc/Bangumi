@@ -24,7 +24,7 @@
 
     <Grid>
         <StackPanel MaxWidth="300">
-            <Grid Name="StatusPanel" CornerRadius="5" Background="{StaticResource SystemChromeMediumHighColor}">
+            <Grid Name="StatusPanel" CornerRadius="5" Background="{ThemeResource SystemChromeMediumHighColor}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />

@@ -34,7 +34,7 @@
                                       RelativePanel.AlignLeftWithPanel="True"
                                       RelativePanel.AlignTopWithPanel="True"
                                       CornerRadius="2"
-                                      PlaceholderSource="ms-appx:///Assets/resource/akkarin.jpg"
+                                      PlaceholderSource="{x:Bind common:Constants.NoAvatarImgUri}"
                                       PlaceholderStretch="UniformToFill"
                                       IsCacheEnabled="True"/>
                     <TextBlock Name="CrtNameTextBlock"
@@ -78,7 +78,7 @@
                                       RelativePanel.AlignLeftWithPanel="True"
                                       RelativePanel.AlignTopWithPanel="True"
                                       CornerRadius="2"
-                                      PlaceholderSource="ms-appx:///Assets/resource/akkarin.jpg"
+                                      PlaceholderSource="{x:Bind common:Constants.NoAvatarImgUri}"
                                       PlaceholderStretch="UniformToFill"
                                       IsCacheEnabled="True"/>
                     <TextBlock Name="StaffNameTextBlock"
@@ -119,7 +119,7 @@
                                       RelativePanel.AlignLeftWithPanel="True"
                                       RelativePanel.AlignTopWithPanel="True"
                                       CornerRadius="2"
-                                      PlaceholderSource="ms-appx:///Assets/resource/akkarin.jpg"
+                                      PlaceholderSource="{x:Bind common:Constants.NoAvatarImgUri}"
                                       PlaceholderStretch="UniformToFill"
                                       IsCacheEnabled="True"/>
                     <TextBlock Name="PostInfoTextBlock"

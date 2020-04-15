@@ -234,6 +234,10 @@ namespace Bangumi.ViewModels
 
         public async Task Load()
         {
+            if (UserCacheSize == "正在计算")
+            {
+                return;
+            }
             ImageCacheCanDelete = false;
             ImageCacheSize = "正在计算";
             UserCacheCanDelete = false;

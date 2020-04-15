@@ -90,7 +90,7 @@
                                           IsCacheEnabled="True"
                                           CacheMode="BitmapCache"
                                           Source="{x:Bind Images.Common}"
-                                          PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
+                                          PlaceholderSource="{x:Bind common:Constants.NotFoundImgUri}"
                                           PlaceholderStretch="UniformToFill"
                                           CornerRadius="2"
                                           RelativePanel.AlignLeftWithPanel="True"
@@ -238,7 +238,7 @@
                Width="200"
                Height="326"
                Visibility="{x:Bind common:Converters.CollapsedIfNotZero(ViewModel.CalendarCollection.Count),Mode=OneWay}"
-               Source="ms-appx:///Assets/resource/empty.png"
+               Source="{x:Bind common:Constants.EmptyImgUri}"
                Stretch="Uniform"/>
 
     </Grid>

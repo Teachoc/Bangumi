@@ -67,7 +67,7 @@
                                                      Visibility="{Binding ElementName=EpStatusStackPanel, Path=Visibility}"/>
                                 <StackPanel x:Name="EpStatusStackPanel"
                                             CornerRadius="5" 
-                                            Background="{StaticResource SystemControlAltHighAcrylicElementBrush}"
+                                            Background="{ThemeResource SystemControlAltHighAcrylicElementBrush}"
                                             Orientation="Horizontal"
                                             HorizontalAlignment="Left">
                                 </StackPanel>
@@ -187,7 +187,7 @@
                                       IsCacheEnabled="True"
                                       CacheMode="BitmapCache"
                                       Source="{x:Bind ViewModel.ImageSource, Mode=OneWay}"
-                                      PlaceholderSource="ms-appx:///Assets/resource/err_404.png"
+                                      PlaceholderSource="{x:Bind common:Constants.NotFoundImgUri}"
                                       PlaceholderStretch="UniformToFill"
                                       CornerRadius="2"
                                       RelativePanel.AlignLeftWithPanel="True"

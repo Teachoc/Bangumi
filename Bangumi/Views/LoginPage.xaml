@@ -5,6 +5,7 @@
     xmlns:local="using:Bangumi.Views"
     xmlns:local2="using:Bangumi.Controls.TitleBar"
     xmlns:local3="using:Bangumi.Controls"
+    xmlns:common="using:Bangumi.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -57,7 +58,7 @@
                Grid.ColumnSpan="2"
                Width="200"
                Height="326"
-               Source="ms-appx:///Assets/resource/welcome.png"
+               Source="{x:Bind common:Constants.WelcomeImgUri}"
                Stretch="Uniform"/>
         <Button Name="LoginButton"
                 Grid.Row="3"

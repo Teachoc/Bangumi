@@ -59,7 +59,7 @@ namespace Bangumi.ViewModels
                 catch (BgmUnauthorizedException)
                 {
                     // 授权过期，返回登录界面
-                    MainPage.RootPage.Frame.Navigate(typeof(LoginPage), "ms-appx:///Assets/resource/err_401.png");
+                    MainPage.RootPage.Frame.Navigate(typeof(LoginPage), Constants.UnauthorizedImgUri);
                     return;
                 }
                 catch (Exception)
