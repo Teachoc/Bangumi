@@ -169,6 +169,16 @@
                                                TextWrapping="Wrap" />
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
+                            <!-- 根据推测的放送时间发送番剧更新通知 -->
+                            <ToggleSwitch Visibility="{x:Bind ViewModel.UseBangumiDataAirTime, Mode=OneWay}"
+                                          IsOn="{x:Bind ViewModel.EnableBangumiAirToast, Mode=TwoWay}" >
+                                <ToggleSwitch.Header>
+                                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                               Text="根据推测的放送时间发送番剧更新通知"
+                                               Margin="0,4,0,0"
+                                               TextWrapping="Wrap" />
+                                </ToggleSwitch.Header>
+                            </ToggleSwitch>
                         </StackPanel>
 
                     </StackPanel>

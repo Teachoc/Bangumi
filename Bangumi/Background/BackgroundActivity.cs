@@ -11,11 +11,18 @@
 using Bangumi.Api;
 using Bangumi.Api.Common;
 using Bangumi.Api.Exceptions;
+using Bangumi.Api.Models;
 using Bangumi.Common;
+using Bangumi.Data;
 using Bangumi.Helper;
+using Bangumi.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.Storage;
 
@@ -60,6 +67,65 @@ namespace Bangumi.Background
                     EncryptionHelper.DecryptionAsync);
 
                 await BangumiApi.BgmOAuth.CheckToken();
+
+                if (SettingHelper.EnableBangumiAirToast)
+                {
+                    if (!BangumiApi.BgmCache.IsUpdatedToday)
+                    {
+                        // 加载缓存，后面获取新数据后比较需要使用
+                        var cachedWatchings = BangumiApi.BgmCache.Watching();
+
+                        // 加载新的收视进度
+                        var newWatching = await BangumiApi.BgmApi.Watching();
+                        var subjectTasks = new List<Task<SubjectLarge>>();
+                        var progressTasks = new List<Task<Progress>>();
+                        // 新的收视进度与缓存的不同或未缓存的条目
+                        var watchingsNotCached = BangumiApi.BgmCache.IsUpdatedToday ?
+                                                 newWatching.Where(it => cachedWatchings.All(it2 => !it2.EqualsExT(it))).ToList() :
+                                                 newWatching;
+                        using (var semaphore = new SemaphoreSlim(10))
+                        {
+                            foreach (var item in watchingsNotCached)
+                            {
+                                await semaphore.WaitAsync();
+                                subjectTasks.Add(BangumiApi.BgmApi.SubjectEp(item.SubjectId.ToString())
+                                    .ContinueWith(t =>
+                                    {
+                                        semaphore.Release();
+                                        return t.Result;
+                                    }));
+                                await semaphore.WaitAsync();
+                                progressTasks.Add(BangumiApi.BgmApi.Progress(item.SubjectId.ToString())
+                                    .ContinueWith(t =>
+                                    {
+                                        semaphore.Release();
+                                        return t.Result;
+                                    }));
+                            }
+                            await Task.WhenAll(subjectTasks);
+                            await Task.WhenAll(progressTasks);
+                        }
+                        BangumiApi.BgmCache.IsUpdatedToday = true;
+                    }
+
+                    ToastNotificationHelper.RemoveAllScheduledToasts();
+                    foreach (var item in CachedWatchProgress())
+                    {
+                        var first = item.Eps?.FirstOrDefault(ep => ep.Type == EpisodeType.本篇)?.AirDate;
+                        var last = item.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate;
+                        if (SettingHelper.UseBangumiDataAirTime &&
+                            first != null && first != DateTime.MinValue && last != null && last != DateTime.MinValue &&
+                            BangumiData.GetAirTimeByBangumiId(item.SubjectId.ToString())?.ToLocalTime() is DateTimeOffset date)
+                        {
+                            var airTime = date.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks);
+                            if (airTime > DateTimeOffset.Now)
+                            {
+                                ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(item.NameCn, item.Name),
+                                    $"更新到：{item.NextEpDesc}", "查看", "viewSubject", "subjectId", item.SubjectId.ToString());
+                            }
+                        }
+                    }
+                }
             }
             catch (BgmUnauthorizedException e)
             {
@@ -70,6 +136,7 @@ namespace Bangumi.Background
                         cur.Value.Unregister(true);
                     }
                 }
+                ToastNotificationHelper.Toast("后台任务", "用户认证过期，后台任务已取消。");
                 Debug.WriteLine(e.StackTrace);
             }
             catch (Exception ex)
@@ -80,6 +147,26 @@ namespace Bangumi.Background
             {
                 _deferral.Complete();
             }
+
+            IEnumerable<WatchProgress> CachedWatchProgress()
+            {
+                foreach (var watching in BangumiApi.BgmCache.Watching())
+                {
+                    var subject = BangumiApi.BgmCache.Subject(watching.SubjectId.ToString());
+                    var progress = BangumiApi.BgmCache.Progress(watching.SubjectId.ToString());
+
+                    var item = WatchProgress.FromWatching(watching);
+                    item.ProcessEpisode(subject);
+                    item.ProcessProgress(progress);
+                    if (subject == null || progress == null)
+                    {
+                        // 标记以重新加载
+                        watching.Subject.Eps = -1;
+                    }
+                    yield return item;
+                }
+            }
+
         }
 
         /// <summary>

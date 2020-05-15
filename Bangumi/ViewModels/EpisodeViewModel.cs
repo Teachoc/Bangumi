@@ -349,6 +349,10 @@ namespace Bangumi.ViewModels
         /// </summary>
         public async Task LoadDetails()
         {
+            if (string.IsNullOrEmpty(SubjectId))
+            {
+                return;
+            }
             if (NetworkHelper.IsOffline)
             {
                 ProcessSubject(BangumiApi.BgmCache.Subject(SubjectId));

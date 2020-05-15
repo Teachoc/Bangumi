@@ -59,5 +59,11 @@ namespace Bangumi.Helper
             get => UseBangumiData && Get();
         }
 
+        public static bool EnableBangumiAirToast
+        {
+            set => Set(value);
+            get => UseBangumiData && UseBangumiDataAirTime && Get();
+        }
+
     }
 }

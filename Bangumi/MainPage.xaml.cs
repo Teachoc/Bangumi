@@ -232,7 +232,13 @@ namespace Bangumi
             AvaterImage.ImageSource = img;
         }
 
-        private void NavigateToPage(Type type, object parameter, NavigationTransitionInfo transitionInfo)
+        public void ResetFrameBackStack()
+        {
+            NavigateToPage(typeof(ProgressPage), null, null);
+            ContentFrame.BackStack.Clear();
+        }
+
+        public void NavigateToPage(Type type, object parameter, NavigationTransitionInfo transitionInfo)
         {
             if (type == null || ContentFrame.CurrentSourcePageType == type)
             {
@@ -251,7 +257,10 @@ namespace Bangumi
         private async Task HidePlaceholderItem()
         {
             await Task.Delay(500);
-            PlaceholderItem.Visibility = Visibility.Collapsed;
+            if (!PlaceholderItem.IsSelected)
+            {
+                PlaceholderItem.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)

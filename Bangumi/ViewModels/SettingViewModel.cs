@@ -83,7 +83,7 @@ namespace Bangumi.ViewModels
             }
             set
             {
-                if(value)
+                if (value)
                 {
                     // If the user denies access, the task will not run.
                     var requestTask = BackgroundExecutionManager.RequestAccessAsync();
@@ -105,6 +105,7 @@ namespace Bangumi.ViewModels
                 }
                 else
                 {
+                    EnableBangumiAirToast = false;
                     foreach (var cur in BackgroundTaskRegistration.AllTasks)
                     {
                         if (cur.Value.Name == "RefreshTokenTask")
@@ -206,6 +207,29 @@ namespace Bangumi.ViewModels
             set
             {
                 SettingHelper.UseBangumiDataAirTime = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(EnableBangumiAirToast));
+            }
+        }
+
+        public bool EnableBangumiAirToast
+        {
+            get => SettingHelper.EnableBangumiAirToast;
+            set
+            {
+                if (value)
+                {
+                    if (!EnableBackgroundTask)
+                    {
+                        NotificationHelper.Notify("该选项需启用后台任务后可用", NotifyType.Warn);
+                        value = false;
+                    }
+                }
+                else
+                {
+                    ToastNotificationHelper.RemoveAllScheduledToasts();
+                }
+                SettingHelper.EnableBangumiAirToast = value;
                 OnPropertyChanged();
             }
         }

@@ -142,6 +142,7 @@
     <Compile Include="Helper\OAuthHelper.cs" />
     <Compile Include="Helper\SettingHelper.cs" />
     <Compile Include="Helper\Singleton.cs" />
+    <Compile Include="Helper\ToastNotificationHelper.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -308,14 +309,20 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.Connectivity">
       <Version>6.0.0</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
+      <Version>6.0.0</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
       <Version>6.0.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.4.0-prerelease.200322001</Version>
+      <Version>2.4.0</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="QueryString.NET">
+      <Version>1.0.0</Version>
     </PackageReference>
     <PackageReference Include="System.Net.Http">
       <Version>4.3.4</Version>

@@ -1,6 +1,9 @@
 ﻿using Bangumi.Api;
 using Bangumi.Background;
+using Bangumi.Views;
+using Microsoft.QueryStringDotNET;
 using System;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -48,6 +51,16 @@ namespace Bangumi
         /// <param name="e">有关启动请求和过程的详细信息。</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            OnLaunchedOrActivated(e);
+        }
+
+        protected override void OnActivated(IActivatedEventArgs e)
+        {
+            OnLaunchedOrActivated(e);
+        }
+
+        private async void OnLaunchedOrActivated(IActivatedEventArgs e)
+        {
             Frame rootFrame = Window.Current.Content as Frame;
 
             // 不要在窗口已包含内容时重复应用程序初始化，
@@ -68,18 +81,56 @@ namespace Bangumi
                 Window.Current.Content = rootFrame;
             }
 
-            if (e.PrelaunchActivated == false)
+            // 处理正常启动
+            if (e is LaunchActivatedEventArgs launchActivatedArgs && launchActivatedArgs.PrelaunchActivated == false)
             {
                 if (rootFrame.Content == null)
                 {
                     // 当导航堆栈尚未还原时，导航到第一页，
                     // 并通过将所需信息作为导航参数传入来配置
                     // 参数
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    rootFrame.Navigate(typeof(MainPage), launchActivatedArgs.Arguments);
                 }
-                // 确保当前窗口处于活动状态
-                Window.Current.Activate();
             }
+
+            // Handle toast activation
+            if (e is ToastNotificationActivatedEventArgs toastActivationArgs)
+            {
+                if (rootFrame.Content == null)
+                {
+                    rootFrame.Navigate(typeof(MainPage));
+                }
+
+                // 等待加载完成
+                while (true)
+                {
+                    if (MainPage.RootPage.IsLoaded)
+                        break;
+                    await Task.Delay(500);
+                }
+
+                // Parse the query string (using QueryString.NET)
+                QueryString args = QueryString.Parse(toastActivationArgs.Argument);
+
+                if(args.Contains("action"))
+                {
+                    // See what action is being requested 
+                    switch (args["action"])
+                    {
+                        // Open the subject
+                        case "viewSubject":
+                            string subjectId = args["subjectId"];
+                            MainPage.RootPage.ResetFrameBackStack();
+                            MainPage.RootPage.NavigateToPage(typeof(EpisodePage), subjectId, null);
+                            break;
+                    }
+                }
+            }
+
+            // 处理其它激活方式
+
+            // 确保当前窗口处于活动状态
+            Window.Current.Activate();
         }
 
         protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)

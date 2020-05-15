@@ -38,19 +38,19 @@ namespace Bangumi.Views
             InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             (((Frame.Parent as NavigationView)?.Parent as Grid).Parent as MainPage)?.SelectPlaceholderItem("章节");
 
-            if (e.Parameter?.GetType() == typeof(int) &&
+            if (int.TryParse(e.Parameter.ToString(), out _) &&
                 (e.NavigationMode != NavigationMode.Back || ViewModel.SubjectId != e.Parameter.ToString()))
             {
                 ViewModel.SubjectId = e.Parameter.ToString();
             }
             else
             {
-                return;
+                ViewModel.SubjectId = null;
             }
 
             ViewModel.InitViewModel();
