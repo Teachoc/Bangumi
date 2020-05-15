@@ -13,5 +13,8 @@ namespace Bangumi.Common
         public const string EmptyImgUri = "ms-appx:///Assets/resource/empty.png";
         public const string NoAvatarImgUri = "ms-appx:///Assets/resource/akkarin.jpg";
         public const string WelcomeImgUri = "ms-appx:///Assets/resource/welcome.png";
+        public const string ClientId = "bgm8905c514a1b94ec1";
+        public const string ClientSecret = "b678c34dd896203627da308b6b453775";
+        public const string RedirectUrl = "BangumiGithubVersion";
     }
 }

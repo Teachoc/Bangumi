@@ -45,14 +45,20 @@ namespace Bangumi.Api.Common
         {
             if (!File.Exists(filePath))
             {
-                using var f = File.Create(filePath);
+                using (var writer = File.CreateText(filePath))
+                {
+                    await writer.WriteAsync(data).ConfigureAwait(false);
+                }
             }
-            var tempFile = filePath + ".temp";
-            using (var writer = File.CreateText(tempFile))
+            else
             {
-                await writer.WriteAsync(data).ConfigureAwait(false);
+                var tempFile = filePath + ".temp";
+                using (var writer = File.CreateText(tempFile))
+                {
+                    await writer.WriteAsync(data).ConfigureAwait(false);
+                }
+                File.Replace(tempFile, filePath, null);
             }
-            File.Replace(tempFile, filePath, null);
         }
 
         #endregion
@@ -68,17 +74,23 @@ namespace Bangumi.Api.Common
         {
             try
             {
+                var encryptedData = await EncryptionAsync(data);
                 if (!File.Exists(filePath))
                 {
-                    using var f = File.Create(filePath);
+                    using (var writer = File.Create(filePath))
+                    {
+                        await writer.WriteAsync(encryptedData, 0, encryptedData.Length).ConfigureAwait(false);
+                    }
                 }
-                var encryptedData = await EncryptionAsync(data);
-                var tempFile = filePath + ".temp";
-                using (var writer = File.Create(tempFile))
+                else
                 {
-                    await writer.WriteAsync(encryptedData, 0, encryptedData.Length).ConfigureAwait(false);
+                    var tempFile = filePath + ".temp";
+                    using (var writer = File.Create(tempFile))
+                    {
+                        await writer.WriteAsync(encryptedData, 0, encryptedData.Length).ConfigureAwait(false);
+                    }
+                    File.Replace(tempFile, filePath, null);
                 }
-                File.Replace(tempFile, filePath, null);
             }
             catch (Exception e)
             {

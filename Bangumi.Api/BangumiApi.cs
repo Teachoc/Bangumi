@@ -48,6 +48,10 @@ namespace Bangumi.Api
             {
                 throw new ArgumentNullException(nameof(redirectUrl));
             }
+            if (string.IsNullOrEmpty(localFolder))
+            {
+                throw new ArgumentNullException(nameof(localFolder));
+            }
             FileHelper.EncryptionAsync = encryptionDelegate ?? throw new ArgumentNullException(nameof(encryptionDelegate));
             FileHelper.DecryptionAsync = decryptionDelegate ?? throw new ArgumentNullException(nameof(decryptionDelegate));
 

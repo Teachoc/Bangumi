@@ -36,7 +36,12 @@ namespace Bangumi.Api.Services
 
         public BgmCache(string cacheFolder)
         {
-            _cacheFolder = cacheFolder ?? throw new ArgumentNullException(nameof(cacheFolder));
+            if (string.IsNullOrWhiteSpace(cacheFolder))
+            {
+                _cache = new Cache();
+                return;
+            }
+            _cacheFolder = cacheFolder;
             // 加载缓存
             if (File.Exists(AppFile.BangumiCache.GetFilePath(_cacheFolder)))
             {
@@ -77,6 +82,11 @@ namespace Bangumi.Api.Services
 
         public async Task WriteToFile()
         {
+            if (string.IsNullOrWhiteSpace(_cacheFolder))
+            {
+                throw new InvalidOperationException("No cache folder specified.");
+            }
+
             if (_isCacheUpdated)
             {
                 _isCacheUpdated = false;
@@ -87,6 +97,11 @@ namespace Bangumi.Api.Services
 
         public void Delete()
         {
+            if (string.IsNullOrWhiteSpace(_cacheFolder))
+            {
+                throw new InvalidOperationException("No cache folder specified.");
+            }
+
             _isCacheUpdated = false;
             _cache = null;
             _cache = new Cache();
@@ -95,6 +110,11 @@ namespace Bangumi.Api.Services
 
         public long GetFileLength()
         {
+            if (string.IsNullOrWhiteSpace(_cacheFolder))
+            {
+                throw new InvalidOperationException("No cache folder specified.");
+            }
+
             return FileHelper.GetFileLength(AppFile.BangumiCache.GetFilePath(_cacheFolder));
         }
 

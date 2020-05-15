@@ -121,6 +121,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Background\BackgroundActivity.cs" />
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Common\Converters.cs" />
     <Compile Include="Common\ViewModelBase.cs" />

@@ -1,4 +1,5 @@
 ﻿using Bangumi.Api;
+using Bangumi.Background;
 using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -79,6 +80,11 @@ namespace Bangumi
                 // 确保当前窗口处于活动状态
                 Window.Current.Activate();
             }
+        }
+
+        protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            BackgroundActivity.Start(args.TaskInstance);
         }
 
         /// <summary>

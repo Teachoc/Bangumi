@@ -117,9 +117,9 @@ namespace Bangumi
             // 初始化 Api 对象
             // 将自己申请的应用相关信息填入 https://bgm.tv/dev/app
             BangumiApi.Init(
-                "bgm8905c514a1b94ec1",
-                "b678c34dd896203627da308b6b453775",
-                "BangumiGithubVersion",
+                Constants.ClientId,
+                Constants.ClientSecret,
+                Constants.RedirectUrl,
                 ApplicationData.Current.LocalFolder.Path,
                 ApplicationData.Current.LocalCacheFolder.Path,
                 EncryptionHelper.EncryptionAsync,

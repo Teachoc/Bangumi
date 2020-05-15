@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.Background;
 using Windows.Storage;
 
 namespace Bangumi.ViewModels
@@ -63,6 +64,56 @@ namespace Bangumi.ViewModels
             set
             {
                 SettingHelper.OrderByAirTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool EnableBackgroundTask
+        {
+            get
+            {
+                foreach (var cur in BackgroundTaskRegistration.AllTasks)
+                {
+                    if (cur.Value.Name == "RefreshTokenTask")
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            set
+            {
+                if(value)
+                {
+                    // If the user denies access, the task will not run.
+                    var requestTask = BackgroundExecutionManager.RequestAccessAsync();
+
+                    var builder = new BackgroundTaskBuilder();
+
+                    builder.Name = "RefreshTokenTask";
+
+                    builder.SetTrigger(new TimeTrigger((uint)TimeSpan.FromDays(1).TotalMinutes, false));
+
+                    builder.AddCondition(new SystemCondition(SystemConditionType.InternetAvailable));
+
+                    // If the condition changes while the background task is executing then it will
+                    // be canceled.
+                    builder.CancelOnConditionLoss = true;
+
+                    builder.Register();
+
+                }
+                else
+                {
+                    foreach (var cur in BackgroundTaskRegistration.AllTasks)
+                    {
+                        if (cur.Value.Name == "RefreshTokenTask")
+                        {
+                            cur.Value.Unregister(true);
+                        }
+                    }
+                }
+
                 OnPropertyChanged();
             }
         }

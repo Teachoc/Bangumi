@@ -50,6 +50,16 @@
                             </ToggleSwitch.Header>
                         </ToggleSwitch>
 
+                        <!-- 启用后台任务进行身份续期 -->
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.EnableBackgroundTask, Mode=TwoWay}" >
+                            <ToggleSwitch.Header>
+                                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                           Text="启用后台任务进行身份续期"
+                                           Margin="0,4,0,0"
+                                           TextWrapping="Wrap" />
+                            </ToggleSwitch.Header>
+                        </ToggleSwitch>
+
                         <!-- 用户数据缓存 -->
                         <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                                    Text="用户数据缓存"
