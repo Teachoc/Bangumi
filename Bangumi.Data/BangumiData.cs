@@ -17,7 +17,7 @@ namespace Bangumi.Data
         private const string BangumiDataCDNUrl = "https://cdn.jsdelivr.net/npm/bangumi-data@0.3/dist/data.json";
         private static BangumiDataSet _dataSet;
         private static Dictionary<string, string> _seasonIdMap;
-        private static VersionInfo _info = new VersionInfo();
+        private static VersionInfo _info;
         private static string _folderPath;
         public static string LatestVersion { get; private set; }
         public static string Version => _info.Version;
@@ -116,7 +116,10 @@ namespace Bangumi.Data
                     // 从老版本升级
                     if (File.Exists(AppFile.Version.GetFilePath(_folderPath)))
                     {
-                        _info.Version = await FileHelper.ReadTextAsync(AppFile.Version.GetFilePath(_folderPath));
+                        _info = new VersionInfo
+                        {
+                            Version = await FileHelper.ReadTextAsync(AppFile.Version.GetFilePath(_folderPath))
+                        };
                         await SaveConfig();
                         FileHelper.DeleteFile(AppFile.Version.GetFilePath(_folderPath));
                         return;
@@ -129,6 +132,12 @@ namespace Bangumi.Data
                     FileHelper.DeleteFile(AppFile.Config_json.GetFilePath(_folderPath));
                 }
                 _info ??= new VersionInfo();
+                // 未设置站点时，设置默认值
+                if (_info.SitesEnabledOrder == null)
+                {
+                    _info.SitesEnabledOrder = _dataSet.SiteMeta.Where(it => it.Value.Type == "onair").Select(it => it.Key).ToArray();
+                    await SaveConfig();
+                }
             }).Wait();
             Task.Run(async () =>
             {
@@ -168,11 +177,9 @@ namespace Bangumi.Data
         /// <returns></returns>
         public static DateTimeOffset? GetAirTimeByBangumiId(string id)
         {
-            var siteList = GetAirSitesByBangumiId(id);
-            string[] airSites = { "bilibili", "acfun", "iqiyi", "qq" };
-            foreach (var siteName in airSites)
+            var siteList = GetOrderedSitesByBangumiId(id);
+            foreach (var site in siteList)
             {
-                if (!(siteList.FirstOrDefault(s => s.SiteName == siteName) is Site site)) continue;
                 if (!site.Begin.HasValue) continue;
                 return site.Begin.Value;
             }
@@ -181,18 +188,19 @@ namespace Bangumi.Data
         }
 
         /// <summary>
-        /// 根据Bangumi的ID返回所有放送网站
+        /// 根据Bangumi的ID返回启用的排好序的放送网站
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public static async Task<List<Site>> GetAirSitesByBangumiIdAsync(string id)
         {
-            var siteList = GetAirSitesByBangumiId(id);
+            var siteList = GetOrderedSitesByBangumiId(id).ToList();
             foreach (var site in siteList)
             {
-                site.Url = string.IsNullOrEmpty(site.Id)
-                           ? site.Url
-                           : _dataSet.SiteMeta[site.SiteName].UrlTemplate.Replace("{{id}}", site.Id);
+                if (!string.IsNullOrEmpty(site.Id))
+                {
+                    site.Url = _dataSet.SiteMeta[site.SiteName].UrlTemplate.Replace("{{id}}", site.Id);
+                }
             }
 
             // 启用设置，将mediaid转换为seasonid
@@ -225,14 +233,55 @@ namespace Bangumi.Data
                 }
             }
 
+            siteList.ForEach(it => it.SiteName = _dataSet.SiteMeta[it.SiteName].Title);
             return siteList;
+        }
 
+        /// <summary>
+        /// 获取未启用的站点
+        /// </summary>
+        /// <returns></returns>
+        public static IDictionary<string, SiteMeta> GetNotEnabledSites()
+        {
+            var sites = new Dictionary<string, SiteMeta>();
+            foreach (var item in _dataSet.SiteMeta)
+            {
+                if (!_info.SitesEnabledOrder.Contains(item.Key) && item.Key != "bangumi")
+                {
+                    sites.Add(item.Key, item.Value);
+                }
+            }
+            return sites;
+        }
+
+        /// <summary>
+        /// 获取已启用站点以及顺序
+        /// </summary>
+        /// <returns></returns>
+        public static IDictionary<string, SiteMeta> GetEnabledSites()
+        {
+            var sites = new Dictionary<string, SiteMeta>();
+            foreach (var site in _info.SitesEnabledOrder)
+            {
+                sites.Add(site, _dataSet.SiteMeta[site]);
+            }
+            return sites;
+        }
+
+        /// <summary>
+        /// 设置启用的站点以及顺序
+        /// </summary>
+        /// <param name="siteKeys"></param>
+        public static async Task SetSitesEnabledOrder(string[] siteKeys)
+        {
+            _info.SitesEnabledOrder = siteKeys;
+            await SaveConfig();
         }
         #endregion
 
         #region 版本更新
         /// <summary>
-        /// 解析网页获取最新版本号，并暂存
+        /// 获取最新版本号，并暂存
         /// </summary>
         /// <returns>返回最新版本号</returns>
         public static async Task<string> GetLatestVersion()
@@ -295,11 +344,40 @@ namespace Bangumi.Data
         /// <summary>
         /// 根据Bangumi的ID返回所有放送网站
         /// </summary>
-        private static List<Site> GetAirSitesByBangumiId(string id)
+        private static IEnumerable<Site> GetOrderedSitesByBangumiId(string id)
         {
-            return _dataSet?.Items.FirstOrDefault(e => e.Sites.Any(s => s.SiteName == "bangumi" && s.Id == id))?.Sites
-                .Where(s => _dataSet.SiteMeta[s.SiteName].Type == "onair").ToList()
-                ?? new List<Site>();
+            var bangumiItem = GetItemByBangumiId(id);
+            var sites = bangumiItem?.Sites;
+            if (sites == null)
+            {
+                yield break;
+            }
+            foreach (var item in _info.SitesEnabledOrder)
+            {
+                // 未标明的资源站使用番剧标题作为ID
+                if (_dataSet.SiteMeta[item].Type == "resource" && !sites.Any(it => it.SiteName == item))
+                {
+                    yield return new Site
+                    {
+                        SiteName = item,
+                        Id = bangumiItem.TitleTranslate?.ZhHans.FirstOrDefault() ??
+                             bangumiItem.TitleTranslate?.ZhHant.FirstOrDefault() ??
+                             bangumiItem.TitleTranslate?.En.FirstOrDefault() ??
+                             bangumiItem.Title
+                    };
+                }
+                var site = sites.FirstOrDefault(it => it.SiteName == item);
+                if (site == null)
+                {
+                    continue;
+                }
+                yield return site.Clone();
+            }
+        }
+
+        private static Item GetItemByBangumiId(string id)
+        {
+            return _dataSet?.Items.FirstOrDefault(e => e.Sites.Any(s => s.SiteName == "bangumi" && s.Id == id));
         }
 
         private static Task SaveConfig()

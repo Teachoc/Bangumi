@@ -12,6 +12,7 @@ namespace Bangumi.Data.Models
         public bool AutoUpdate { get; set; } = false;
         public DateTimeOffset LastUpdate { get; set; }
         public int CheckInterval { get; set; } = 7;
+        public string[] SitesEnabledOrder { get; set; }
 
         public string ToJson() =>
             JsonConvert.SerializeObject(this);

@@ -86,6 +86,7 @@
             </Hyperlink>
         </TextBlock>
         <local3:InAppNotification x:Name="NotifyControl"
-                                  Grid.Row="1"/>
+                                  Grid.Row="1"
+                                  Grid.ColumnSpan="2"/>
     </Grid>
 </Page>

@@ -120,6 +120,27 @@ namespace Bangumi.ViewModels
                 }
                 BangumiApi.BgmCache.IsUpdatedToday = true;
                 CollectionHelper.Differ(WatchingCollection, SortWatchProgress(newWatchStatus).ToList());
+
+                if (SettingHelper.EnableBangumiAirToast)
+                {
+                    ToastNotificationHelper.RemoveAllScheduledToasts();
+                    foreach (var item in CachedWatchProgress())
+                    {
+                        var first = item.Eps?.FirstOrDefault(ep => ep.Type == EpisodeType.本篇)?.AirDate;
+                        var last = item.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate;
+                        if (SettingHelper.UseBangumiDataAirTime &&
+                            first != null && first != DateTime.MinValue && last != null && last != DateTime.MinValue &&
+                            BangumiData.GetAirTimeByBangumiId(item.SubjectId.ToString())?.ToLocalTime() is DateTimeOffset date)
+                        {
+                            var airTime = date.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks);
+                            if (airTime > DateTimeOffset.Now)
+                            {
+                                ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(item.NameCn, item.Name),
+                                    $"更新到：{item.NextEpDesc}", "查看", "viewSubject", "subjectId", item.SubjectId.ToString());
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {

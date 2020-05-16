@@ -1,5 +1,6 @@
 ﻿using Bangumi.Api;
 using Bangumi.Common;
+using Bangumi.ContentDialogs;
 using Bangumi.Controls;
 using Bangumi.Data;
 using Bangumi.Helper;
@@ -403,6 +404,14 @@ namespace Bangumi.ViewModels
             BangumiDataVersionChecking = false;
         }
 
+        /// <summary>
+        /// 打开站点设置面板
+        /// </summary>
+        public async Task OpenSitesContentDialog()
+        {
+            var dg = new SitesContentDialog();
+            await dg.ShowAsync();
+        }
 
     }
 

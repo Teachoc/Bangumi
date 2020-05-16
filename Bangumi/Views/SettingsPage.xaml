@@ -139,13 +139,16 @@
                                             SpinButtonPlacementMode="Inline" 
                                             Width="180"
                                             HorizontalAlignment="Left"/>
+                            <Button Content="设置站点" 
+                                    Margin="0,4,0,0"
+                                    Click="{x:Bind ViewModel.OpenSitesContentDialog}"/>
                             <!-- 显示番剧放送网站 -->
                             <ToggleSwitch IsOn="{x:Bind ViewModel.UseBangumiDataAirSites, Mode=TwoWay}" >
                                 <ToggleSwitch.Header>
                                     <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                                           Text="使用 bangumi-data 数据显示番剧放送网站"
-                                           Margin="0,4,0,0"
-                                           TextWrapping="Wrap" />
+                                               Text="使用 bangumi-data 数据显示番剧放送网站"
+                                               Margin="0,4,0,0"
+                                               TextWrapping="Wrap" />
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
                             <!-- 使用哔哩哔哩动画应用打开 -->

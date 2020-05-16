@@ -39,6 +39,15 @@ namespace Bangumi.Data.Models
         /// </summary>
         [JsonProperty("url")]
         public string Url { get; set; }
+
+        public Site Clone() => new Site
+        {
+            SiteName = SiteName,
+            Id = Id,
+            Begin = Begin,
+            Comment = Comment,
+            Url = Url
+        };
     }
 
 }
