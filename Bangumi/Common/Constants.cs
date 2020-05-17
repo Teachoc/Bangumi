@@ -16,5 +16,8 @@ namespace Bangumi.Common
         public const string ClientId = "bgm8905c514a1b94ec1";
         public const string ClientSecret = "b678c34dd896203627da308b6b453775";
         public const string RedirectUrl = "BangumiGithubVersion";
+
+        public const string RefreshTokenTask = "RefreshTokenTask";
+        public const string ToastBackgroundTask = "ToastBackgroundTask";
     }
 }

@@ -1,11 +1,17 @@
 ﻿using Bangumi.Api;
-using Bangumi.Background;
+using Bangumi.BackgroundTasks;
+using Bangumi.Common;
+using Bangumi.Data;
+using Bangumi.Helper;
+using Bangumi.ViewModels;
 using Bangumi.Views;
 using Microsoft.QueryStringDotNET;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -112,16 +118,27 @@ namespace Bangumi
                 // Parse the query string (using QueryString.NET)
                 QueryString args = QueryString.Parse(toastActivationArgs.Argument);
 
-                if(args.Contains("action"))
+                if (args.Contains("action"))
                 {
+                    string id = string.Empty;
                     // See what action is being requested 
                     switch (args["action"])
                     {
                         // Open the subject
                         case "viewSubject":
-                            string subjectId = args["subjectId"];
+                            id = args["subjectId"];
                             MainPage.RootPage.ResetFrameBackStack();
-                            MainPage.RootPage.NavigateToPage(typeof(EpisodePage), subjectId, null);
+                            MainPage.RootPage.NavigateToPage(typeof(EpisodePage), args["subjectId"], null);
+                            break;
+                        case "gotoPlaySite":
+                            id = args["url"];
+                            var sites = await BangumiData.GetAirSitesByBangumiIdAsync(id);
+                            await Launcher.LaunchUriAsync(new Uri(args["url"]));
+                            var episode = JsonConvert.DeserializeObject<EpisodeForSort>(args["episode"]);
+                            ToastNotificationHelper.Toast("看完了吗？",
+                                $"Ep.{episode.Sort} {Converters.StringOneOrTwo(episode.NameCn, episode.Name)}", "看完了！看完了！",
+                                "markEpWatched", "episodeId", episode.Id.ToString(), string.Empty, string.Empty,
+                                Microsoft.Toolkit.Uwp.Notifications.ToastActivationType.Background, true);
                             break;
                     }
                 }
@@ -135,7 +152,18 @@ namespace Bangumi
 
         protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
         {
-            BackgroundActivity.Start(args.TaskInstance);
+            switch (args.TaskInstance.Task.Name)
+            {
+                case Constants.ToastBackgroundTask:
+                    var activity = new ToastBackgroundTask();
+                    activity.Run(args.TaskInstance);
+                    break;
+                case Constants.RefreshTokenTask:
+                    BackgroundActivity.Start(args.TaskInstance);
+                    break;
+                default:
+                    break;
+            }
         }
 
         /// <summary>

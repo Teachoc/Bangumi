@@ -8,6 +8,7 @@ using Bangumi.Controls;
 using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.Views;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -135,8 +136,18 @@ namespace Bangumi.ViewModels
                             var airTime = date.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks);
                             if (airTime > DateTimeOffset.Now)
                             {
-                                ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(item.NameCn, item.Name),
-                                    $"更新到：{item.NextEpDesc}", "查看", "viewSubject", "subjectId", item.SubjectId.ToString());
+                                if (!SettingHelper.UseActionCenterMode)
+                                {
+                                    ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(item.NameCn, item.Name),
+                                        $"更新到：{item.NextEpDesc}", "查看", "viewSubject", "subjectId", item.SubjectId.ToString());
+                                }
+                                else
+                                {
+                                    var sites = await BangumiData.GetAirSitesByBangumiIdAsync(item.SubjectId.ToString());
+                                    var site = sites.FirstOrDefault();
+                                    ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(item.NameCn, item.Name),
+                                        $"更新到：{item.NextEpDesc}", $"前往{site.SiteName}播放", "gotoPlaySite", "url", site.Url, "episode", JsonConvert.SerializeObject(item.NextEp));
+                                }
                             }
                         }
                     }
@@ -459,6 +470,35 @@ namespace Bangumi.ViewModels
             finally
             {
                 IsUpdating = false;
+            }
+        }
+
+        /// <summary>
+        /// 标记下一话为看过，静默（后台任务使用）
+        /// </summary>
+        public async Task<(bool, string)> MarkNextEpWatchedSilently()
+        {
+            if (NetworkHelper.IsOffline)
+            {
+                return (false, "无网络连接！");
+            }
+            var next = NextEp;
+            try
+            {
+                if (await BangumiApi.BgmApi.UpdateProgress(next.Id.ToString(), EpStatusType.watched))
+                {
+                    next.EpStatus = EpStatusType.watched;
+                    LastTouch = DateTime.Now.ToJsTick();
+                    return (true, $"标记 ep.{next.Sort} {Converters.StringOneOrTwo(next.NameCn, next.Name)} {EpStatusType.watched.GetCnName()}成功");
+                }
+                else
+                {
+                    return (false, $"标记 ep.{next.Sort} {Converters.StringOneOrTwo(next.NameCn, next.Name)} {EpStatusType.watched.GetCnName()}失败，请重试！");
+                }
+            }
+            catch (Exception e)
+            {
+                return (false, $"标记 ep.{next.Sort} {Converters.StringOneOrTwo(next.NameCn, next.Name)} {EpStatusType.watched.GetCnName()}失败！\n错误信息：{e.Message}");
             }
         }
 

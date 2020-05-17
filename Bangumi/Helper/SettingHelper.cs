@@ -50,7 +50,7 @@ namespace Bangumi.Helper
         public static bool UseBiliApp
         {
             set => Set(value);
-            get => UseBangumiData && UseBangumiDataAirSites && Get();
+            get => UseBangumiDataAirSites && Get();
         }
 
         public static bool UseBangumiDataAirTime
@@ -62,7 +62,13 @@ namespace Bangumi.Helper
         public static bool EnableBangumiAirToast
         {
             set => Set(value);
-            get => UseBangumiData && UseBangumiDataAirTime && Get();
+            get => UseBangumiDataAirTime && Get();
+        }
+
+        public static bool UseActionCenterMode
+        {
+            set => Set(value);
+            get => EnableBangumiAirToast && Get();
         }
 
     }

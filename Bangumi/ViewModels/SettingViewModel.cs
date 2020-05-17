@@ -7,6 +7,7 @@ using Bangumi.Helper;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Background;
@@ -75,7 +76,7 @@ namespace Bangumi.ViewModels
             {
                 foreach (var cur in BackgroundTaskRegistration.AllTasks)
                 {
-                    if (cur.Value.Name == "RefreshTokenTask")
+                    if (cur.Value.Name == Constants.RefreshTokenTask)
                     {
                         return true;
                     }
@@ -91,7 +92,7 @@ namespace Bangumi.ViewModels
 
                     var builder = new BackgroundTaskBuilder();
 
-                    builder.Name = "RefreshTokenTask";
+                    builder.Name = Constants.RefreshTokenTask;
 
                     builder.SetTrigger(new TimeTrigger((uint)TimeSpan.FromDays(1).TotalMinutes, false));
 
@@ -107,12 +108,10 @@ namespace Bangumi.ViewModels
                 else
                 {
                     EnableBangumiAirToast = false;
+                    // 取消所有后台任务
                     foreach (var cur in BackgroundTaskRegistration.AllTasks)
                     {
-                        if (cur.Value.Name == "RefreshTokenTask")
-                        {
-                            cur.Value.Unregister(true);
-                        }
+                        cur.Value.Unregister(true);
                     }
                 }
 
@@ -210,6 +209,7 @@ namespace Bangumi.ViewModels
                 SettingHelper.UseBangumiDataAirTime = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(EnableBangumiAirToast));
+                OnPropertyChanged(nameof(UseActionCenterMode));
             }
         }
 
@@ -231,6 +231,46 @@ namespace Bangumi.ViewModels
                     ToastNotificationHelper.RemoveAllScheduledToasts();
                 }
                 SettingHelper.EnableBangumiAirToast = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(UseActionCenterMode));
+            }
+        }
+
+        public bool UseActionCenterMode
+        {
+            get
+            {
+                var v = BackgroundTaskRegistration.AllTasks.Any(i => i.Value.Name.Equals(Constants.ToastBackgroundTask));
+                SettingHelper.UseActionCenterMode = v;
+                return v;
+            }
+            set
+            {
+                if (value)
+                {
+                    // If the user denies access, the task will not run.
+                    var requestTask = BackgroundExecutionManager.RequestAccessAsync();
+
+                    var builder = new BackgroundTaskBuilder();
+
+                    builder.Name = Constants.ToastBackgroundTask;
+
+                    builder.SetTrigger(new ToastNotificationActionTrigger());
+
+                    builder.Register();
+
+                }
+                else
+                {
+                    foreach (var cur in BackgroundTaskRegistration.AllTasks)
+                    {
+                        if (cur.Value.Name == Constants.ToastBackgroundTask)
+                        {
+                            cur.Value.Unregister(true);
+                        }
+                    }
+                }
+                SettingHelper.UseActionCenterMode = value;
                 OnPropertyChanged();
             }
         }

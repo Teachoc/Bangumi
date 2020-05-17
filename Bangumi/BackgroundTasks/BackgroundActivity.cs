@@ -16,9 +16,11 @@ using Bangumi.Common;
 using Bangumi.Data;
 using Bangumi.Helper;
 using Bangumi.ViewModels;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -26,7 +28,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.Storage;
 
-namespace Bangumi.Background
+namespace Bangumi.BackgroundTasks
 {
     public class BackgroundActivity
     {
@@ -62,7 +64,7 @@ namespace Bangumi.Background
                     Constants.ClientSecret,
                     Constants.RedirectUrl,
                     ApplicationData.Current.LocalFolder.Path,
-                    null,
+                    ApplicationData.Current.LocalCacheFolder.Path,
                     EncryptionHelper.EncryptionAsync,
                     EncryptionHelper.DecryptionAsync);
 
@@ -70,6 +72,10 @@ namespace Bangumi.Background
 
                 if (SettingHelper.EnableBangumiAirToast)
                 {
+                    // 初始化 BangumiData 对象
+                    BangumiData.Init(Path.Combine(ApplicationData.Current.LocalFolder.Path, "bangumi-data"),
+                                     SettingHelper.UseBiliApp);
+
                     if (!BangumiApi.BgmCache.IsUpdatedToday)
                     {
                         // 加载缓存，后面获取新数据后比较需要使用
@@ -106,6 +112,7 @@ namespace Bangumi.Background
                             await Task.WhenAll(progressTasks);
                         }
                         BangumiApi.BgmCache.IsUpdatedToday = true;
+                        await BangumiApi.BgmCache.WriteToFile();
                     }
 
                     ToastNotificationHelper.RemoveAllScheduledToasts();
@@ -113,15 +120,24 @@ namespace Bangumi.Background
                     {
                         var first = item.Eps?.FirstOrDefault(ep => ep.Type == EpisodeType.本篇)?.AirDate;
                         var last = item.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate;
-                        if (SettingHelper.UseBangumiDataAirTime &&
-                            first != null && first != DateTime.MinValue && last != null && last != DateTime.MinValue &&
+                        if (first != null && first != DateTime.MinValue && last != null && last != DateTime.MinValue &&
                             BangumiData.GetAirTimeByBangumiId(item.SubjectId.ToString())?.ToLocalTime() is DateTimeOffset date)
                         {
                             var airTime = date.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks);
                             if (airTime > DateTimeOffset.Now)
                             {
-                                ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(item.NameCn, item.Name),
-                                    $"更新到：{item.NextEpDesc}", "查看", "viewSubject", "subjectId", item.SubjectId.ToString());
+                                if (!SettingHelper.UseActionCenterMode)
+                                {
+                                    ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(item.NameCn, item.Name),
+                                        $"更新到：{item.NextEpDesc}", "查看", "viewSubject", "subjectId", item.SubjectId.ToString());
+                                }
+                                else
+                                {
+                                    var sites = await BangumiData.GetAirSitesByBangumiIdAsync(item.SubjectId.ToString());
+                                    var site = sites.FirstOrDefault();
+                                    ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(item.NameCn, item.Name),
+                                        $"更新到：{item.NextEpDesc}", $"前往{site.SiteName}播放", "gotoPlaySite", "url", site.Url, "episode", JsonConvert.SerializeObject(item.NextEp));
+                                }
                             }
                         }
                     }
@@ -129,12 +145,10 @@ namespace Bangumi.Background
             }
             catch (BgmUnauthorizedException e)
             {
+                // 取消所有后台任务
                 foreach (var cur in BackgroundTaskRegistration.AllTasks)
                 {
-                    if (cur.Value.Name == "RefreshTokenTask")
-                    {
-                        cur.Value.Unregister(true);
-                    }
+                    cur.Value.Unregister(true);
                 }
                 ToastNotificationHelper.Toast("后台任务", "用户认证过期，后台任务已取消。");
                 Debug.WriteLine(e.StackTrace);

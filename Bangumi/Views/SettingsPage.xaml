@@ -182,6 +182,16 @@
                                                TextWrapping="Wrap" />
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
+                            <!-- 使用通知中心交互模式 -->
+                            <ToggleSwitch Visibility="{x:Bind ViewModel.EnableBangumiAirToast, Mode=OneWay}"
+                                          IsOn="{x:Bind ViewModel.UseActionCenterMode, Mode=TwoWay}" >
+                                <ToggleSwitch.Header>
+                                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                                               Text="使用通知中心交互模式"
+                                               Margin="0,4,0,0"
+                                               TextWrapping="Wrap" />
+                                </ToggleSwitch.Header>
+                            </ToggleSwitch>
                         </StackPanel>
 
                     </StackPanel>
