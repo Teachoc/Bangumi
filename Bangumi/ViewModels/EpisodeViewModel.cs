@@ -349,15 +349,9 @@ namespace Bangumi.ViewModels
         /// </summary>
         public async Task LoadDetails()
         {
-            if (string.IsNullOrEmpty(SubjectId))
-            {
-                return;
-            }
             if (NetworkHelper.IsOffline)
             {
-                ProcessSubject(BangumiApi.BgmCache.Subject(SubjectId));
-                ProcessProgress(BangumiApi.BgmCache.Progress(SubjectId));
-                SetCollectionStatus(BangumiApi.BgmCache.Status(SubjectId)?.Status?.Id);
+                LoadDetailsFromCache();
                 return;
             }
             if (IsLoading)
@@ -405,6 +399,17 @@ namespace Bangumi.ViewModels
                 IsProgressLoading = false;
                 IsStatusLoading = false;
             }
+        }
+
+        /// <summary>
+        /// 从缓存加载详情和章节，
+        /// 用户进度，收藏状态。
+        /// </summary>
+        public void LoadDetailsFromCache()
+        {
+            ProcessSubject(BangumiApi.BgmCache.Subject(SubjectId));
+            ProcessProgress(BangumiApi.BgmCache.Progress(SubjectId));
+            SetCollectionStatus(BangumiApi.BgmCache.Status(SubjectId)?.Status?.Id);
         }
 
         /// <summary>

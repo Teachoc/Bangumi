@@ -30,6 +30,10 @@ namespace Bangumi.Views
 
         public async Task Refresh()
         {
+            if (string.IsNullOrEmpty(ViewModel.SubjectId))
+            {
+                return;
+            }
             await ViewModel.LoadDetails();
         }
 
@@ -38,23 +42,24 @@ namespace Bangumi.Views
             InitializeComponent();
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             (((Frame.Parent as NavigationView)?.Parent as Grid).Parent as MainPage)?.SelectPlaceholderItem("章节");
 
-            if (int.TryParse(e.Parameter.ToString(), out _) &&
-                (e.NavigationMode != NavigationMode.Back || ViewModel.SubjectId != e.Parameter.ToString()))
+            if (int.TryParse(e.Parameter.ToString(), out _))
             {
                 ViewModel.SubjectId = e.Parameter.ToString();
+                ViewModel.InitViewModel();
+                if (e.NavigationMode == NavigationMode.Back)
+                {
+                    ViewModel.LoadDetailsFromCache();
+                }
+                else
+                {
+                    ViewModel.LoadDetails();
+                }
             }
-            else
-            {
-                ViewModel.SubjectId = null;
-            }
-
-            ViewModel.InitViewModel();
-            ViewModel.LoadDetails();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)

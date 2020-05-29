@@ -228,6 +228,7 @@ namespace Bangumi.ViewModels
                 }
                 else
                 {
+                    UseActionCenterMode = false;
                     ToastNotificationHelper.RemoveAllScheduledToasts();
                 }
                 SettingHelper.EnableBangumiAirToast = value;
