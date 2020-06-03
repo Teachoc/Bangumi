@@ -17,7 +17,7 @@ namespace Bangumi.Data
         private const string BangumiDataCDNUrl = "https://cdn.jsdelivr.net/npm/bangumi-data@0.3/dist/data.json";
         private static BangumiDataSet _dataSet;
         private static Dictionary<string, string> _seasonIdMap;
-        private static VersionInfo _info;
+        private static VersionInfo _info = new VersionInfo();
         private static string _folderPath;
         public static string LatestVersion { get; private set; }
         public static string Version => _info.Version;
