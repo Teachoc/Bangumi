@@ -87,6 +87,13 @@ namespace Bangumi.ViewModels
             {
                 if (value)
                 {
+                    if (!BangumiApi.BgmOAuth.IsLogin)
+                    {
+                        NotificationHelper.Notify("请先登录！", NotifyType.Warn);
+                        OnPropertyChanged();
+                        return;
+                    }
+
                     // If the user denies access, the task will not run.
                     var requestTask = BackgroundExecutionManager.RequestAccessAsync();
 

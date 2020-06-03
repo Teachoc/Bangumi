@@ -135,7 +135,7 @@ namespace Bangumi.Data
                 // 未设置站点时，设置默认值
                 if (_info.SitesEnabledOrder == null)
                 {
-                    _info.SitesEnabledOrder = _dataSet.SiteMeta.Where(it => it.Value.Type == "onair").Select(it => it.Key).ToArray();
+                    _info.SitesEnabledOrder = _dataSet?.SiteMeta.Where(it => it.Value.Type == "onair").Select(it => it.Key).ToArray();
                     await SaveConfig();
                 }
             }).Wait();
@@ -244,11 +244,14 @@ namespace Bangumi.Data
         public static IDictionary<string, SiteMeta> GetNotEnabledSites()
         {
             var sites = new Dictionary<string, SiteMeta>();
-            foreach (var item in _dataSet.SiteMeta)
+            if (_dataSet?.SiteMeta != null && _info.SitesEnabledOrder != null)
             {
-                if (!_info.SitesEnabledOrder.Contains(item.Key) && item.Key != "bangumi")
+                foreach (var item in _dataSet.SiteMeta)
                 {
-                    sites.Add(item.Key, item.Value);
+                    if (!_info.SitesEnabledOrder.Contains(item.Key) && item.Key != "bangumi")
+                    {
+                        sites.Add(item.Key, item.Value);
+                    }
                 }
             }
             return sites;
@@ -261,9 +264,15 @@ namespace Bangumi.Data
         public static IDictionary<string, SiteMeta> GetEnabledSites()
         {
             var sites = new Dictionary<string, SiteMeta>();
-            foreach (var site in _info.SitesEnabledOrder)
+            if (_dataSet?.SiteMeta != null && _info.SitesEnabledOrder != null)
             {
-                sites.Add(site, _dataSet.SiteMeta[site]);
+                foreach (var site in _info.SitesEnabledOrder)
+                {
+                    if (_dataSet.SiteMeta.TryGetValue(site, out var siteMeta))
+                    {
+                        sites.Add(site, siteMeta);
+                    }
+                }
             }
             return sites;
         }
@@ -329,6 +338,12 @@ namespace Bangumi.Data
                 await FileHelper.WriteTextAsync(AppFile.Data_json.GetFilePath(_folderPath), data);
                 _info.Version = LatestVersion;
                 _info.LastUpdate = DateTimeOffset.UtcNow;
+                // 未设置站点时，设置默认值
+                if (_info.SitesEnabledOrder == null)
+                {
+                    _info.SitesEnabledOrder = _dataSet?.SiteMeta.Where(it => it.Value.Type == "onair").Select(it => it.Key).ToArray();
+                    await SaveConfig();
+                }
                 await SaveConfig();
                 return true;
             }
@@ -348,7 +363,7 @@ namespace Bangumi.Data
         {
             var bangumiItem = GetItemByBangumiId(id);
             var sites = bangumiItem?.Sites;
-            if (sites == null)
+            if (sites == null || _info.SitesEnabledOrder == null)
             {
                 yield break;
             }

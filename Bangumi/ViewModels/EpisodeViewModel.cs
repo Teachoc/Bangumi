@@ -178,6 +178,7 @@ namespace Bangumi.ViewModels
             }
             if (!BangumiApi.BgmOAuth.IsLogin)
             {
+                NotificationHelper.Notify("请先登录！", NotifyType.Warn);
                 return;
             }
             var subjectStatus = BangumiApi.BgmApi.Status(SubjectId);
