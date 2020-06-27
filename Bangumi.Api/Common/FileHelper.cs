@@ -57,7 +57,7 @@ namespace Bangumi.Api.Common
                 {
                     await writer.WriteAsync(data).ConfigureAwait(false);
                 }
-                File.Replace(tempFile, filePath, null);
+                File.Replace(tempFile, filePath, null, true);
             }
         }
 
@@ -89,7 +89,7 @@ namespace Bangumi.Api.Common
                     {
                         await writer.WriteAsync(encryptedData, 0, encryptedData.Length).ConfigureAwait(false);
                     }
-                    File.Replace(tempFile, filePath, null);
+                    File.Replace(tempFile, filePath, null, true);
                 }
             }
             catch (Exception e)

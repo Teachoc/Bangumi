@@ -39,7 +39,7 @@ namespace Bangumi.Data
             {
                 await writer.WriteAsync(data).ConfigureAwait(false);
             }
-            File.Replace(tempFile, filePath, null);
+            File.Replace(tempFile, filePath, null, true);
         }
 
         /// <summary>
