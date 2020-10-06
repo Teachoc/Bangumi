@@ -10,6 +10,7 @@
     xmlns:viewmodel="using:Bangumi.ViewModels"
     xmlns:data="using:Bangumi.Api.Models"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:controls1="using:Bangumi.Controls"
     mc:Ignorable="d"
     NavigationCacheMode="Disabled"
     Background="{ThemeResource SystemChromeLowColor}">
@@ -226,15 +227,14 @@
                            Visibility="{x:Bind common:Converters.CollapsedIfNull(ViewModel.Characters)}"
                            Foreground="{StaticResource BangumiPinkBrush}"
                            Padding="0,15,0,0"><Bold>角色资料</Bold></TextBlock>
-                <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.Characters}"
-                                    ItemTemplate="{StaticResource CrtTemplate}">
-                    <muxc:ItemsRepeater.Layout>
-                        <muxc:UniformGridLayout Orientation="Horizontal"
-                                                ItemsJustification="Start"
-                                                ItemsStretch="Fill"
-                                                MinItemWidth="260"/>
-                    </muxc:ItemsRepeater.Layout>
-                </muxc:ItemsRepeater>
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Characters}"
+                              ItemTemplate="{StaticResource CrtTemplate}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <controls1:ItemsStretchWrapGrid DesiredColumnWidth="260"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
 
                 <!-- 演职资料 -->
                 <TextBlock LineHeight="34"
@@ -242,15 +242,14 @@
                            Visibility="{x:Bind common:Converters.CollapsedIfNull(ViewModel.Staffs)}"
                            Foreground="{StaticResource BangumiPinkBrush}"
                            Padding="0,15,0,0"><Bold>演职资料</Bold></TextBlock>
-                <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.Staffs}"
-                                    ItemTemplate="{StaticResource StaffTemplate}">
-                    <muxc:ItemsRepeater.Layout>
-                        <muxc:UniformGridLayout Orientation="Horizontal"
-                                                ItemsJustification="Start"
-                                                ItemsStretch="Fill"
-                                                MinItemWidth="260"/>
-                    </muxc:ItemsRepeater.Layout>
-                </muxc:ItemsRepeater>
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Staffs}"
+                              ItemTemplate="{StaticResource StaffTemplate}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <controls1:ItemsStretchWrapGrid DesiredColumnWidth="260"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
 
                 <!-- 评论 -->
                 <TextBlock LineHeight="34"
@@ -258,12 +257,14 @@
                            Visibility="{x:Bind common:Converters.CollapsedIfNull(ViewModel.Blogs)}"
                            Foreground="{StaticResource BangumiPinkBrush}"
                            Padding="0,15,0,0"><Bold>评论</Bold></TextBlock>
-                <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.Blogs}"
-                                    ItemTemplate="{StaticResource BlogTemplate}">
-                    <muxc:ItemsRepeater.Layout>
-                        <muxc:StackLayout Orientation="Vertical"/>
-                    </muxc:ItemsRepeater.Layout>
-                </muxc:ItemsRepeater>
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Blogs}"
+                              ItemTemplate="{StaticResource BlogTemplate}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsStackPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
 
                 <!-- 讨论版 -->
                 <TextBlock LineHeight="34"
@@ -271,12 +272,14 @@
                            Visibility="{x:Bind common:Converters.CollapsedIfNull(ViewModel.Topics)}"
                            Foreground="{StaticResource BangumiPinkBrush}"
                            Padding="0,15,0,0"><Bold>讨论版</Bold></TextBlock>
-                <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.Topics}"
-                                    ItemTemplate="{StaticResource TopicTemplate}">
-                    <muxc:ItemsRepeater.Layout>
-                        <muxc:StackLayout Orientation="Vertical"/>
-                    </muxc:ItemsRepeater.Layout>
-                </muxc:ItemsRepeater>
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Topics}"
+                              ItemTemplate="{StaticResource TopicTemplate}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsStackPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
 
             </StackPanel>
         </ScrollViewer>

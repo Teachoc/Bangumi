@@ -135,6 +135,7 @@
     <Compile Include="Controls\InAppNotification.xaml.cs">
       <DependentUpon>InAppNotification.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ItemsStretchWrapGrid.cs" />
     <Compile Include="Controls\TitleBar\TitleBarEx.xaml.cs">
       <DependentUpon>TitleBarEx.xaml</DependentUpon>
     </Compile>
