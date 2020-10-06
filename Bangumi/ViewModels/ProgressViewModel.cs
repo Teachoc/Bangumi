@@ -127,29 +127,7 @@ namespace Bangumi.ViewModels
                     ToastNotificationHelper.RemoveAllScheduledToasts();
                     foreach (var item in CachedWatchProgress())
                     {
-                        var first = item.Eps?.FirstOrDefault(ep => ep.Type == EpisodeType.本篇)?.AirDate;
-                        var last = item.Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate;
-                        if (SettingHelper.UseBangumiDataAirTime &&
-                            first != null && first != DateTime.MinValue && last != null && last != DateTime.MinValue &&
-                            BangumiData.GetAirTimeByBangumiId(item.SubjectId.ToString())?.ToLocalTime() is DateTimeOffset date)
-                        {
-                            var airTime = date.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks);
-                            if (airTime > DateTimeOffset.Now)
-                            {
-                                if (!SettingHelper.UseActionCenterMode)
-                                {
-                                    ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(item.NameCn, item.Name),
-                                        $"更新到：{item.NextEpDesc}", "查看", "viewSubject", "subjectId", item.SubjectId.ToString());
-                                }
-                                else
-                                {
-                                    var sites = await BangumiData.GetAirSitesByBangumiIdAsync(item.SubjectId.ToString());
-                                    var site = sites.FirstOrDefault();
-                                    ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(item.NameCn, item.Name),
-                                        $"更新到：{item.NextEpDesc}", $"前往{site.SiteName}播放", "gotoPlaySite", "url", site.Url, "episode", JsonConvert.SerializeObject(item.NextEp));
-                                }
-                            }
-                        }
+                        await item.ScheduleToast();
                     }
                 }
             }
@@ -380,43 +358,96 @@ namespace Bangumi.ViewModels
             IsUpdating = false,
         };
 
-        public void ProcessEpisode(SubjectLarge subject)
+        public async Task ScheduleToast()
         {
-            if (subject?.Eps != null)
+            if (DateTimeOffset.TryParse(AirTime, out var airTime))
             {
-                Eps = new List<EpisodeForSort>();
-                foreach (var ep in subject.Eps)
+                if (airTime > DateTimeOffset.Now)
                 {
-                    Eps.Add(EpisodeForSort.FromEpisode(ep));
+                    if (!SettingHelper.UseActionCenterMode)
+                    {
+                        ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(NameCn, Name),
+                            $"更新到：{NextEpDesc}", "查看", "viewSubject", "subjectId", SubjectId.ToString());
+                    }
+                    else
+                    {
+                        var sites = await BangumiData.GetAirSitesByBangumiIdAsync(SubjectId.ToString());
+                        var site = sites.FirstOrDefault();
+                        if (site != null)
+                        {
+                            ToastNotificationHelper.ScheduledToast(airTime, Converters.StringOneOrTwo(NameCn, Name),
+                                $"更新到：{NextEpDesc}", $"前往{site.SiteName}播放", "gotoPlaySite", "url", site.Url, "episode", JsonConvert.SerializeObject(NextEp));
+                        }
+                    }
                 }
             }
-            var first = Eps?.FirstOrDefault(ep => ep.Type == EpisodeType.本篇)?.AirDate;
-            var last = Eps?.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate;
+        }
+
+        private void ProcessAirTime()
+        {
+            // 本篇的已放送集数
+            int count = Eps.Count(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"));
+            // 根据本篇的已放送集数与本篇的总集数比较确定是否已完结
+            bool isEnd = count == Eps.Count(ep => ep.Type == EpisodeType.本篇);
             if (SettingHelper.UseBangumiDataAirTime &&
-                BangumiData.GetAirTimeByBangumiId(subject.Id.ToString())?.ToLocalTime() is DateTimeOffset date)
+                BangumiData.GetAirTimeByBangumiId(SubjectId.ToString(), isEnd ? count - 1 : count)?.ToLocalTime() is DateTimeOffset date)
             {
                 var dateFormat = "yyyy-MM-dd HH:mm";
-                if (first != null && first != DateTime.MinValue && last != null && last != DateTime.MinValue)
-                {
-                    AirTime = date.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks).ToString(dateFormat);
-                }
-                else
-                {
-                    AirTime = date.ToString(dateFormat);
-                }
+                AirTime = date.ToString(dateFormat);
             }
-            else if (DateTime.TryParse(AirTime, out var airDate))
+            else if (Eps.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate is DateTime last)
             {
                 var dateFormat = "yyyy-MM-dd";
-                if (first != null && first != DateTime.MinValue && last != null && last != DateTime.MinValue)
+                // 已完结直接使用最后一集放送时间
+                if (isEnd)
                 {
-                    AirTime = airDate.AddTicks(last.Value.Ticks).AddTicks(-first.Value.Ticks).ToString(dateFormat);
+                    AirTime = last.ToString(dateFormat);
                 }
+                // 未完结则尝试使用第一个未放送的章节放送时间
+                else if (Eps.FirstOrDefault(ep => ep.Type == EpisodeType.本篇 && Regex.IsMatch(ep.Status, "(NA)"))?.AirDate is DateTime next)
+                {
+                    AirTime = next.ToString(dateFormat);
+                }
+                // 其他情况，通过计算相邻章节放送间隔并使用最常出现的放送间隔预测放送时间
                 else
                 {
-                    AirTime = airDate.ToString(dateFormat);
+                    var list = new List<int>();
+                    EpisodeForSort episode = null;
+                    foreach (var item in Eps.Where(ep => !Regex.IsMatch(ep.Status, "(NA)")))
+                    {
+                        if (episode == null)
+                        {
+                            episode = item;
+                            continue;
+                        }
+                        if (item.AirDate.HasValue && episode.AirDate.HasValue)
+                        {
+                            list.Add((item.AirDate.Value - episode.AirDate.Value).Days);
+                        }
+                        episode = item;
+                    }
+                    var interval = list.GroupBy(it => it).OrderBy(it => it.Count()).FirstOrDefault()?.Key ?? 7;
+                    AirTime = last.AddDays(interval).ToString(dateFormat);
                 }
             }
+            // 尚未放送
+            else if (Eps.FirstOrDefault(ep => ep.Type == EpisodeType.本篇 && Regex.IsMatch(ep.Status, "(NA)"))?.AirDate is DateTime first)
+            {
+                var dateFormat = "yyyy-MM-dd";
+                AirTime = first.ToString(dateFormat);
+            }
+        }
+
+        public void ProcessEpisode(SubjectLarge subject)
+        {
+            if (subject?.Eps == null)
+            {
+                return;
+            }
+            Eps = new List<EpisodeForSort>();
+            subject.Eps.ForEach(ep => Eps.Add(EpisodeForSort.FromEpisode(ep)));
+
+            ProcessAirTime();
         }
 
         public void ProcessProgress(Progress progress)
@@ -533,7 +564,7 @@ namespace Bangumi.ViewModels
 
     public class EpisodeForSort : EpisodeWithEpStatus
     {
-        public new DateTime AirDate { get; set; }
+        public new DateTime? AirDate { get; set; }
 
         public new static EpisodeForSort FromEpisode(Episode ep) => new EpisodeForSort
         {
@@ -544,7 +575,7 @@ namespace Bangumi.ViewModels
             Name = ep.Name,
             NameCn = ep.NameCn,
             Duration = ep.Duration,
-            AirDate = DateTime.TryParse(ep.AirDate, out var d) ? d : d,
+            AirDate = DateTime.TryParse(ep.AirDate, out var d) ? d : (DateTime?)null,
             Comment = ep.Comment,
             Desc = ep.Desc,
             Status = ep.Status,

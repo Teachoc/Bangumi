@@ -36,7 +36,7 @@ namespace Bangumi.ContentDialogs
             BangumiData.GetEnabledSites()
                 .Select(it => SiteMetaWithKey.FromSiteMeta(it)).ToList()
                 .ForEach(it => EnabledSites.Add(it));
-            BangumiData.GetNotEnabledSites()
+            BangumiData.GetDisabledSites()
                 .Select(it => SiteMetaWithKey.FromSiteMeta(it)).ToList()
                 .ForEach(it => NotEnabledSites.Add(it));
         }

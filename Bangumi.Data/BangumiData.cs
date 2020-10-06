@@ -174,14 +174,33 @@ namespace Bangumi.Data
         /// 根据网站放送开始时间推测更新时间
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="count">已放送集数</param>
         /// <returns></returns>
-        public static DateTimeOffset? GetAirTimeByBangumiId(string id)
+        public static DateTimeOffset? GetAirTimeByBangumiId(string id, int count)
         {
             var siteList = GetOrderedSitesByBangumiId(id);
             foreach (var site in siteList)
             {
-                if (!site.Begin.HasValue) continue;
-                return site.Begin.Value;
+                if (!string.IsNullOrEmpty(site.Broadcast))
+                {
+                    var broadcast = site.Broadcast.Split('/');
+                    if (broadcast.Length == 3
+                        && DateTimeOffset.TryParse(broadcast[1], out var startTime)
+                        && broadcast[2].Length >= 3
+                        && int.TryParse(broadcast[2].Substring(1, broadcast[2].Length - 2), out int interval))
+                    {
+                        return broadcast[2][broadcast[2].Length - 1] switch
+                        {
+                            'D' => startTime.AddDays(interval * count),
+                            'M' => startTime.AddMonths(interval * count),
+                            _ => startTime
+                        };
+                    }
+                }
+                else if (site.Begin.HasValue)
+                {
+                    return site.Begin.Value.AddDays(7 * count);
+                }
             }
 
             return null;
@@ -241,14 +260,14 @@ namespace Bangumi.Data
         /// 获取未启用的站点
         /// </summary>
         /// <returns></returns>
-        public static IDictionary<string, SiteMeta> GetNotEnabledSites()
+        public static IDictionary<string, SiteMeta> GetDisabledSites()
         {
             var sites = new Dictionary<string, SiteMeta>();
             if (_dataSet?.SiteMeta != null && _info.SitesEnabledOrder != null)
             {
                 foreach (var item in _dataSet.SiteMeta)
                 {
-                    if (!_info.SitesEnabledOrder.Contains(item.Key) && item.Key != "bangumi")
+                    if (item.Key != "bangumi" && !_info.SitesEnabledOrder.Contains(item.Key))
                     {
                         sites.Add(item.Key, item.Value);
                     }
