@@ -188,8 +188,8 @@
         <ComboBox Name="TypeCombobox" 
                   HorizontalAlignment="Right"
                   SelectedIndex="{x:Bind ViewModel.SelectedIndex, Mode=TwoWay}"
-                  SelectionChanged="TypeCombobox_SelectionChanged"
-                  Margin="0,4,16,0">
+                  Margin="0,4,16,0"
+                  TabIndex="-1">
             <ComboBoxItem Content="动画"/>
             <ComboBoxItem Content="书籍" />
             <ComboBoxItem Content="音乐" />

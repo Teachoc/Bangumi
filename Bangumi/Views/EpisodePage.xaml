@@ -178,7 +178,6 @@
                   ItemsSource="{x:Bind EpsCVS.View}" 
                   Padding="10,5,10,45"
                   SelectionMode="None"
-                  IsItemClickEnabled="True"
                   ShowsScrollingPlaceholders="False"
                   ItemTemplate="{StaticResource EpTemplate}">
             <GridView.Header>

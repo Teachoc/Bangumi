@@ -46,16 +46,6 @@ namespace Bangumi.Views
             }
         }
 
-        private void TypeCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (!BangumiApi.BgmOAuth.IsLogin)
-            {
-                return;
-            }
-            ViewModel.PopulateSubjectCollectionFromCache();
-            ViewModel.PopulateSubjectCollectionAsync();
-        }
-
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var selectedItem = (SubjectBaseE)e.ClickedItem;

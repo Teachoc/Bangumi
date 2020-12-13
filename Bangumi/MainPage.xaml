@@ -40,7 +40,7 @@
                                     Tag="others" />
             </NavigationView.MenuItems>
             <NavigationView.PaneFooter>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" TabFocusNavigation="Once">
                     <AppBarButton x:Name="NetworkErrorButton" 
                                   Width="48" 
                                   Visibility="{x:Bind IsOffline, Mode=OneWay}"

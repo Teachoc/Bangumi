@@ -47,7 +47,16 @@ namespace Bangumi.ViewModels
         public int SelectedIndex
         {
             get => _selectedIndex;
-            set => Set(ref _selectedIndex, value);
+            set
+            {
+                Set(ref _selectedIndex, value);
+                if (!BangumiApi.BgmOAuth.IsLogin)
+                {
+                    return;
+                }
+                PopulateSubjectCollectionFromCache();
+                PopulateSubjectCollectionAsync();
+            }
         }
 
         /// <summary>
