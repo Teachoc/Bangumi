@@ -385,49 +385,19 @@ namespace Bangumi.ViewModels
 
         private void ProcessAirTime()
         {
-            // 本篇的已放送集数
-            int count = Eps.Count(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"));
-            // 根据本篇的已放送集数与本篇的总集数比较确定是否已完结
-            bool isEnd = count == Eps.Count(ep => ep.Type == EpisodeType.本篇);
-            if (SettingHelper.UseBangumiDataAirTime &&
-                BangumiData.GetAirTimeByBangumiId(SubjectId.ToString(), isEnd ? count - 1 : count)?.ToLocalTime() is DateTimeOffset date)
+            // 获取最后一集放送日期
+            if (Eps.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate is DateTime last)
             {
-                var dateFormat = "yyyy-MM-dd HH:mm";
-                AirTime = date.ToString(dateFormat);
-            }
-            else if (Eps.LastOrDefault(ep => ep.Type == EpisodeType.本篇 && !Regex.IsMatch(ep.Status, "(NA)"))?.AirDate is DateTime last)
-            {
-                var dateFormat = "yyyy-MM-dd";
-                // 已完结直接使用最后一集放送时间
-                if (isEnd)
+                if (SettingHelper.UseBangumiDataAirTime
+                    && BangumiData.GetAirTimeByBangumiId(SubjectId.ToString(), last)?.ToLocalTime() is DateTimeOffset date)
                 {
-                    AirTime = last.ToString(dateFormat);
+                    var dateFormat = "yyyy-MM-dd HH:mm";
+                    AirTime = date.ToString(dateFormat);
                 }
-                // 未完结则尝试使用第一个未放送的章节放送时间
-                else if (Eps.FirstOrDefault(ep => ep.Type == EpisodeType.本篇 && Regex.IsMatch(ep.Status, "(NA)"))?.AirDate is DateTime next)
-                {
-                    AirTime = next.ToString(dateFormat);
-                }
-                // 其他情况，通过计算相邻章节放送间隔并使用最常出现的放送间隔预测放送时间
                 else
                 {
-                    var list = new List<int>();
-                    EpisodeForSort episode = null;
-                    foreach (var item in Eps.Where(ep => !Regex.IsMatch(ep.Status, "(NA)")))
-                    {
-                        if (episode == null)
-                        {
-                            episode = item;
-                            continue;
-                        }
-                        if (item.AirDate.HasValue && episode.AirDate.HasValue)
-                        {
-                            list.Add((item.AirDate.Value - episode.AirDate.Value).Days);
-                        }
-                        episode = item;
-                    }
-                    var interval = list.GroupBy(it => it).OrderBy(it => it.Count()).FirstOrDefault()?.Key ?? 7;
-                    AirTime = last.AddDays(interval).ToString(dateFormat);
+                    var dateFormat = "yyyy-MM-dd";
+                    AirTime = last.ToString(dateFormat);
                 }
             }
             // 尚未放送

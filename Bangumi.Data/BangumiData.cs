@@ -174,9 +174,9 @@ namespace Bangumi.Data
         /// 根据网站放送开始时间推测更新时间
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="count">已放送集数</param>
+        /// <param name="dateTime">放送日期</param>
         /// <returns></returns>
-        public static DateTimeOffset? GetAirTimeByBangumiId(string id, int count)
+        public static DateTimeOffset? GetAirTimeByBangumiId(string id, DateTimeOffset dateTime)
         {
             var siteList = GetOrderedSitesByBangumiId(id);
             foreach (var site in siteList)
@@ -189,17 +189,23 @@ namespace Bangumi.Data
                         && broadcast[2].Length >= 3
                         && int.TryParse(broadcast[2].Substring(1, broadcast[2].Length - 2), out int interval))
                     {
-                        return broadcast[2][broadcast[2].Length - 1] switch
+                        if (interval != 0)
                         {
-                            'D' => startTime.AddDays(interval * count),
-                            'M' => startTime.AddMonths(interval * count),
-                            _ => startTime
-                        };
+                            return (broadcast[2][broadcast[2].Length - 1]) switch
+                            {
+                                'D' => startTime.AddDays(interval * (int)Math.Round((dateTime - startTime.Date).Days / (double)interval, MidpointRounding.AwayFromZero)),
+                                'M' => startTime.AddYears(dateTime.Year - startTime.Year).AddMonths(dateTime.Month - startTime.Month),
+                                _ => startTime.AddDays((dateTime - startTime.Date).Days),
+                            };
+                        }
+                        return startTime;
                     }
                 }
-                else if (site.Begin.HasValue)
+                else if (site.Begin is DateTimeOffset begin)
                 {
-                    return site.Begin.Value.AddDays(7 * count);
+                    var duration = dateTime - begin.Date;
+                    var count = (int)Math.Round(duration.Days / 7.0, MidpointRounding.AwayFromZero);
+                    return begin.AddDays(7 * count);
                 }
             }
 
