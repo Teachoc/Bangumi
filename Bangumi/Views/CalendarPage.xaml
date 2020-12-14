@@ -40,7 +40,6 @@
             <DataTemplate x:Key="ZoomedInTemplate" x:DataType="data:SubjectForCalendar">
                 <UserControl>
                     <RelativePanel Padding="5"
-                                   RightTapped="ItemRelativePanel_RightTapped"
                                    Holding="RelativePanel_Holding"
                                    Background="Transparent">
                         <VisualStateManager.VisualStateGroups>
@@ -206,7 +205,8 @@
                                            IsItemClickEnabled="True"
                                            SelectionMode="None"
                                            ItemTemplate="{StaticResource ZoomedInTemplate}"
-                                           ItemClick="GridView_ItemClick">
+                                           ItemClick="GridView_ItemClick"
+                                           RightTapped="GridView_RightTapped">
                     <GridView.GroupStyle>
                         <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}"/>
                     </GridView.GroupStyle>

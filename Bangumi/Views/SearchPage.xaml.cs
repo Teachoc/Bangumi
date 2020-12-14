@@ -158,12 +158,22 @@ namespace Bangumi.Views
         }
 
         // 鼠标右键弹出菜单
-        private void ItemRelativePanel_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        private void GridView_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             if (BangumiApi.BgmOAuth.IsLogin && e.PointerDeviceType == PointerDeviceType.Mouse)
             {
-                SetMenuFlyoutByType();
-                CollectionMenuFlyout.ShowAt((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
+                FrameworkElement element = e.OriginalSource switch
+                {
+                    GridViewItem item => item.ContentTemplateRoot as FrameworkElement,
+                    FrameworkElement el => el,
+                    _ => null
+                };
+                if (element != null && element.DataContext is SubjectForSearch)
+                {
+                    e.Handled = true;
+                    SetMenuFlyoutByType();
+                    CollectionMenuFlyout.ShowAt(element, e.GetPosition(element));
+                }
             }
         }
 

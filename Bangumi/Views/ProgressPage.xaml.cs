@@ -138,7 +138,7 @@ namespace Bangumi.Views
         /// <param name="point"></param>
         private async Task ShowSitesMenuFlyout(FrameworkElement sender, Point point)
         {
-            if (sender is Panel panel && panel.DataContext is WatchProgress watch)
+            if (sender.DataContext is WatchProgress watch)
             {
                 await InitAirSites(watch.SubjectId.ToString());
                 SitesMenuFlyout.ShowAt(sender, point);
@@ -150,12 +150,21 @@ namespace Bangumi.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void RelativePanel_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        private async void GridView_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             if (SettingHelper.UseBangumiDataAirSites && e.PointerDeviceType == PointerDeviceType.Mouse)
             {
-                e.Handled = true;
-                ShowSitesMenuFlyout((FrameworkElement)sender, e.GetPosition((FrameworkElement)sender));
+                object data = e.OriginalSource switch{
+                    GridViewItem item => item.Content,
+                    FrameworkElement element => element.DataContext,
+                    _ => null
+                };
+                if (data is WatchProgress watch)
+                {
+                    e.Handled = true;
+                    await InitAirSites(watch.SubjectId.ToString());
+                    SitesMenuFlyout.ShowAt((FrameworkElement)e.OriginalSource, e.GetPosition((FrameworkElement)e.OriginalSource));
+                }
             }
         }
 

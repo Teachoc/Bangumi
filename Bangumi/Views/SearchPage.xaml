@@ -41,7 +41,6 @@
             <DataTemplate x:Key="SubjectWithTypeTemplate" x:DataType="data:SubjectForSearch">
                 <UserControl>
                     <RelativePanel Padding="5"
-                                   RightTapped="ItemRelativePanel_RightTapped"
                                    Holding="ItemRelativePanel_Holding"
                                    Background="Transparent">
                         <VisualStateManager.VisualStateGroups>
@@ -132,7 +131,6 @@
             <DataTemplate x:Key="SubjectTemplate" x:DataType="data:SubjectForSearch">
                 <UserControl>
                     <RelativePanel Padding="5"
-                                   RightTapped="ItemRelativePanel_RightTapped"
                                    Holding="ItemRelativePanel_Holding"
                                    Background="Transparent">
                         <VisualStateManager.VisualStateGroups>
@@ -274,6 +272,7 @@
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
+                                           RightTapped="GridView_RightTapped"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
@@ -311,6 +310,7 @@
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
+                                           RightTapped="GridView_RightTapped"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
@@ -348,6 +348,7 @@
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
+                                           RightTapped="GridView_RightTapped"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
@@ -385,6 +386,7 @@
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
+                                           RightTapped="GridView_RightTapped"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
@@ -422,6 +424,7 @@
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
+                                           RightTapped="GridView_RightTapped"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"
@@ -459,6 +462,7 @@
                                            Padding="12,0"
                                            IsItemClickEnabled="True" 
                                            ItemClick="GridView_ItemClick"
+                                           RightTapped="GridView_RightTapped"
                                            SelectionMode="None"
                                            IncrementalLoadingTrigger="Edge"
                                            ShowsScrollingPlaceholders="False"

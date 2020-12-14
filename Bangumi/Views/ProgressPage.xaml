@@ -21,7 +21,6 @@
             <DataTemplate x:Key="ProgressSubjectTemplate" x:DataType="data:WatchProgress">
                 <UserControl>
                     <RelativePanel Padding="5"
-                                   RightTapped="RelativePanel_RightTapped"
                                    Holding="RelativePanel_Holding"
                                    Background="Transparent">
                         <VisualStateManager.VisualStateGroups>
@@ -211,6 +210,7 @@
                                    ShowsScrollingPlaceholders="False"
                                    IsItemClickEnabled="True" 
                                    ItemClick="GridView_ItemClick"
+                                   RightTapped="GridView_RightTapped"
                                    SelectionMode="None"
                                    ItemTemplate="{StaticResource ProgressSubjectTemplate}">
             <GridView.ItemContainerTransitions>

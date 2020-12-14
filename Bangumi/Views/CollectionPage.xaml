@@ -44,7 +44,6 @@
             <DataTemplate x:Key="ZoomedInTemplate" x:DataType="data:SubjectBaseE">
                 <UserControl>
                     <RelativePanel Padding="5"
-                                   RightTapped="ItemRelativePanel_RightTapped"
                                    Holding="ItemRelativePanel_Holding"
                                    Background="Transparent">
                         <VisualStateManager.VisualStateGroups>
@@ -161,7 +160,8 @@
                                            SelectionMode="None"
                                            IsItemClickEnabled="True" 
                                            ItemTemplate="{StaticResource ZoomedInTemplate}"
-                                           ItemClick="GridView_ItemClick">
+                                           ItemClick="GridView_ItemClick"
+                                           RightTapped="GridView_RightTapped">
                     <GridView.GroupStyle>
                         <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}"
                                     HidesIfEmpty="True"/>
