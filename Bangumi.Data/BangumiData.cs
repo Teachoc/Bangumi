@@ -400,9 +400,9 @@ namespace Bangumi.Data
                     yield return new Site
                     {
                         SiteName = item,
-                        Id = bangumiItem.TitleTranslate?.ZhHans.FirstOrDefault() ??
-                             bangumiItem.TitleTranslate?.ZhHant.FirstOrDefault() ??
-                             bangumiItem.TitleTranslate?.En.FirstOrDefault() ??
+                        Id = bangumiItem.TitleTranslate?.ZhHans?.FirstOrDefault() ??
+                             bangumiItem.TitleTranslate?.ZhHant?.FirstOrDefault() ??
+                             bangumiItem.TitleTranslate?.En?.FirstOrDefault() ??
                              bangumiItem.Title
                     };
                 }
